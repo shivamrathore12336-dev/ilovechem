@@ -26,6 +26,6 @@ COPY --chown=user:user . .
 # Run DB migration for SQLite session/cache
 RUN python manage.py migrate
 
-EXPOSE 7860
+EXPOSE 10000
 
-CMD ["gunicorn", "chemsite.wsgi:application", "--bind", "0.0.0.0:7860", "--workers", "3", "--timeout", "120"]
+CMD ["sh", "-c", "gunicorn chemsite.wsgi:application --bind 0.0.0.0:${PORT:-10000} --workers 3 --timeout 120"]
