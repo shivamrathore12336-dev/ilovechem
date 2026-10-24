@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChemCompute AI — Computational Chemistry Workbench</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- 3Dmol.js for WebGL Molecular Graphics -->
+    <script src="https://3dmol.org/build/3Dmol-min.js"></script>
+    <style>
+        .mol-canvas {
+            width: 100%;
+            height: 480px;
+            position: relative;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
+
+    <!-- Top Navigation Bar -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                    <i data-lucide="atom" class="w-6 h-6 text-white animate-spin-slow"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400">
+                        ChemCompute Studio
+                    </span>
+                    <span class="text-xs ml-2 px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800 font-medium">v1.0 Ready</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4 text-sm">
+                <a href="#quick-docs" class="text-slate-400 hover:text-cyan-400 transition-colors">Documentation</a>
+                <a href="/api/history/" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">REST API</a>
+                <span class="text-xs text-emerald-400 flex items-center gap-1.5 bg-emerald-950/60 border border-emerald-800/80 px-2.5 py-1 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> RDKit Engine Online
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+        <!-- Error Notification -->
+        {% if error %}
+        <div class="bg-rose-950/70 border border-rose-800 text-rose-200 px-4 py-3 rounded-xl flex items-center space-x-3 shadow-lg">
+            <i data-lucide="alert-circle" class="w-5 h-5 text-rose-400 shrink-0"></i>
+            <div>{{ error }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Input Section -->
+        <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+            <div class="absolute -right-16 -top-16 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <form method="POST" action="/" class="space-y-4">
+                {% csrf_token %}
+                <div class="flex flex-col md:flex-row gap-3">
+                    <div class="relative flex-1">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            <i data-lucide="search" class="w-5 h-5"></i>
+                        </div>
+                        <input type="text" name="smiles" id="smiles-input"
+                            value="{{ input_smiles|default:'CC(=O)OC1=CC=CC=C1C(=O)O' }}"
+                            placeholder="Enter SMILES notation (e.g. Aspirin, Caffeine, Penicillin)..."
+                            class="w-full pl-11 pr-4 py-3.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent font-mono text-sm transition">
+                    </div>
+                    <button type="submit"
+                        class="px-6 py-3.5 bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-cyan-500/25 flex items-center justify-center space-x-2 transition duration-200">
+                        <i data-lucide="cpu" class="w-5 h-5"></i>
+                        <span>Compute & Model</span>
+                    </button>
+                </div>
+
+                <!-- Presets / Quick Chips -->
+                <div class="flex flex-wrap items-center gap-2 pt-1 text-xs">
+                    <span class="text-slate-400 flex items-center gap-1 font-medium mr-1">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-400"></i> Fast Presets:
+                    </span>
+                    <button type="button" onclick="setSmiles('CC(=O)OC1=CC=CC=C1C(=O)O')" 
+                        class="px-2.5 py-1 rounded-md bg-slate-800 hover:bg-cyan-950 hover:text-cyan-300 border border-slate-700 transition">Aspirin</button>
+                    <button type="button" onclick="setSmiles('CN1C=NC2=C1C(=O)N(C(=O)N2C)C')" 
+                        class="px-2.5 py-1 rounded-md bg-slate-800 hover:bg-cyan-950 hover:text-cyan-300 border border-slate-700 transition">Caffeine</button>
+                    <button type="button" onclick="setSmiles('CC(C)CC1=CC=C(C=C1)C(C)C(=O)O')" 
+                        class="px-2.5 py-1 rounded-md bg-slate-800 hover:bg-cyan-950 hover:text-cyan-300 border border-slate-700 transition">Ibuprofen</button>
+                    <button type="button" onclick="setSmiles('CC12CCC3C(C1CCC2O)CCC4=CC(=O)CCC34C')" 
+                        class="px-2.5 py-1 rounded-md bg-slate-800 hover:bg-cyan-950 hover:text-cyan-300 border border-slate-700 transition">Testosterone</button>
+                    <button type="button" onclick="setSmiles('CN(C)CCOC(C1=CC=CC=C1)C2=CC=CC=C2')" 
+                        class="px-2.5 py-1 rounded-md bg-slate-800 hover:bg-cyan-950 hover:text-cyan-300 border border-slate-700 transition">Diphenhydramine</button>
+                    <button type="button" onclick="setSmiles('C1=CC=C(C=C1)C2=CC(=NO2)C3=CC=CC=C3')" 
+                        class="px-2.5 py-1 rounded-md bg-slate-800 hover:bg-cyan-950 hover:text-cyan-300 border border-slate-700 transition">Isoxazole Derivative</button>
+                </div>
+            </form>
+        </section>
+
+        {% if properties %}
+        <!-- Analysis View Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Left Panel: 3D Molecular Graphics -->
+            <div class="lg:col-span-7 space-y-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+                    <div class="px-5 py-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="box" class="w-4 h-4 text-cyan-400"></i>
+                            <h2 class="text-sm font-semibold text-slate-200">Interactive 3D Conformer (MMFF Optimized)</h2>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="toggleStyle('stick')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs border border-slate-700 transition">Sticks</button>
+                            <button onclick="toggleStyle('sphere')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs border border-slate-700 transition">Spacefill</button>
+                            <button onclick="toggleStyle('ball_and_stick')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs border border-slate-700 transition">Ball & Stick</button>
+                            <button onclick="reset3DView()" class="px-2.5 py-1 rounded bg-cyan-900/40 text-cyan-300 hover:bg-cyan-900/70 text-xs border border-cyan-700/60 transition">Reset Camera</button>
+                        </div>
+                    </div>
+                    
+                    <div id="3d-container" class="mol-canvas"></div>
+
+                    <div class="px-5 py-3 border-t border-slate-800 bg-slate-900/40 text-xs text-slate-400 flex items-center justify-between">
+                        <span>Drag to rotate • Scroll to zoom • Right-click to pan</span>
+                        <span class="text-cyan-400 font-mono">ETKDGv3 Conformer</span>
+                    </div>
+                </div>
+
+                <!-- 2D Structure & Topology -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <div>
+                        <h3 class="text-xs uppercase tracking-wider text-slate-400 font-bold mb-2">2D Skeletal Structure</h3>
+                        <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 flex items-center justify-center">
+                            {% if img_2d %}
+                            <img src="{{ img_2d }}" alt="2D Chemical Representation" class="rounded-lg max-h-48 object-contain filter invert opacity-90">
+                            {% else %}
+                            <div class="text-xs text-slate-500 py-12">No 2D depiction available</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <h3 class="text-xs uppercase tracking-wider text-slate-400 font-bold mb-2">Formula & Rings</h3>
+                        <div class="flex justify-between py-1.5 border-b border-slate-800/80">
+                            <span class="text-slate-400">Chemical Formula</span>
+                            <span class="font-mono text-cyan-300 font-semibold">{{ properties.formula }}</span>
+                        </div>
+                        <div class="flex justify-between py-1.5 border-b border-slate-800/80">
+                            <span class="text-slate-400">Aromatic Rings</span>
+                            <span class="font-mono text-slate-200">{{ properties.aromatic_rings }}</span>
+                        </div>
+                        <div class="flex justify-between py-1.5 border-b border-slate-800/80">
+                            <span class="text-slate-400">Total Ring Systems</span>
+                            <span class="font-mono text-slate-200">{{ properties.rings }}</span>
+                        </div>
+                        <div class="flex justify-between py-1.5">
+                            <span class="text-slate-400">Fraction Csp3</span>
+                            <span class="font-mono text-slate-200">{{ properties.fraction_csp3 }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Quantitative Chemical & Drug Properties -->
+            <div class="lg:col-span-5 space-y-4">
+                
+                <!-- Drug-likeness & Lipinski Status Banner -->
+                <div class="p-4 rounded-2xl border {% if properties.lipinski_pass %}bg-emerald-950/40 border-emerald-800/60{% else %}bg-amber-950/40 border-amber-800/60{% endif %}">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2.5">
+                            {% if properties.lipinski_pass %}
+                            <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i>
+                            <div>
+                                <div class="text-sm font-bold text-emerald-300">Lipinski Rule of 5: Passed</div>
+                                <div class="text-xs text-emerald-400/80">Violations: {{ properties.lipinski_violations }} (Drug-like candidate)</div>
+                            </div>
+                            {% else %}
+                            <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400"></i>
+                            <div>
+                                <div class="text-sm font-bold text-amber-300">Lipinski Rule of 5: Flagged</div>
+                                <div class="text-xs text-amber-400/80">Violations: {{ properties.lipinski_violations }} (>1 rule violated)</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-slate-400">QED Score</div>
+                            <div class="text-xl font-bold font-mono text-cyan-300">{{ properties.qed_score }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Properties Grid Cards -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5">
+                        <div class="text-xs text-slate-400">Molecular Weight</div>
+                        <div class="text-lg font-bold font-mono text-cyan-400 mt-1">{{ properties.molecular_weight }} <span class="text-xs text-slate-500 font-normal">g/mol</span></div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">Exact: {{ properties.exact_mass }}</div>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5">
+                        <div class="text-xs text-slate-400">LogP (Lipophilicity)</div>
+                        <div class="text-lg font-bold font-mono text-indigo-400 mt-1">{{ properties.logp }}</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">Target: &lt; 5.0</div>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5">
+                        <div class="text-xs text-slate-400">TPSA</div>
+                        <div class="text-lg font-bold font-mono text-sky-400 mt-1">{{ properties.tpsa }} <span class="text-xs text-slate-500 font-normal">Å²</span></div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">Polar surface area</div>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5">
+                        <div class="text-xs text-slate-400">Rotatable Bonds</div>
+                        <div class="text-lg font-bold font-mono text-purple-400 mt-1">{{ properties.rotatable_bonds }}</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">Flexibility metric</div>
+                    </div>
+                </div>
+
+                <!-- Detailed Molecular Descriptors -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
+                    <h3 class="text-sm font-semibold text-slate-200 flex items-center space-x-2">
+                        <i data-lucide="sliders" class="w-4 h-4 text-cyan-400"></i>
+                        <span>Hydrogen Bonding & Atoms</span>
+                    </h3>
+
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between py-1.5 border-b border-slate-800">
+                            <span class="text-slate-400">H-Bond Donors (HBD)</span>
+                            <span class="font-mono text-slate-200 font-semibold">{{ properties.h_bond_donors }}</span>
+                        </div>
+                        <div class="flex justify-between py-1.5 border-b border-slate-800">
+                            <span class="text-slate-400">H-Bond Acceptors (HBA)</span>
+                            <span class="font-mono text-slate-200 font-semibold">{{ properties.h_bond_acceptors }}</span>
+                        </div>
+                        <div class="flex justify-between py-1.5 border-b border-slate-800">
+                            <span class="text-slate-400">Heavy Atom Count</span>
+                            <span class="font-mono text-slate-200 font-semibold">{{ properties.heavy_atoms }}</span>
+                        </div>
+                    </div>
+
+                    <!-- JSON Export Modal Trigger -->
+                    <div class="pt-3">
+                        <button onclick="downloadJSON()"
+                            class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 text-xs flex items-center justify-center space-x-2 transition">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                            <span>Export Calculated Descriptors (JSON)</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recent Search History / Quick Access -->
+        {% if recent_queries %}
+        <section class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 shadow-lg">
+            <h3 class="text-xs uppercase tracking-wider text-slate-400 font-bold mb-3 flex items-center gap-2">
+                <i data-lucide="history" class="w-4 h-4 text-cyan-400"></i> Recent Calculations
+            </h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5">
+                {% for q in recent_queries %}
+                <button type="button" onclick="setSmiles('{{ q.smiles|escapejs }}')"
+                    class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 text-left transition group">
+                    <div class="text-xs font-mono font-bold text-cyan-300 truncate">{{ q.formula|default:'Molecule' }}</div>
+                    <div class="text-[11px] text-slate-400 truncate mt-0.5">MW: {{ q.molecular_weight|default:'--' }}</div>
+                </button>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 py-6 text-center text-xs text-slate-500 bg-slate-950">
+        ChemCompute Studio • Integrated RDKit Chemical Kernel & 3Dmol.js WebGL Graphics
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+
+        function setSmiles(val) {
+            document.getElementById('smiles-input').value = val;
+            document.querySelector('form').submit();
+        }
+
+        // 3Dmol.js Viewer Logic
+        let viewer = null;
+        let currentMode = 'ball_and_stick';
+        const rawMolData = `{{ mol_block|escapejs }}`;
+
+        function init3D() {
+            const container = document.getElementById('3d-container');
+            if (!container || !rawMolData || rawMolData.trim() === "") return;
+
+            viewer = $3Dmol.createViewer(container, {
+                backgroundColor: '#090d16'
+            });
+
+            applyViewerStyle();
+        }
+
+        function applyViewerStyle() {
+            if (!viewer || !rawMolData) return;
+            viewer.clear();
+            viewer.addModel(rawMolData, "mol");
+
+            if (currentMode === 'stick') {
+                viewer.setStyle({}, { stick: { radius: 0.15 } });
+            } else if (currentMode === 'sphere') {
+                viewer.setStyle({}, { sphere: { scale: 0.35 } });
+            } else {
+                // Ball and stick
+                viewer.setStyle({}, { stick: { radius: 0.14 }, sphere: { scale: 0.28 } });
+            }
+
+            viewer.zoomTo();
+            viewer.render();
+        }
+
+        function toggleStyle(mode) {
+            currentMode = mode;
+            applyViewerStyle();
+        }
+
+        function reset3DView() {
+            if (viewer) {
+                viewer.zoomTo();
+                viewer.render();
+            }
+        }
+
+        function downloadJSON() {
+            const data = {{ properties|safe|default:"{}" }};
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `chem_properties_${Date.now()}.json`;
+            a.click();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            init3D();
+        });
+    </script>
+</body>
+</html>
