@@ -6,6 +6,7 @@ urlpatterns = [
     # Universal Converter Studio (Main Hub)
     path('', studio_views.studio_view, name='studio_home'),
     path('downloads/', studio_views.downloads_view, name='downloads_page'),
+    path('about/', studio_views.about_view, name='about_page'),
     path('robots.txt', studio_views.robots_txt_view, name='robots_txt'),
     path('sitemap.xml', studio_views.sitemap_xml_view, name='sitemap_xml'),
     path('google889b369925c8069a.html', studio_views.google_verification_view, name='google_verify_calc'),

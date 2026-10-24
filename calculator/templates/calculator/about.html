@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50 antialiased">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About &amp; Capabilities | iLoveChem — Universal Computational Chemistry Platform</title>
+    
+    <!-- SEO & Metadata -->
+    <meta name="title" content="About & Capabilities | iLoveChem — Universal Computational Chemistry Platform">
+    <meta name="description" content="Explore iLoveChem's universal in-memory computational chemistry architecture. 15+ CADD formats, automated quantum spin multiplicity parity, real-time Lipinski Ro5 calculation, and pharma-grade zero-storage security. Designed by Shivam Rathore.">
+    <meta name="keywords" content="about ilovechem, computational chemistry platform, cadd format converter, orca dft input, gaussian com builder, autodock pdbqt, rdkit descriptors, pharma zero storage, Shivam Rathore">
+    <meta name="author" content="Shivam Rathore">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#2563EB">
+
+    <!-- Open Graph / LinkedIn / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="About & Capabilities | iLoveChem — Universal Computational Chemistry Platform">
+    <meta property="og:description" content="In-depth platform specifications: 15+ format conversion matrix, quantum parity verification, Lipinski drug-likeness radar, and 100% volatile RAM privacy.">
+    <meta property="og:url" content="https://ilovechem.onrender.com/about/">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%232563EB'/%3E%3Cstop offset='100%25' stop-color='%234F46E5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3Cpath d='M13 7h6M14 7v6l-5.5 9c-.8 1.3.1 3 1.7 3h11.6c1.6 0 2.5-1.7 1.7-3L18 13V7' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M11 19c2-.8 4 .8 6 0' stroke='%2393C5FD' stroke-width='1.5' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='16' cy='15' r='1.2' fill='%2360A5FA'/%3E%3C/svg%3E">
+
+    <!-- Google Fonts & Tailwind CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            background-color: #F8FAFC;
+            color: #0F172A;
+        }
+        .code-pill {
+            font-family: 'JetBrains Mono', monospace;
+            background: #0F172A;
+            color: #38BDF8;
+            padding: 0.15rem 0.45rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body class="min-h-full flex flex-col justify-between">
+
+    <!-- 1. APP HEADER -->
+    <header class="bg-white border-b border-slate-200/90 sticky top-0 z-40 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            
+            <!-- Left: Logo & Nav Links -->
+            <div class="flex items-center space-x-6 sm:space-x-8">
+                <a href="/" class="flex items-center space-x-2.5 group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-blue-500 flex items-center justify-center text-white shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform shrink-0">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 2v5.5L4.5 18a2.5 2.5 0 0 0 2.2 3.5h10.6a2.5 2.5 0 0 0 2.2-3.5L14 7.5V2" />
+                            <path d="M8.5 2h7" />
+                            <path d="M7 14.5c2.5-1 4.5 1 7 0" />
+                            <circle cx="12" cy="11" r="1.2" fill="currentColor" />
+                        </svg>
+                    </div>
+                    <div class="flex items-baseline space-x-1.5">
+                        <span class="text-2xl font-black tracking-tight text-slate-900">iLove<span class="text-blue-600">Chem</span></span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                    </div>
+                </a>
+
+                <!-- Navigation Links -->
+                <nav class="hidden md:flex items-center space-x-1 text-sm font-semibold text-slate-700">
+                    <a href="/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5">
+                        <i data-lucide="flask-conical" class="w-4 h-4 text-slate-500"></i>
+                        <span>Converter Studio</span>
+                    </a>
+                    <a href="/downloads/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5">
+                        <i data-lucide="download" class="w-4 h-4 text-slate-500"></i>
+                        <span>Downloads Hub</span>
+                    </a>
+                    <a href="/about/" class="px-3 py-2 rounded-lg bg-blue-50 text-blue-600 font-bold transition flex items-center gap-1.5">
+                        <i data-lucide="info" class="w-4 h-4 text-blue-600"></i>
+                        <span>About &amp; Capabilities</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Right Actions -->
+            <div class="flex items-center space-x-3 text-xs">
+                <a href="/" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-xs">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span>Open Converter</span>
+                </a>
+
+                <a href="https://www.linkedin.com/in/shivam-rathore-medchem/" target="_blank" rel="noopener noreferrer"
+                    class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0A66C2] hover:bg-[#084e96] text-white font-bold transition shadow-xs">
+                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                    </svg>
+                    <span>Shivam Rathore</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. HERO SECTION (Enterprise Documentation / Overview Style) -->
+    <main class="flex-grow">
+        <section class="bg-gradient-to-b from-white to-slate-50 border-b border-slate-200/80 pt-16 pb-20">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 text-center space-y-6">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold tracking-wide uppercase font-mono">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-600"></i>
+                    <span>Official Architecture &amp; Platform Capabilities</span>
+                </div>
+
+                <h1 class="text-4xl sm:text-6xl font-black text-slate-900 tracking-tight leading-tight max-w-4xl mx-auto">
+                    The Universal In-Memory Platform for <span class="text-blue-600">Computational Chemistry</span> &amp; CADD
+                </h1>
+
+                <p class="text-slate-600 text-base sm:text-xl max-w-3xl mx-auto leading-relaxed">
+                    Designed from the ground up by medicinal chemists to solve file format fragmentation, quantum spin multiplicity mismatches, and proprietary IP privacy risks.
+                </p>
+
+                <!-- High-Impact Platform Highlights Metric Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 max-w-4xl mx-auto text-left">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+                        <div class="text-3xl font-black text-blue-600">15+</div>
+                        <div class="font-bold text-slate-900 text-sm mt-1">Chemical Formats</div>
+                        <p class="text-xs text-slate-500 mt-1">PDB, PDBQT, SDF, CIF, XYZ, CDXML, ORCA, Gaussian, Q-Chem, VASP.</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+                        <div class="text-3xl font-black text-emerald-600">100%</div>
+                        <div class="font-bold text-slate-900 text-sm mt-1">Volatile RAM Only</div>
+                        <p class="text-xs text-slate-500 mt-1">Zero disk scratch persistence, zero database logging of molecular IP.</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+                        <div class="text-3xl font-black text-indigo-600">Ro5</div>
+                        <div class="font-bold text-slate-900 text-sm mt-1">Lipinski MedChem</div>
+                        <p class="text-xs text-slate-500 mt-1">Live calculation of MW, LogP, HBD, HBA, TPSA, and Rotatable Bonds.</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+                        <div class="text-3xl font-black text-purple-600">20 / 20</div>
+                        <div class="font-bold text-slate-900 text-sm mt-1">GRAVITAS Benchmark</div>
+                        <p class="text-xs text-slate-500 mt-1">100% zero-failure parity across complex organometallics and peptides.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. DETAILED CAPABILITIES BREAKDOWN -->
+        <section class="max-w-5xl mx-auto px-4 sm:px-6 py-16 space-y-16">
+
+            <!-- CAPABILITY 1: FORMAT TRANSLATION MATRIX -->
+            <div class="space-y-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+                        <i data-lucide="layers" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-900">1. Universal Chemical &amp; Quantum Format Translation</h2>
+                        <p class="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">Cross-Ecosystem Interoperability</p>
+                    </div>
+                </div>
+
+                <div class="prose prose-slate max-w-none text-slate-600 text-sm leading-relaxed space-y-3">
+                    <p>
+                        Computational chemistry software ecosystems are notorious for isolated, proprietary syntax. An AutoDock Vina user needs <code class="code-pill">.pdbqt</code> with Gasteiger charges and defined rotatable torsions; an ORCA user requires <code class="code-pill">.inp</code> decks with <code class="code-pill">%pal</code> cores and basis sets; crystallography platforms output <code class="code-pill">.cif</code> with fractional coordinates; and synthetic chemists draw reaction schemes in ChemDraw <code class="code-pill">.cdxml</code>.
+                    </p>
+                    <p>
+                        <strong>iLoveChem</strong> eliminates manual reformatting by serving as a universal in-memory bridge. It handles all coordinate transformations, atom typing, implicit-to-explicit hydrogen additions, and periodic boundary wrapping without loss of stereochemical integrity.
+                    </p>
+                </div>
+
+                <!-- Format Matrix Table -->
+                <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-xs">
+                    <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 font-bold text-xs text-slate-700 font-mono uppercase">
+                        Supported Chemical Formats &amp; Target Applications
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-100/60 text-slate-500 font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="px-4 py-3">Category</th>
+                                    <th class="px-4 py-3">File Extensions</th>
+                                    <th class="px-4 py-3">Target Applications</th>
+                                    <th class="px-4 py-3">Engine Behavior</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
+                                <tr>
+                                    <td class="px-4 py-3 font-bold text-blue-600">Quantum Chemistry (DFT)</td>
+                                    <td class="px-4 py-3 font-mono">.inp, .com, .gjf, .log, .out</td>
+                                    <td class="px-4 py-3">ORCA 5/6, Gaussian 16/09, Q-Chem, NWChem</td>
+                                    <td class="px-4 py-3">Auto-determines charge &amp; spin multiplicity; generates keywords &amp; %pal parallel directives.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-bold text-emerald-600">Molecular Docking (CADD)</td>
+                                    <td class="px-4 py-3 font-mono">.pdb, .pdbqt, .mol2</td>
+                                    <td class="px-4 py-3">AutoDock Vina, PyRx, ChimeraX, LeDock</td>
+                                    <td class="px-4 py-3">Computes Gasteiger partial charges, identifies rotatable bonds, and strips unwanted co-solvents.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-bold text-purple-600">Solid State &amp; Crystals</td>
+                                    <td class="px-4 py-3 font-mono">.cif, .xyz, POSCAR</td>
+                                    <td class="px-4 py-3">Mercury, VESTA, VASP, Materials Project</td>
+                                    <td class="px-4 py-3">Fractional-to-Cartesian orthogonalization; adds 15Å vacuum buffers for single-molecule DFT.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-bold text-teal-600">2D/3D Chemical Drawings</td>
+                                    <td class="px-4 py-3 font-mono">.cdxml, .cdx, .sdf, .mol, .smi</td>
+                                    <td class="px-4 py-3">ChemDraw, ChemAxon Marvin, RDKit</td>
+                                    <td class="px-4 py-3">Filters reaction arrows &amp; text; builds 3D conformers with ETKDGv3 distance geometry.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CAPABILITY 2: QUANTUM PARITY & ELECTRONIC STATE -->
+            <div class="space-y-6 pt-8 border-t border-slate-200">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-red-100 text-red-700 flex items-center justify-center font-bold">
+                        <i data-lucide="zap" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-900">2. Automated Valence Electron &amp; Spin Multiplicity Guard</h2>
+                        <p class="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">Preventing #1 Quantum Failure Mode</p>
+                    </div>
+                </div>
+
+                <div class="prose prose-slate max-w-none text-slate-600 text-sm leading-relaxed space-y-3">
+                    <p>
+                        The most frequent error when setting up ORCA (<code class="code-pill">.inp</code>) and Gaussian (<code class="code-pill">.com</code> / <code class="code-pill">.gjf</code>) calculations is an inconsistent charge and multiplicity specification. If an open-shell radical like TEMPO or a radical cation is inadvertently assigned a Singlet multiplicity (<code class="code-pill">Mult = 1</code>), the quantum solver immediately crashes with:
+                    </p>
+                    <div class="p-3.5 bg-slate-900 rounded-xl text-rose-400 font-mono text-xs">
+                        ORCA ERROR: Total number of electrons = 107. Multiplicity = 1 is IMPOSSIBLE! (Odd number of electrons requires Doublet or higher).
+                    </div>
+                    <p>
+                        <strong>The iLoveChem Solution:</strong> The converter executes a real-time valence audit across every atom's atomic number (<code class="code-pill">Z</code>), formal charges, and electron pairs. If an odd total electron count is detected, it automatically elevates the spin multiplicity to Doublet (<code class="code-pill">Mult = 2</code>) and flags the electronic state with an alert badge, guaranteeing successful SCF initialization.
+                    </p>
+                </div>
+            </div>
+
+            <!-- CAPABILITY 3: REAL-TIME MEDICINAL CHEMISTRY & LIPINSKI RADAR -->
+            <div class="space-y-6 pt-8 border-t border-slate-200">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
+                        <i data-lucide="activity" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-900">3. In-Memory Medicinal Chemistry &amp; Lipinski Rule of 5 Radar</h2>
+                        <p class="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">Drug-Likeness &amp; Lead Optimization</p>
+                    </div>
+                </div>
+
+                <div class="prose prose-slate max-w-none text-slate-600 text-sm leading-relaxed space-y-3">
+                    <p>
+                        Whenever a chemical structure is processed, iLoveChem evaluates its drug-likeness profile using RDKit's validated cheminformatics descriptors:
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-1">
+                        <div class="font-bold text-slate-900 text-sm">Molecular Weight (MW)</div>
+                        <div class="text-xs text-slate-500 font-mono">Cutoff: &lt; 500 Da</div>
+                        <p class="text-xs text-slate-600 mt-1">Governs passive gastrointestinal absorption and biomembrane permeability.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-1">
+                        <div class="font-bold text-slate-900 text-sm">Wildman-Crippen LogP</div>
+                        <div class="text-xs text-slate-500 font-mono">Cutoff: &lt; 5.0</div>
+                        <p class="text-xs text-slate-600 mt-1">Measures lipophilicity and aqueous solubility ratio for oral bioavailability.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-1">
+                        <div class="font-bold text-slate-900 text-sm">H-Bond Donors &amp; Acceptors</div>
+                        <div class="text-xs text-slate-500 font-mono">HBD &le; 5 &bull; HBA &le; 10</div>
+                        <p class="text-xs text-slate-600 mt-1">Key determinant of target binding affinity and desolvation penalty.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-1">
+                        <div class="font-bold text-slate-900 text-sm">Polar Surface Area (TPSA)</div>
+                        <div class="text-xs text-slate-500 font-mono">Cutoff: &lt; 140 &#8491;&sup2;</div>
+                        <p class="text-xs text-slate-600 mt-1">Crucial for predicting cell penetration and Blood-Brain Barrier (BBB) transport.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-1">
+                        <div class="font-bold text-slate-900 text-sm">Rotatable Bonds (RotB)</div>
+                        <div class="text-xs text-slate-500 font-mono">Cutoff: &le; 10</div>
+                        <p class="text-xs text-slate-600 mt-1">Evaluates molecular conformational entropy and rigid-body target docking.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-1">
+                        <div class="font-bold text-emerald-700 text-sm">Ro5 Classification</div>
+                        <div class="text-xs text-emerald-600 font-mono">&le; 1 Violation = Drug-Like</div>
+                        <p class="text-xs text-slate-600 mt-1">Immediate green/amber/slate badges indicating suitability for oral dosing.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CAPABILITY 4: ENTERPRISE PHARMA ZERO-STORAGE SECURITY INVARIANT -->
+            <div class="space-y-6 pt-8 border-t border-slate-200">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+                        <i data-lucide="shield-check" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-900">4. Enterprise Pharma Zero-Storage Invariant (Privacy by Architecture)</h2>
+                        <p class="text-xs font-mono uppercase tracking-wider text-emerald-700 font-bold">Zero Disk &bull; Zero DB &bull; Zero IP Leakage</p>
+                    </div>
+                </div>
+
+                <div class="p-5 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-4 text-xs text-emerald-950 leading-relaxed">
+                    <div class="font-extrabold text-sm flex items-center gap-2">
+                        <i data-lucide="lock" class="w-4 h-4 text-emerald-600"></i>
+                        <span>Why Pharmaceutical &amp; Biotech Teams Trust iLoveChem</span>
+                    </div>
+                    <p>
+                        Most web-based converters stream uploaded files directly to temporary server disk directories (<code class="code-pill">/tmp</code>), retain unmonitored logs, or persist chemical structures in relational databases. For pharmaceutical labs, medicinal chemistry startups, and academic researchers developing novel patent-pending scaffolds, this poses an unacceptable intellectual property hazard.
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 text-slate-800">
+                        <div class="p-3 bg-white rounded-xl border border-emerald-200/60 shadow-2xs">
+                            <div class="font-bold text-xs text-slate-900">100% Volatile RAM Execution</div>
+                            <p class="text-[11px] text-slate-600 mt-1">Configured with Django <code class="code-pill">MemoryFileUploadHandler</code>. Files reside strictly in RAM buffers and vanish immediately after conversion.</p>
+                        </div>
+                        <div class="p-3 bg-white rounded-xl border border-emerald-200/60 shadow-2xs">
+                            <div class="font-bold text-xs text-slate-900">Zero Structure Database Logging</div>
+                            <p class="text-[11px] text-slate-600 mt-1">No database tables record user chemical inputs, SMILES strings, or coordinates. Not even hash fingerprints are retained.</p>
+                        </div>
+                        <div class="p-3 bg-white rounded-xl border border-emerald-200/60 shadow-2xs">
+                            <div class="font-bold text-xs text-slate-900">Zero AI Training on User Data</div>
+                            <p class="text-[11px] text-slate-600 mt-1">Your proprietary chemical entities are never harvested or indexed for machine learning training sets.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CAPABILITY 5: 3D MOLECULAR GRAPHICS & PUBLICATION EXPORT -->
+            <div class="space-y-6 pt-8 border-t border-slate-200">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
+                        <i data-lucide="box" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-900">5. Hardware-Accelerated 3D WebGL Visualization &amp; Figures</h2>
+                        <p class="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">Publication-Ready Graphics</p>
+                    </div>
+                </div>
+
+                <div class="prose prose-slate max-w-none text-slate-600 text-sm leading-relaxed space-y-3">
+                    <p>
+                        Every conversion instantly initializes an interactive 3D WebGL viewport powered by Mol* / 3Dmol.js:
+                    </p>
+                    <ul class="space-y-1.5 list-disc pl-5 text-xs text-slate-700">
+                        <li><strong>Multiple Molecular Representations:</strong> Licorice Stick (bonding verification), CPK Space-Filling Spheres (steric clash detection), and Wireframe.</li>
+                        <li><strong>Academic White / Dark Mode Toggle:</strong> Seamlessly switch between the default dark viewer and pure publication white for thesis figures and presentations.</li>
+                        <li><strong>1-Click 300 DPI PNG Snapshot:</strong> Direct hardware-accelerated canvas capture to export high-definition transparent figures without launching external software.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- CAPABILITY 6: REST API AUTOMATION -->
+            <div class="space-y-6 pt-8 border-t border-slate-200">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center font-bold">
+                        <i data-lucide="terminal" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-900">6. Python REST API for CADD Pipeline Automation</h2>
+                        <p class="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">Endpoint: /api/convert/</p>
+                    </div>
+                </div>
+
+                <div class="prose prose-slate max-w-none text-slate-600 text-sm leading-relaxed space-y-3">
+                    <p>
+                        Automate virtual screening and quantum geometry preparation directly inside Python scripts, Jupyter Notebooks, or Nextflow pipelines using our REST API:
+                    </p>
+                    <div class="bg-slate-900 text-slate-200 p-4 rounded-xl font-mono text-xs overflow-x-auto leading-relaxed">
+                        <pre>import requests
+
+response = requests.post("https://ilovechem.onrender.com/api/convert/", data={
+    "raw_content": "CC(=O)Oc1ccccc1C(=O)O",  # Aspirin SMILES or raw file string
+    "target_format": "orca",                  # Target: orca, gjf, pdbqt, sdf, etc.
+    "method": "B3LYP",
+    "basis": "def2-SVP",
+    "nprocs": 8
+})
+
+data = response.json()
+print("Generated ORCA Input Deck:\n", data["output_content"])
+print("MedChem Properties:", data["medchem"])</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 7: SCIENTIFIC ATTRIBUTION & HOW TO CITE -->
+            <div class="space-y-6 pt-8 border-t border-slate-200">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
+                        <i data-lucide="bookmark" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-900">7. Scientific Attribution &amp; Academic Citation</h2>
+                        <p class="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">BibTeX &amp; Software Reference</p>
+                    </div>
+                </div>
+
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    If you use <strong>iLoveChem</strong> in academic research, published papers, conference posters, or software pipelines, please cite the platform:
+                </p>
+
+                <div class="bg-slate-900 text-slate-200 p-4 rounded-xl font-mono text-xs relative overflow-x-auto">
+                    <pre id="bibtex-block">@software{ilovechem2026,
+  author = {Shivam Rathore},
+  title = {iLoveChem: Universal Computational Chemistry &amp; CADD Platform},
+  url = {https://ilovechem.onrender.com/},
+  year = {2026},
+  version = {2.4.0}
+}</pre>
+                    <button type="button" onclick="copyBibTeXAbout()" class="absolute top-3 right-3 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition">
+                        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                        <span id="copy-btn-text">Copy BibTeX</span>
+                    </button>
+                </div>
+
+                <div class="p-5 rounded-2xl bg-white border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="space-y-1 text-center sm:text-left">
+                        <div class="font-extrabold text-slate-900 text-sm">Lead Architect &amp; Creator</div>
+                        <div class="text-xs text-slate-600"><strong>Shivam Rathore</strong> &bull; Medicinal Chemist &amp; Computational Drug Discovery Researcher</div>
+                    </div>
+                    <div class="flex items-center gap-2.5">
+                        <a href="https://www.linkedin.com/in/shivam-rathore-medchem/" target="_blank" class="px-4 py-2 rounded-xl bg-[#0A66C2] hover:bg-[#084e96] text-white text-xs font-bold transition flex items-center gap-1.5 shadow-2xs">
+                            <i data-lucide="user" class="w-4 h-4"></i>
+                            <span>LinkedIn Profile</span>
+                        </a>
+                        <a href="https://github.com/shivamrathore12336-dev" target="_blank" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-2xs">
+                            <i data-lucide="github" class="w-4 h-4"></i>
+                            <span>GitHub</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- 4. GLOBAL MINIMALIST FOOTER -->
+    <footer class="bg-[#18181B] text-slate-400 pt-16 pb-12 border-t border-slate-800 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="space-y-3">
+                    <div class="font-bold uppercase tracking-wider text-slate-200 text-[11px] font-mono">Platform</div>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="/" class="hover:text-white transition">Converter Studio</a></li>
+                        <li><a href="/downloads/" class="hover:text-white transition">Downloads Hub</a></li>
+                        <li><a href="/about/" class="hover:text-white transition text-blue-400 font-bold">About &amp; Capabilities</a></li>
+                        <li><a href="/api/convert/" target="_blank" class="hover:text-white transition">REST API Docs</a></li>
+                    </ul>
+                </div>
+                <div class="space-y-3">
+                    <div class="font-bold uppercase tracking-wider text-slate-200 text-[11px] font-mono">Chemistry Engines</div>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="/?target=orca" class="hover:text-white transition">ORCA DFT Generator</a></li>
+                        <li><a href="/?target=gjf" class="hover:text-white transition">Gaussian Input Builder</a></li>
+                        <li><a href="/?target=pdbqt" class="hover:text-white transition">AutoDock Vina (PDBQT)</a></li>
+                        <li><a href="/?target=cdxml" class="hover:text-white transition">ChemDraw CDXML Unpacker</a></li>
+                    </ul>
+                </div>
+                <div class="space-y-3">
+                    <div class="font-bold uppercase tracking-wider text-slate-200 text-[11px] font-mono">Enterprise Privacy</div>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><span class="text-emerald-400 font-bold">100% Volatile RAM Execution</span></li>
+                        <li><span>Zero Disk Scratch Persistence</span></li>
+                        <li><span>Zero Database Structure Logging</span></li>
+                        <li><span>Pharma IP Leak-Proof</span></li>
+                    </ul>
+                </div>
+                <div class="space-y-3">
+                    <div class="font-bold uppercase tracking-wider text-slate-200 text-[11px] font-mono">Creator &amp; Citation</div>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="https://www.linkedin.com/in/shivam-rathore-medchem/" target="_blank" class="hover:text-white transition">Shivam Rathore (LinkedIn)</a></li>
+                        <li><a href="https://github.com/shivamrathore12336-dev" target="_blank" class="hover:text-white transition">GitHub Projects</a></li>
+                        <li><a href="mailto:shivamrathore.medchem@gmail.com" class="hover:text-white transition">Contact Support</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500 text-[11px]">
+                <div class="flex items-center space-x-2">
+                    <span class="font-extrabold text-slate-300">iLoveChem</span>
+                    <span>&bull; Universal Computational Chemistry Platform &bull; Designed by Shivam Rathore</span>
+                </div>
+                <div>&copy; 2026 iLoveChem. All rights reserved. Free for Academic &amp; Industrial Research.</div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        function copyBibTeXAbout() {
+            const text = document.getElementById('bibtex-block').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('copy-btn-text');
+                if (btn) btn.textContent = "Copied! ✓";
+                setTimeout(() => {
+                    if (btn) btn.textContent = "Copy BibTeX";
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

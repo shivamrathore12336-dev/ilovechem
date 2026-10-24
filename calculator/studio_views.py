@@ -29,6 +29,10 @@ def downloads_view(request):
     return render(request, "calculator/downloads.html")
 
 
+def about_view(request):
+    return render(request, "calculator/about.html")
+
+
 
 def safe_int(val, default):
     try:
