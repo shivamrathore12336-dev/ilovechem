@@ -10,16 +10,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+# Set up non-root user (UID 1000) for security and Hugging Face Spaces compatibility
+RUN useradd -m -u 1000 user
+USER user
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+WORKDIR $HOME/app
 
-COPY . .
+COPY --chown=user:user requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
 
-# Run DB migration and collect static
+COPY --chown=user:user . .
+
+# Run DB migration for SQLite session/cache
 RUN python manage.py migrate
 
-EXPOSE 8000
+EXPOSE 7860
 
-CMD gunicorn chemsite.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 3 --timeout 120
+CMD ["gunicorn", "chemsite.wsgi:application", "--bind", "0.0.0.0:7860", "--workers", "3", "--timeout", "120"]
