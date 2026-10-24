@@ -1,0 +1,38 @@
+# CodeRabbit Configuration for iLoveChem
+# https://docs.coderabbit.ai/guides/configure-coderabbit
+
+version: "2"
+language: "en"
+
+tone_instructions: "You are a senior software architect and computational chemist reviewing code for iLoveChem. Be concise, actionable, and prioritize chemical correctness and data privacy."
+
+reviews:
+  profile: "assertive"
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - "main"
+
+  path_filters:
+    - "!**/node_modules/**"
+    - "!**/dist/**"
+    - "!**/.git/**"
+    - "!**/audit/**"
+
+  # Project-specific guidelines for CodeRabbit
+  instructions: |
+    Strict Invariants for iLoveChem:
+    1. Pharma Zero-Disk Invariant: No user chemical structures or conversion outputs should ever be written to the physical server disk. All conversions must execute strictly in volatile memory (io.BytesIO, io.StringIO, RAM).
+    2. Spin Multiplicity & Parity: Ensure all quantum calculations (ORCA, Gaussian) have verified valence electron counts and valid spin states (singlet vs doublet).
+    3. Conformer Generation Safeguards: RDKit EmbedMolecule must always be bounded with maxAttempts and useRandomCoords=True to prevent infinite loops on conjugated/exocyclic rings.
+    4. Security: No hardcoded secrets, API keys, or credentials. All environment settings must use os.environ.get with safe fallbacks.
+    5. Clean Architecture: Maintain modular separation between Django views, format converters, and scientific guardrails.
+
+chat:
+  auto_reply: true
