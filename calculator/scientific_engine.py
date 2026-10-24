@@ -741,10 +741,21 @@ class DeepContentSniffer:
         if len(non_empty) == 1:
             s = non_empty[0]
             # Full SMILES alphabet (any element symbol incl. lowercase aromatics s/o/p/se),
-            # validated by RDKit so arbitrary one-word text is not mistaken for a molecule.
+            # validated by RDKit or OpenBabel so organometallics (e.g. Ferrocene) and arbitrary molecules parse cleanly.
             if ' ' not in s and re.fullmatch(r"[A-Za-z0-9@+\-\[\]()\\/=#$%:.*~]+", s):
                 try:
                     if Chem.MolFromSmiles(s) is not None:
+                        return "smi", None
+                except Exception:
+                    pass
+                try:
+                    if Chem.MolFromSmiles(s, sanitize=False) is not None:
+                        return "smi", None
+                except Exception:
+                    pass
+                try:
+                    ob_test = pybel.readstring("smi", s)
+                    if len(ob_test.atoms) > 0:
                         return "smi", None
                 except Exception:
                     pass

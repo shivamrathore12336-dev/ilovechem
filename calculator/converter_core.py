@@ -151,6 +151,31 @@ def parse_and_extract_atoms(
         except Exception as e:
             meta_info["warnings"].append(f"InChI parser note: {str(e)}")
 
+    # 1c. ORCA Input (.inp) Geometry & Coordinate Extractor
+    if in_format == "inp" or (b"*" in input_bytes and (b"! " in input_bytes or b"%maxcore" in input_bytes or b"%pal" in input_bytes)):
+        try:
+            content_str = input_bytes.decode('utf-8', errors='ignore')
+            m = re.search(r'\*\s*(?:xyz|xyzfile|int|gzmt)\s+(-?\d+)\s+(\d+)\s*\n(.*?)\n\s*\*|\*\s*xyz\s+(-?\d+)\s+(\d+)\s*\n(.*)', content_str, re.DOTALL | re.IGNORECASE)
+            if m:
+                extracted_charge = int(m.group(1) or m.group(4) or 0)
+                extracted_mult = int(m.group(2) or m.group(5) or 1)
+                coords_text = (m.group(3) or m.group(6) or "").strip()
+                coord_lines = [l.strip() for l in coords_text.splitlines() if l.strip() and not l.strip().startswith('#') and not l.strip().startswith('*')]
+                if coord_lines:
+                    xyz_payload = f"{len(coord_lines)}\nConverted from ORCA input\n" + "\n".join(coord_lines)
+                    py_mol = pybel.readstring("xyz", xyz_payload)
+                    if py_mol and len(py_mol.atoms) > 0:
+                        meta_info["parsed_by"] = "ORCA Input Coordinate Extractor"
+                        meta_info["charge"] = extracted_charge
+                        meta_info["detected_charge"] = extracted_charge
+                        meta_info["suggested_mult"] = extracted_mult
+                        meta_info["formula"] = py_mol.formula
+                        meta_info["num_atoms"] = len(py_mol.atoms)
+                        py_mol = _apply_integrity_audit(py_mol, meta_info, strip_salts=strip_salts)
+                        return py_mol, meta_info
+        except Exception as e:
+            meta_info["warnings"].append(f"ORCA input parser note: {str(e)}")
+
     # 2. Output logs via Inverted QuantumLogParser (Issue 7) or cclib
     if in_format in ["log", "out", "output", "pwout"]:
         try:
