@@ -7,11 +7,19 @@ __pycache__/
 db.sqlite3
 *.sqlite3
 
-# Environment
+# Environment & Secrets
 .env
+.env.*
+!.env.example
+secrets.json
+credentials.json
+*.key
+*.pem
+*.cert
 venv/
 env/
 ENV/
+.venv/
 
 # Logs
 *.log
