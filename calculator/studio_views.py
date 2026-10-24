@@ -25,6 +25,11 @@ def studio_view(request):
     })
 
 
+def downloads_view(request):
+    return render(request, "calculator/downloads.html")
+
+
+
 def safe_int(val, default):
     try:
         if val is None or val == '':
@@ -267,6 +272,11 @@ def sitemap_xml_view(request):
     <loc>{scheme}://{host}/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>{scheme}://{host}/downloads/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>{scheme}://{host}/properties/</loc>
