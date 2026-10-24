@@ -89,10 +89,12 @@ def generate_3d_molblock(smiles: str) -> dict:
         mol = Chem.AddHs(mol)
         params = AllChem.ETKDGv3()
         params.randomSeed = 42
+        params.useRandomCoords = True
+        params.maxIterations = 50
         embed_status = AllChem.EmbedMolecule(mol, params)
         if embed_status < 0:
-            # Fallback to standard embed if ETKDGv3 fails
-            embed_status = AllChem.EmbedMolecule(mol)
+            # Fallback to standard embed with random coords if ETKDGv3 fails
+            embed_status = AllChem.EmbedMolecule(mol, maxAttempts=20, randomSeed=42, useRandomCoords=True)
             if embed_status < 0:
                 return {"error": "Failed to generate 3D coordinates."}
 

@@ -3,7 +3,7 @@
 
 [![Live Web App](https://img.shields.io/badge/Live_App-ilovechem.onrender.com-blue?style=for-the-badge&logo=render)](https://ilovechem.onrender.com/)
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![Django](https://img.shields.io/badge/Django-6.1-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![Django](https://img.shields.io/badge/Django-5.1+-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
 [![RDKit](https://img.shields.io/badge/RDKit-Cheminformatics-238636?style=for-the-badge)](https://www.rdkit.org/)
 [![OpenBabel](https://img.shields.io/badge/OpenBabel-Chemical_Toolbox-blueviolet?style=for-the-badge)](https://openbabel.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -37,7 +37,8 @@ Inspired by the clean simplicity of **iLovePDF**, iLoveChem eliminates the frict
 
 In chemical and pharmaceutical research, molecular intellectual property is critical. **iLoveChem** is architected with a strict zero-disk policy:
 - **100% In-Memory RAM Execution:** All conversions and coordinate embeddings are executed in volatile RAM buffers (`io.BytesIO`, `io.StringIO`).
-- **Zero Disk Persistence:** No user molecules, structures, or logs are written to physical disks.
+- **Enforced Memory-Only Upload Handlers:** Configured with Django's `MemoryFileUploadHandler` up to 50 MB, preventing temporary file spooling to disk.
+- **Zero Database Persistence:** No user chemical structures, SMILES, or calculation results are stored in database models or disk logs.
 - **Immediate In-Memory Purge:** Buffers are explicitly closed and garbage-collected immediately upon HTTP response delivery.
 - **Zero AI Training:** No user data is ever stored, analyzed, or used for model training.
 

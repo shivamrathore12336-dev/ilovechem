@@ -173,15 +173,18 @@ def parse_and_extract_atoms(
                 py_mol = _apply_integrity_audit(py_mol, meta_info, strip_salts=strip_salts)
                 return py_mol, meta_info
 
-            # Step 2b: Fallback to cclib
-            with tempfile.NamedTemporaryFile(delete=False, suffix="." + in_format) as tmp:
-                tmp.write(input_bytes)
-                tmp_path = tmp.name
-            
-            parser = cclib.io.ccopen(tmp_path)
-            data = parser.parse()
-            try: os.remove(tmp_path)
-            except Exception: pass
+            # Step 2b: Fallback to cclib with guaranteed temporary file cleanup
+            tmp_path = None
+            try:
+                with tempfile.NamedTemporaryFile(delete=False, suffix="." + in_format) as tmp:
+                    tmp.write(input_bytes)
+                    tmp_path = tmp.name
+                parser = cclib.io.ccopen(tmp_path)
+                data = parser.parse()
+            finally:
+                if tmp_path and os.path.exists(tmp_path):
+                    try: os.remove(tmp_path)
+                    except Exception: pass
 
             if hasattr(data, 'atomcoords') and len(data.atomcoords) > 0:
                 final_coords = data.atomcoords[-1]

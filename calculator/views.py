@@ -41,24 +41,9 @@ def home_view(request):
                 else:
                     context["structure_warning"] = structure_res.get("error", "3D generation unavailable")
 
-                # Store history asynchronously or directly in SQLite
-                try:
-                    MoleculeQuery.objects.create(
-                        smiles=selected_smiles,
-                        formula=props.get("formula", ""),
-                        molecular_weight=props.get("molecular_weight"),
-                        logp=props.get("logp"),
-                        tpsa=props.get("tpsa"),
-                        h_bond_donors=props.get("h_bond_donors"),
-                        h_bond_acceptors=props.get("h_bond_acceptors"),
-                        rotatable_bonds=props.get("rotatable_bonds"),
-                        qed_score=props.get("qed_score"),
-                        lipinski_pass=props.get("lipinski_pass", True)
-                    )
-                except Exception:
-                    pass
+                # Pharma Zero-Storage Invariant: Never persist user SMILES to disk or SQLite database.
 
-    context["recent_queries"] = MoleculeQuery.objects.all()[:6]
+    context["recent_queries"] = []
     return render(request, "calculator/index.html", context)
 
 
@@ -80,6 +65,12 @@ def api_calculate_properties(request):
         return Response(props, status=status.HTTP_400_BAD_REQUEST)
 
     structure_3d = generate_3d_molblock(smiles)
+    if "error" in structure_3d:
+        return Response(
+            {"success": False, "error": structure_3d["error"]},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
     img_2d = generate_2d_base64_image(smiles)
 
     return Response({

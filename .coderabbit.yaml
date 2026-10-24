@@ -1,7 +1,7 @@
 # CodeRabbit Configuration for iLoveChem
 # https://docs.coderabbit.ai/guides/configure-coderabbit
 
-version: "2"
+version: 2
 language: "en"
 
 tone_instructions: "You are a senior software architect and computational chemist reviewing code for iLoveChem. Be concise, actionable, and prioritize chemical correctness and data privacy."

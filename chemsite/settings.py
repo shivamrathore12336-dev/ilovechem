@@ -129,9 +129,15 @@ MAILERS = {
     },
 }
 
-# Support large PDB macromolecules, NMR ensembles, and quantum logs (up to 500 MB in RAM)
-DATA_UPLOAD_MAX_MEMORY_SIZE = 524288000  # 500 MB
-FILE_UPLOAD_MAX_MEMORY_SIZE = 524288000  # 500 MB
+# Pharma Zero-Disk Invariant: Exclusively use MemoryFileUploadHandler.
+# Disables Django's TemporaryFileUploadHandler so no file is ever spooled to disk.
+FILE_UPLOAD_HANDLERS = [
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+]
+
+# Support large PDB macromolecules, NMR ensembles, and quantum logs (up to 50 MB in RAM)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
 
 # Security Hardening Headers
 SECURE_CONTENT_TYPE_NOSNIFF = True

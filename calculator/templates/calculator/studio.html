@@ -167,7 +167,7 @@
                     <button type="button" onclick="selectToolFromGrid('orca', 'ORCA Generator', 'Generate DFT input files with spin parity')" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1">
                         <span>ORCA</span>
                     </button>
-                    <button type="button" onclick="selectToolFromGrid('gaussian', 'Gaussian Builder', 'Convert 2D/3D molecules into .com / .gjf')" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1">
+                    <button type="button" onclick="selectToolFromGrid('gjf', 'Gaussian Builder', 'Convert 2D/3D molecules into .com / .gjf')" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1">
                         <span>Gaussian</span>
                     </button>
                     <button type="button" onclick="selectToolFromGrid('pdbqt', 'AutoDock PDBQT', 'Prepare ligands & receptors for Vina docking')" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1">
@@ -346,7 +346,7 @@
             </div>
 
             <!-- Card 2: Gaussian Builder -->
-            <div onclick="selectToolFromGrid('gaussian', 'Gaussian Input Builder', 'Generate .com / .gjf keywords, charges, and coordinates')"
+            <div onclick="selectToolFromGrid('gjf', 'Gaussian Input Builder', 'Generate .com / .gjf keywords, charges, and coordinates')"
                 class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
@@ -979,7 +979,7 @@
                         <li><a href="/" class="hover:text-white transition">Home</a></li>
                         <li><a href="/downloads/" class="hover:text-white transition text-blue-400 font-bold">Software Downloads</a></li>
                         <li><a href="javascript:void(0)" onclick="selectToolFromGrid('orca', 'ORCA Generator', 'Generate DFT input files with spin parity')" class="hover:text-white transition">ORCA Generator</a></li>
-                        <li><a href="javascript:void(0)" onclick="selectToolFromGrid('gaussian', 'Gaussian Builder', 'Convert 2D/3D molecules into .com / .gjf')" class="hover:text-white transition">Gaussian Builder</a></li>
+                        <li><a href="javascript:void(0)" onclick="selectToolFromGrid('gjf', 'Gaussian Builder', 'Convert 2D/3D molecules into .com / .gjf')" class="hover:text-white transition">Gaussian Builder</a></li>
                         <li><a href="javascript:void(0)" onclick="selectToolFromGrid('pdbqt', 'AutoDock PDBQT Prep', 'Prepare ligands & receptors for Vina')" class="hover:text-white transition">AutoDock PDBQT</a></li>
                         <li><a href="javascript:void(0)" onclick="selectToolFromGrid('cdxml', 'ChemDraw Unpacker', 'Extract schemes & SuperAtoms into 3D')" class="hover:text-white transition">ChemDraw Unpacker</a></li>
                         <li><a href="javascript:void(0)" onclick="selectToolFromGrid('xyz', 'CIF Crystallography', 'Convert crystal unit cells to XYZ')" class="hover:text-white transition">CIF Crystallography</a></li>
@@ -1890,6 +1890,7 @@
         });
 
         function selectToolFromGrid(format, name, desc) {
+            if (format === 'gaussian') format = 'gjf';
             const sel = document.getElementById('target-format-select');
             if (sel && format) {
                 sel.value = format;
@@ -1949,9 +1950,11 @@
             toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl border text-xs font-semibold backdrop-blur-md transition-all duration-300 transform translate-y-3 opacity-0 ${bgStyle}`;
             toast.innerHTML = `
                 ${iconMarkup}
-                <span class="flex-1 font-medium">${message}</span>
+                <span class="flex-1 font-medium" data-toast-message></span>
                 <button type="button" class="text-slate-400 hover:text-white transition ml-2 cursor-pointer text-xs" onclick="this.parentElement.remove()">✕</button>
             `;
+            const msgEl = toast.querySelector('[data-toast-message]');
+            if (msgEl) msgEl.textContent = message;
 
             container.appendChild(toast);
             lucide.createIcons();
