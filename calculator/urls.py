@@ -7,6 +7,7 @@ urlpatterns = [
     path('', studio_views.studio_view, name='studio_home'),
     path('robots.txt', studio_views.robots_txt_view, name='robots_txt'),
     path('sitemap.xml', studio_views.sitemap_xml_view, name='sitemap_xml'),
+    path('google889b369925c8069a.html', studio_views.google_verification_view, name='google_verify_calc'),
     path('api/convert/', studio_views.api_convert_file, name='api_convert'),
     path('audit/bundle/', studio_views.audit_bundle_view, name='audit_bundle'),
     

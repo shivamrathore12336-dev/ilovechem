@@ -277,3 +277,8 @@ def sitemap_xml_view(request):
     return HttpResponse(xml.strip(), content_type="application/xml; charset=utf-8")
 
 
+def google_verification_view(request):
+    return HttpResponse("google-site-verification: google889b369925c8069a.html", content_type="text/html; charset=utf-8")
+
+
+
