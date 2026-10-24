@@ -876,12 +876,13 @@ class ZeroCoordinateGuard:
                 rd_mol = Chem.MolFromSmiles(smi)
                 if rd_mol:
                     rd_mol = Chem.AddHs(rd_mol)
-                    AllChem.EmbedMolecule(rd_mol, AllChem.ETKDGv3())
-                    try: AllChem.UFFOptimizeMolecule(rd_mol, maxIters=300)
-                    except Exception: pass
-                    new_mb = Chem.MolToMolBlock(rd_mol)
-                    mol = pybel.readstring("mol", new_mb)
-                    fixed_rd = True
+                    res = AllChem.EmbedMolecule(rd_mol, maxAttempts=20, randomSeed=42, useRandomCoords=True)
+                    if res >= 0:
+                        try: AllChem.UFFOptimizeMolecule(rd_mol, maxIters=300)
+                        except Exception: pass
+                        new_mb = Chem.MolToMolBlock(rd_mol)
+                        mol = pybel.readstring("mol", new_mb)
+                        fixed_rd = True
         except Exception:
             pass
 

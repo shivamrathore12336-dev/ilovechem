@@ -83,6 +83,7 @@ def api_calculate_properties(request):
     img_2d = generate_2d_base64_image(smiles)
 
     return Response({
+        "success": True,
         "properties": props,
         "mol_block": structure_3d.get("mol_block", ""),
         "image_2d": img_2d

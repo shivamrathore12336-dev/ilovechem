@@ -548,7 +548,7 @@ def export_to_target_format(
         return _finalize("\n".join(lines), "calculation.inp")
 
     # 2. Gaussian GJF / COM (Issues 8, 9, 11)
-    if target_format in ["gjf", "com"]:
+    if target_format in ["gjf", "com", "gaussian"]:
         lines = [
             f"%nprocshared={nprocs}",
             f"%mem={mem_gb}GB",
@@ -567,7 +567,8 @@ def export_to_target_format(
         # Guaranteed trailing 2 blank lines to prevent Gaussian QPErr / EOF crash (Issue 9)
         lines.append("")
         lines.append("")
-        return _finalize("\n".join(lines), f"molecule.{target_format}")
+        out_fname = "molecule.gjf" if target_format == "gaussian" else f"molecule.{target_format}"
+        return _finalize("\n".join(lines), out_fname)
 
     # 3. Standard 3D XYZ
     if target_format == "xyz":
