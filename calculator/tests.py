@@ -68,7 +68,7 @@ class FormatSniffingRegressionTests(TestCase):
 
 
 class SiteMetadataTests(TestCase):
-    @override_settings(SITE_URL="https://example.org")
+    @override_settings(SITE_URL="https://example.org", ALLOWED_HOSTS=["evil.example"])
     def test_sitemap_uses_configured_https_origin_and_lists_about(self):
         body = self.client.get("/sitemap.xml", HTTP_HOST="evil.example").content.decode()
         self.assertIn("https://example.org/about/", body)
@@ -83,3 +83,4 @@ class SiteMetadataTests(TestCase):
     def test_public_source_bundle_and_history_endpoints_are_gone(self):
         self.assertEqual(self.client.get("/audit/bundle/").status_code, 404)
         self.assertEqual(self.client.get("/api/history/").status_code, 404)
+

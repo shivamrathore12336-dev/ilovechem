@@ -1,6 +1,5 @@
 """
-Exhaustive Master Registry of Computational Chemistry Formats
-Grouping over 40+ production-grade scientific formats into clear, intuitive categories.
+Supported output formats for the universal computational chemistry converter.
 """
 
 COMPLETE_TARGET_FORMATS = {
@@ -10,7 +9,6 @@ COMPLETE_TARGET_FORMATS = {
         ("qchem", "Q-Chem Input (.in)", "Quantum chemical calculations"),
         ("mop", "MOPAC Input (.mop)", "Semiempirical QM (PM6, PM7, RM1)"),
         ("nw", "NWChem Input (.nw)", "High-performance computational chemistry"),
-        ("gam", "GAMESS (US) Input (.inp)", "Ab initio quantum chemistry"),
         ("fhiaims", "FHI-aims Input (.in)", "All-electron electronic structure"),
     ],
     "Materials Science, DFT & Crystallography": [
@@ -18,7 +16,6 @@ COMPLETE_TARGET_FORMATS = {
         ("cif", "Crystallographic Info (.cif)", "X-ray crystal structure exchange"),
         ("pwi", "Quantum ESPRESSO (.pwi)", "Plane-wave pseudopotential DFT"),
         ("lmpdat", "LAMMPS Data (.data)", "Large-scale atomic/molecular massively parallel"),
-        ("xtl", "XTL Crystal (.xtl)", "Crystal structure visualization"),
     ],
     "Drug Discovery, Docking & Biochemistry": [
         ("pdbqt", "AutoDock Vina (.pdbqt)", "Flexible docking with partial charges & torsions"),
@@ -28,17 +25,17 @@ COMPLETE_TARGET_FORMATS = {
         ("pqr", "PQR (.pqr)", "PDB format with atomic charge & radius for APBS"),
     ],
     "2D Lab Sketching & Cheminformatics": [
-        ("cdxml", "ChemDraw XML (.cdxml)", "PerkinElmer ChemDraw exchange format"),
         ("mol", "MDL Molfile (.mol)", "Standard 2D/3D connection table"),
         ("sdf", "Structure-Data File (.sdf)", "High-throughput multi-molecule library"),
         ("smi", "SMILES String (.smi)", "Simplified Molecular Input Line Entry"),
-        ("inchi", "InChI (.txt)", "IUPAC International Chemical Identifier"),
-        ("inchikey", "InChIKey (.txt)", "Fixed-length 27-character hashed key"),
+        ("inchi", "InChI (.inchi)", "IUPAC International Chemical Identifier"),
+        ("inchikey", "InChIKey (.inchikey)", "Fixed-length 27-character hashed key"),
         ("cml", "Chemical Markup Language (.cml)", "XML-based chemical structure format"),
     ],
     "Standard 3D Coordinates & Graphics": [
         ("xyz", "Standard XYZ (.xyz)", "Universal 3D Cartesian coordinates"),
-        ("txyz", "TINKER XYZ (.xyz)", "TINKER molecular mechanics coordinate format"),
+        ("txyz", "TINKER XYZ (.txyz)", "TINKER molecular mechanics coordinate format"),
         ("svg", "2D Vector Diagram (.svg)", "Publication-quality scalable vector graphic"),
     ]
 }
+

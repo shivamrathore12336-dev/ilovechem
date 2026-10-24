@@ -38,6 +38,26 @@ from .scientific_engine import (
     MesoCompoundDetector
 )
 
+def _rebuild_conformer_with_rdkit(mol: pybel.Molecule) -> Optional[pybel.Molecule]:
+    """Repair invalid generated coordinates using RDKit ETKDG and a supported force field."""
+    try:
+        rd_mol = Chem.MolFromMolBlock(mol.write("mol"), sanitize=True, removeHs=False)
+        if rd_mol is None:
+            return None
+        rd_mol.RemoveAllConformers()
+        if AllChem.EmbedMolecule(rd_mol, AllChem.ETKDGv3()) != 0:
+            return None
+        if AllChem.MMFFHasAllMoleculeParams(rd_mol):
+            AllChem.MMFFOptimizeMolecule(rd_mol, maxIters=500)
+        elif AllChem.UFFHasAllMoleculeParams(rd_mol):
+            AllChem.UFFOptimizeMolecule(rd_mol, maxIters=500)
+        rebuilt = pybel.readstring("mol", Chem.MolToMolBlock(rd_mol))
+        audit = PhysicalIntegrityChecker.check_clashes_and_metals(rebuilt)
+        return None if audit["has_clashes"] else rebuilt
+    except Exception:
+        return None
+
+
 KNOWN_INPUT_EXTENSIONS = {
     "cdxml", "cdx", "mol", "sdf", "smi", "smiles", "inchi", "cml", "rxn", "skc", "mrv",
     "gjf", "com", "log", "out", "inp", "in", "nw", "mop", "gam", "output",
@@ -129,7 +149,7 @@ def parse_and_extract_atoms(
                     py_mol = _apply_integrity_audit(py_mol, meta_info, strip_salts=strip_salts)
                     return py_mol, meta_info
         except Exception as e:
-            meta_info["warnings"].append(f"ChemDraw parser note: {str(e)}")
+            meta_info["warnings"].append("ChemDraw parsing failed; check the input structure and file syntax.")
 
     # 1b. InChI Native Support via RDKit
     if in_format in ["inchi"] or (isinstance(input_bytes, (bytes, bytearray)) and input_bytes.strip().startswith(b"InChI=")):
@@ -149,7 +169,7 @@ def parse_and_extract_atoms(
                 py_mol = _apply_integrity_audit(py_mol, meta_info, strip_salts=strip_salts)
                 return py_mol, meta_info
         except Exception as e:
-            meta_info["warnings"].append(f"InChI parser note: {str(e)}")
+            meta_info["warnings"].append("InChI parsing failed; check the identifier syntax.")
 
     # 1c. ORCA Input (.inp) Geometry & Coordinate Extractor
     if in_format == "inp" or (b"*" in input_bytes and (b"! " in input_bytes or b"%maxcore" in input_bytes or b"%pal" in input_bytes)):
@@ -205,7 +225,7 @@ def parse_and_extract_atoms(
                 parser = cclib.io.ccopen(io.StringIO(content_str))
                 data = parser.parse()
             except Exception as cclib_err:
-                meta_info["warnings"].append(f"cclib could not parse this log ({cclib_err}); trying rescue parser.")
+                meta_info["warnings"].append("The primary log parser could not read this file; trying the rescue parser.")
 
             if data is not None and hasattr(data, 'atomcoords') and len(data.atomcoords) > 0:
                 final_coords = data.atomcoords[-1]
@@ -246,7 +266,7 @@ def parse_and_extract_atoms(
                 py_mol = _apply_integrity_audit(py_mol, meta_info, strip_salts=strip_salts)
                 return py_mol, meta_info
         except Exception as e:
-            meta_info["warnings"].append(f"Quantum log parser note: {str(e)}")
+            meta_info["warnings"].append("Quantum chemistry log parsing failed; check the log format.")
 
     # 3a. AutoDock PDBQT Ligand Support
     if in_format in ["pdbqt"]:
@@ -259,7 +279,7 @@ def parse_and_extract_atoms(
             mol = _apply_integrity_audit(mol, meta_info, strip_salts=strip_salts)
             return mol, meta_info
         except Exception as e:
-            meta_info["warnings"].append(f"PDBQT parser note: {str(e)}")
+            meta_info["warnings"].append("PDBQT parsing failed; check the input file syntax.")
 
     # 3b. PDB / Macromolecules Sanitization (Issues 16 & 17 + Loophole 4)
     if in_format in ["pdb", "ent"]:
@@ -279,7 +299,7 @@ def parse_and_extract_atoms(
             mol = _apply_integrity_audit(mol, meta_info, strip_salts=strip_salts)
             return mol, meta_info
         except Exception as e:
-            meta_info["warnings"].append(f"PDB sanitizer note: {str(e)}")
+            meta_info["warnings"].append("PDB parsing failed; check the input file syntax.")
 
     # 4. Materials & Crystals via ASE (Issues 12, 13, 14)
     if in_format in ["cif", "poscar", "contcar", "pwi", "cell", "res"]:
@@ -319,7 +339,7 @@ def parse_and_extract_atoms(
             py_mol = _apply_integrity_audit(py_mol, meta_info, strip_salts=strip_salts)
             return py_mol, meta_info
         except Exception as e:
-            meta_info["warnings"].append(f"ASE crystal parser note: {str(e)}")
+            meta_info["warnings"].append("Crystal parsing failed; check the cell parameters and coordinates.")
 
     # 5. Standard OpenBabel Formats with Heavy Metal UFF Detection (Issue 20 & Loophole 6)
     try:
@@ -348,11 +368,15 @@ def parse_and_extract_atoms(
         coords = [a.coords for a in mol.atoms]
         if coords and not was_fixed:
             z_vals = [c[2] for c in coords]
-            if any(abs(z) > 1e-4 for z in z_vals):
-                has_3d = True
+            # XYZ and biomolecular coordinate formats are explicit Cartesian
+            # geometries even when the structure is planar (all z = 0).
+            has_3d = any(abs(z) > 1e-4 for z in z_vals) or in_format in {
+                "xyz", "pdb", "pdbqt", "gro", "pqr", "mol2", "txyz", "poscar", "contcar"
+            }
         elif was_fixed:
             has_3d = True
 
+        used_rdkit_conformer = False
         if not has_3d or in_format in ["cdx", "smi", "smiles", "mol"]:
             meta_info["is_2d"] = True
             
@@ -380,13 +404,39 @@ def parse_and_extract_atoms(
                 for a in mol.atoms
             )
             forcefield = 'uff' if (contains_metal or is_hypervalent) else 'mmff94'
-            try:
-                mol.make3D(forcefield=forcefield, steps=300)
-            except Exception:
-                try: mol.make3D(forcefield='uff', steps=300)
-                except Exception: pass
+            # RDKit ETKDG plus MMFF/UFF is the primary route for ordinary organics.
+            # The bundled Windows Open Babel wheel can lack its builder/force-field
+            # parameter files, so do not trust a nominally successful but collapsed
+            # Open Babel geometry when RDKit can produce and validate a conformer.
+            repaired = None if (contains_metal or is_hypervalent) else _rebuild_conformer_with_rdkit(mol)
+            if repaired is not None:
+                mol = repaired
+                used_rdkit_conformer = True
+                meta_info["warnings"].append(
+                    "3D Conformer: Generated with RDKit ETKDG and force-field minimization."
+                )
+            else:
+                try:
+                    mol.make3D(forcefield=forcefield, steps=300)
+                except Exception:
+                    try: mol.make3D(forcefield='uff', steps=300)
+                    except Exception: pass
 
-        meta_info["parsed_by"] = "OpenBabel 3.1"
+                if PhysicalIntegrityChecker.check_clashes_and_metals(mol)["has_clashes"]:
+                    repaired = _rebuild_conformer_with_rdkit(mol)
+                    if repaired is None:
+                        raise ValueError("Could not generate a clash-free 3D conformer for this molecule.")
+                    mol = repaired
+                    used_rdkit_conformer = True
+                    meta_info["warnings"].append(
+                        "3D Geometry Repair: Rebuilt overlapping coordinates with RDKit ETKDG and force-field minimization."
+                    )
+
+        meta_info["parsed_by"] = (
+            "Open Babel parser + RDKit ETKDG/MMFF conformer"
+            if used_rdkit_conformer
+            else "Open Babel 3.1"
+        )
         meta_info["formula"] = mol.formula
         meta_info["num_atoms"] = len(mol.atoms)
         mol = _apply_integrity_audit(mol, meta_info, strip_salts=strip_salts)
@@ -489,6 +539,10 @@ def _apply_integrity_audit(mol: pybel.Molecule, meta_info: dict, strip_salts: bo
     meta_info["total_electrons"] = n_electrons
     meta_info["suggested_mult"] = suggested_mult
     meta_info["electronic_state"] = electronic_state
+    # Report the post-cleanup structure users actually receive (for example,
+    # CIF hydrogenation and salt stripping can change formula and atom count).
+    meta_info["formula"] = mol.formula
+    meta_info["num_atoms"] = len(mol.atoms)
     return mol
 
 
@@ -697,23 +751,34 @@ def export_to_target_format(
         warnings.extend(gro_warns)
         return _finalize(gro_str, gro_fname)
 
-    # 9. General OpenBabel Formats
+    # 9. Textual identifiers and XML output use RDKit's dedicated writers.
+    if target_format in {"inchi", "inchikey", "cml"}:
+        rd_mol = Chem.MolFromMolBlock(mol.write("mol"), sanitize=True, removeHs=False)
+        if rd_mol is None:
+            raise ValueError("The molecule could not be sanitized for this output format.")
+        if target_format == "inchi":
+            content = Chem.MolToInchi(rd_mol)
+            if not content:
+                raise ValueError("RDKit could not generate an InChI for this molecule.")
+            return _finalize(content + "\n", "converted.inchi")
+        if target_format == "inchikey":
+            content = Chem.MolToInchiKey(rd_mol)
+            if not content:
+                raise ValueError("RDKit could not generate an InChIKey for this molecule.")
+            return _finalize(content + "\n", "converted.inchikey")
+        return _finalize(Chem.MolToCMLBlock(rd_mol), "converted.cml")
+
+    # 10. General OpenBabel Formats
     try:
         out_str = mol.write(target_format)
         ext_map = {
-            "mop": ".mop", "nw": ".nw", "gam": ".inp", "fhiaims": ".in",
-            "lmpdat": ".data", "xtl": ".xtl", "pdbqt": ".pdbqt", "pdb": ".pdb",
-            "mol2": ".mol2", "gro": ".gro", "pqr": ".pqr", "cdxml": ".cdxml",
-            "mol": ".mol", "sdf": ".sdf", "smi": ".smi", "inchi": ".txt",
-            "inchikey": ".txt", "cml": ".cml", "txyz": ".xyz", "svg": ".svg"
+            "mop": ".mop", "nw": ".nw", "fhiaims": ".in",
+            "lmpdat": ".data", "pdbqt": ".pdbqt", "pdb": ".pdb",
+            "mol2": ".mol2", "gro": ".gro", "pqr": ".pqr",
+            "mol": ".mol", "sdf": ".sdf", "smi": ".smi", "svg": ".svg"
         }
         ext = ext_map.get(target_format, f".{target_format}")
         return _finalize(out_str, f"converted{ext}")
-    except Exception:
-        # Never fail silently: tell the user the requested format could not be written.
-        warnings.append(
-            f"Could not write the requested format '{target_format}'. "
-            f"The structure was exported as standard XYZ instead."
-        )
-        out_str = mol.write("xyz")
-        return _finalize(out_str, "converted.xyz")
+    except Exception as exc:
+        raise ValueError(f"The requested output format '{target_format}' is unavailable.") from exc
+

@@ -224,7 +224,7 @@ class QuantumLogParser:
         """
         Streaming tail extractor for giant 50 MB - 500 MB output logs.
         Seeks directly to the final 4MB of the file and extracts the converged stationary geometry
-        in < 20 ms without loading the full 100MB+ file into server RAM.
+        without loading the full 100MB+ file into server RAM; runtime depends on the input and host.
         """
         try:
             file_obj.seek(0, os.SEEK_END)
@@ -1118,3 +1118,4 @@ class MesoCompoundDetector:
             pass
 
         return False, warnings
+

@@ -72,8 +72,8 @@ def calculate_properties(smiles: str) -> dict:
             "lipinski_violations": lipinski_violations,
             "lipinski_pass": lipinski_pass,
         }
-    except Exception as e:
-        return {"error": str(e)}
+    except Exception:
+        return {"error": "Failed to calculate molecular properties."}
 
 def generate_3d_molblock(smiles: str) -> dict:
     """
@@ -106,8 +106,8 @@ def generate_3d_molblock(smiles: str) -> dict:
 
         mol_block = Chem.MolToMolBlock(mol)
         return {"mol_block": mol_block}
-    except Exception as e:
-        return {"error": str(e)}
+    except Exception:
+        return {"error": "Failed to generate 3D coordinates for this molecule."}
 
 def generate_2d_base64_image(smiles: str, width: int = 360, height: int = 280) -> str:
     """
@@ -124,3 +124,4 @@ def generate_2d_base64_image(smiles: str, width: int = 360, height: int = 280) -
         return f"data:image/png;base64,{b64}"
     except Exception:
         return ""
+

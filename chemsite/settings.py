@@ -35,9 +35,13 @@ if SECRET_KEY == _INSECURE_DEV_KEY and not DEBUG:
         RuntimeWarning,
     )
 
-# Comma-separated list, e.g. ALLOWED_HOSTS=ilovechem.onrender.com,localhost
-# Defaults to '*' (previous behavior) so existing deployments keep working until it is set.
-ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '*').split(',') if h.strip()]
+# Comma-separated list of accepted Host headers. Keep the default scoped to this
+# deployment and local development; configure custom domains through the environment.
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('ALLOWED_HOSTS', 'ilovechem.onrender.com,localhost,127.0.0.1,testserver').split(',')
+    if host.strip()
+]
 
 # Canonical public origin used for robots.txt and sitemap.xml.
 SITE_URL = os.environ.get('SITE_URL', 'https://ilovechem.onrender.com')
@@ -137,15 +141,6 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 
-# Email
-# https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
-
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
-
 # Pharma Zero-Disk Invariant: Exclusively use MemoryFileUploadHandler.
 # Disables Django's TemporaryFileUploadHandler so no file is ever spooled to disk.
 FILE_UPLOAD_HANDLERS = [
@@ -156,14 +151,25 @@ FILE_UPLOAD_HANDLERS = [
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
 
-# Security Hardening Headers
+# Security hardening. Production values are explicitly enabled in render.yaml;
+# defaults preserve local HTTP development.
+def _env_bool(name: str, default: bool = False) -> bool:
+    return os.environ.get(name, str(default)).lower() in ('true', '1', 't', 'yes')
+
+SECURE_SSL_REDIRECT = _env_bool('SECURE_SSL_REDIRECT')
+SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '0'))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = _env_bool('SECURE_HSTS_INCLUDE_SUBDOMAINS')
+SECURE_HSTS_PRELOAD = _env_bool('SECURE_HSTS_PRELOAD')
+SESSION_COOKIE_SECURE = _env_bool('SESSION_COOKIE_SECURE')
+CSRF_COOKIE_SECURE = _env_bool('CSRF_COOKIE_SECURE')
 SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+X_FRAME_OPTIONS = 'DENY'
 
 
 CSRF_TRUSTED_ORIGINS = [
     'https://ilovechem.onrender.com',
-    'https://*.onrender.com',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
 ]
+

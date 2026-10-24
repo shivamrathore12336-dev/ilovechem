@@ -48,6 +48,10 @@ def api_convert_file(request):
     uploaded_file = request.FILES.get('file')
     raw_content = request.data.get('raw_content', '')
     target_format = str(request.data.get('target_format', 'orca') or 'orca').lower()
+    supported_formats = {fmt for group in COMPLETE_TARGET_FORMATS.values() for fmt, _, _ in group}
+    supported_formats.update({"inp", "com", "gaussian", "in", "vina", "gromacs"})
+    if target_format not in supported_formats:
+        return Response({"error": "Unsupported target format."}, status=status.HTTP_400_BAD_REQUEST)
     in_format = str(request.data.get('input_format', '') or '').lower()
     fragment_index = safe_int(request.data.get('fragment_index'), 0)
     convert_mode = str(request.data.get('convert_mode', 'single') or 'single') # 'single' or 'all_zip'
@@ -79,7 +83,7 @@ def api_convert_file(request):
             in_format = detect_format(filename, "")
 
         # Giant 50 MB - 500 MB Log Streaming Parser:
-        # Avoid loading 100MB+ into RAM. Seek directly to the final 4MB and extract the converged geometry in 0.05s!
+        # Avoid loading giant logs in full. Seek directly to the final 4MB and extract the latest geometry.
         if in_format in ["log", "out", "output", "pwout"] and uploaded_file.size > 2 * 1024 * 1024:
             scan_res = QuantumLogParser.reverse_stream_extract_from_file(uploaded_file)
             if scan_res:
@@ -93,12 +97,12 @@ def api_convert_file(request):
                 meta = {
                     "is_2d": False,
                     "is_periodic": False,
-                    "parsed_by": f"0.05s Streaming Tail Parser ({parser_label})",
+                    "parsed_by": f"Streaming Tail Parser ({parser_label})",
                     "formula": mol.formula,
                     "num_atoms": len(mol.atoms),
                     "input_format": in_format,
                     "warnings": [
-                        f"Giant Log Streamer Active: Processed {uploaded_file.size / (1024*1024):.1f} MB file in < 0.1s. Final converged stationary point extracted from tail buffer."
+                        f"Giant Log Tail Parser Active: Scanned the final segment of a {uploaded_file.size / (1024*1024):.1f} MB file and extracted the latest stationary point."
                     ]
                 }
                 mol = _apply_integrity_audit(mol, meta, strip_salts=strip_salts)
@@ -168,8 +172,8 @@ def api_convert_file(request):
                         "parsed_by": "Reaction Scheme ZIP Generator"
                     }
                 }, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": f"Failed to generate reaction ZIP: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception:
+            return Response({"error": "Failed to generate the reaction-scheme archive."}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     # Special Case: Multi-Structure SDF batch export to ZIP (Loophole 5)
     if (convert_mode == 'all_zip' or b'$$$$' in file_bytes) and file_bytes.count(b'$$$$') >= 2:
@@ -193,8 +197,8 @@ def api_convert_file(request):
                         "parsed_by": "Batch SDF Virtual Screening ZIP Generator"
                     }
                 }, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": f"Failed to generate batch SDF ZIP: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception:
+            return Response({"error": "Failed to generate the SDF batch archive."}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     # Standard Single / Selected Molecule Conversion
     mol, meta = parse_and_extract_atoms(
@@ -282,8 +286,8 @@ def api_convert_file(request):
             "mol_block_3d": viewer_molblock
         }, status=status.HTTP_200_OK)
 
-    except Exception as e:
-        return Response({"error": f"Conversion error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception:
+        return Response({"error": f"Conversion failed for target format '{target_format}'."}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 
 def _site_url() -> str:
@@ -325,6 +329,7 @@ def sitemap_xml_view(request):
 
 def google_verification_view(request):
     return HttpResponse("google-site-verification: google889b369925c8069a.html", content_type="text/html; charset=utf-8")
+
 
 
 
