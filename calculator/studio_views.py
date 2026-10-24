@@ -225,6 +225,43 @@ def api_convert_file(request):
             meta["warnings"].extend(export_warnings)
 
         viewer_molblock = mol.write("mol")
+
+        # In-Memory Real-Time MedChem & Lipinski Ro5 Descriptors
+        medchem_props = None
+        try:
+            from rdkit import Chem
+            from rdkit.Chem import Descriptors, Lipinski, Crippen
+            rd_mol = Chem.MolFromMolBlock(viewer_molblock, sanitize=False)
+            if rd_mol is not None:
+                try:
+                    Chem.SanitizeMol(rd_mol)
+                except Exception:
+                    pass
+                mw = round(float(Descriptors.MolWt(rd_mol)), 2)
+                logp = round(float(Crippen.MolLogP(rd_mol)), 2)
+                hbd = int(Lipinski.NumHDonors(rd_mol))
+                hba = int(Lipinski.NumHAcceptors(rd_mol))
+                tpsa = round(float(Descriptors.TPSA(rd_mol)), 2)
+                rotb = int(Lipinski.NumRotatableBonds(rd_mol))
+
+                violations = 0
+                if mw > 500: violations += 1
+                if logp > 5.0: violations += 1
+                if hbd > 5: violations += 1
+                if hba > 10: violations += 1
+
+                medchem_props = {
+                    "mw": mw,
+                    "logp": logp,
+                    "hbd": hbd,
+                    "hba": hba,
+                    "tpsa": tpsa,
+                    "rotb": rotb,
+                    "lipinski_violations": violations,
+                    "is_druglike": (violations <= 1)
+                }
+        except Exception:
+            pass
         
         return Response({
             "success": True,
@@ -234,6 +271,7 @@ def api_convert_file(request):
             "detected_input_format": in_format,
             "target_format": target_format,
             "metadata": meta,
+            "medchem": medchem_props,
             "mol_block_3d": viewer_molblock
         }, status=status.HTTP_200_OK)
 
