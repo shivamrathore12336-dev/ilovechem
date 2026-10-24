@@ -141,44 +141,422 @@
 </head>
 <body class="min-h-full flex flex-col justify-between">
 
-    <!-- 1. APP HEADER -->
-    <header class="bg-white/95 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-40">
-        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <a href="/" class="flex items-center space-x-3 group">
-                <div class="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-white font-bold transition group-hover:bg-blue-600">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                    </svg>
-                </div>
-                <div class="flex items-baseline space-x-2">
-                    <span class="text-xl font-bold tracking-tight text-slate-900">iLove<span class="text-blue-600">Chem</span></span>
-                    <span class="text-[11px] font-mono font-medium text-slate-500 hidden sm:inline">v2.4 • Computational Chemistry Hub</span>
-                </div>
-            </a>
+    <!-- 1. APP HEADER (iLovePDF Clean Minimalist Style with Mega-Dropdown) -->
+    <header class="bg-white border-b border-slate-200/90 sticky top-0 z-40 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            
+            <!-- Left: Logo & Nav Links -->
+            <div class="flex items-center space-x-8">
+                <a href="/" class="flex items-center space-x-2.5 group">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <div class="flex items-baseline space-x-1.5">
+                        <span class="text-2xl font-black tracking-tight text-slate-900">iLove<span class="text-blue-600">Chem</span></span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                    </div>
+                </a>
 
+                <!-- Navigation Links (iLovePDF Style) -->
+                <nav class="hidden md:flex items-center space-x-1 text-sm font-semibold text-slate-700">
+                    <button type="button" onclick="selectToolFromGrid('orca', 'ORCA Generator', 'Generate DFT input files with spin parity')" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1">
+                        <span>ORCA</span>
+                    </button>
+                    <button type="button" onclick="selectToolFromGrid('gaussian', 'Gaussian Builder', 'Convert 2D/3D molecules into .com / .gjf')" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1">
+                        <span>Gaussian</span>
+                    </button>
+                    <button type="button" onclick="selectToolFromGrid('pdbqt', 'AutoDock PDBQT', 'Prepare ligands & receptors for Vina docking')" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1">
+                        <span>AutoDock PDBQT</span>
+                    </button>
+                    <button type="button" onclick="selectToolFromGrid('cdxml', 'ChemDraw Unpacker', 'Extract schemes & SuperAtoms into 3D files')" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1">
+                        <span>ChemDraw</span>
+                    </button>
+
+                    <!-- Mega Dropdown Trigger (Matching Image 1) -->
+                    <div class="relative">
+                        <button type="button" id="mega-menu-btn" onclick="toggleMegaDropdown()" class="px-3 py-2 rounded-lg hover:bg-slate-100 text-blue-600 font-bold transition flex items-center gap-1 cursor-pointer">
+                            <span>ALL CHEMISTRY TOOLS</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-200" id="mega-arrow"></i>
+                        </button>
+
+                        <!-- MEGA DROPDOWN POPUP (iLovePDF Style - Exact replica of Image 1) -->
+                        <div id="mega-dropdown" class="hidden absolute left-0 top-full mt-2 w-[780px] bg-white rounded-2xl shadow-2xl border border-slate-200 p-6 z-50 transition-all duration-150">
+                            <div class="grid grid-cols-12 gap-6">
+                                
+                                <!-- Column 1: COMPUTATIONAL ENGINES (OTHER PRODUCTS) -->
+                                <div class="col-span-5 space-y-4 border-r border-slate-100 pr-5">
+                                    <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold">Computational Engines</div>
+                                    <div class="space-y-3">
+                                        <a href="javascript:void(0)" onclick="selectToolFromGrid('orca', 'iLoveQuantum (ORCA / DFT)', 'High-precision DFT input builder'); toggleMegaDropdown();" class="flex items-start gap-3 p-2 rounded-xl hover:bg-slate-50 transition group">
+                                            <div class="w-9 h-9 rounded-lg bg-red-50 text-red-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+                                                <i data-lucide="atom" class="w-5 h-5"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-bold text-slate-900 group-hover:text-blue-600 text-sm">iLoveQuantum</div>
+                                                <div class="text-xs text-slate-500">ORCA, Gaussian, Q-Chem, VASP DFT</div>
+                                            </div>
+                                        </a>
+
+                                        <a href="javascript:void(0)" onclick="selectToolFromGrid('pdbqt', 'iLoveDocking (PDB / PDBQT)', 'Protonation & AutoDock Vina preparation'); toggleMegaDropdown();" class="flex items-start gap-3 p-2 rounded-xl hover:bg-slate-50 transition group">
+                                            <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+                                                <i data-lucide="dna" class="w-5 h-5"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-bold text-slate-900 group-hover:text-blue-600 text-sm">iLoveDocking</div>
+                                                <div class="text-xs text-slate-500">PDBQT, Gasteiger charges, Vina prep</div>
+                                            </div>
+                                        </a>
+
+                                        <a href="javascript:void(0)" onclick="selectToolFromGrid('cdxml', 'iLoveChemDraw (CDXML Schemes)', 'Extract reaction schemes & SuperAtoms'); toggleMegaDropdown();" class="flex items-start gap-3 p-2 rounded-xl hover:bg-slate-50 transition group">
+                                            <div class="w-9 h-9 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+                                                <i data-lucide="file-code" class="w-5 h-5"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-bold text-slate-900 group-hover:text-blue-600 text-sm">iLoveChemDraw</div>
+                                                <div class="text-xs text-slate-500">Unpack reaction schemes into 3D</div>
+                                            </div>
+                                        </a>
+
+                                        <a href="/api/convert/" target="_blank" class="flex items-start gap-3 p-2 rounded-xl hover:bg-slate-50 transition group">
+                                            <div class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+                                                <i data-lucide="terminal" class="w-5 h-5"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-bold text-slate-900 group-hover:text-blue-600 text-sm">iLoveAPI</div>
+                                                <div class="text-xs text-slate-500">Python REST automation for pipelines</div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Column 2: SOLUTIONS & APPLICATIONS -->
+                                <div class="col-span-4 space-y-4 border-r border-slate-100 pr-5">
+                                    <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold">Solutions & Labs</div>
+                                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
+                                        <div class="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                                            <i data-lucide="building-2" class="w-4 h-4 text-blue-600"></i>
+                                            <span>Pharma & Biotech</span>
+                                        </div>
+                                        <p class="text-[11px] text-slate-500 leading-relaxed">
+                                            Volatile in-memory zero-storage execution for proprietary chemistry IP.
+                                        </p>
+                                    </div>
+
+                                    <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold mt-2">Applications</div>
+                                    <div class="space-y-2 text-xs font-semibold text-slate-700">
+                                        <div class="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-50">
+                                            <i data-lucide="laptop" class="w-4 h-4 text-slate-500"></i>
+                                            <span>Web Studio (No Install)</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-50">
+                                            <i data-lucide="box" class="w-4 h-4 text-slate-500"></i>
+                                            <span>Docker Containerized</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Column 3: QUICK LINKS & SECURITY -->
+                                <div class="col-span-3 space-y-3 text-xs font-semibold text-slate-700">
+                                    <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold">Security & Legal</div>
+                                    <a href="javascript:void(0)" onclick="document.getElementById('security-modal').classList.remove('hidden'); toggleMegaDropdown();" class="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-50 text-slate-800">
+                                        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+                                        <span>Zero-Disk Policy</span>
+                                    </a>
+                                    <a href="javascript:void(0)" onclick="document.getElementById('presets-catalog-modal').classList.remove('hidden'); toggleMegaDropdown();" class="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-50 text-slate-800">
+                                        <i data-lucide="flask-conical" class="w-4 h-4 text-blue-600"></i>
+                                        <span>19 Test Cases</span>
+                                    </a>
+                                    <a href="https://www.linkedin.com/in/shivam-rathore-medchem/" target="_blank" class="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-50 text-slate-800">
+                                        <i data-lucide="user" class="w-4 h-4 text-sky-600"></i>
+                                        <span>About Creator</span>
+                                    </a>
+                                    <a href="mailto:shivamrathore.medchem@gmail.com" class="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-50 text-slate-800">
+                                        <i data-lucide="mail" class="w-4 h-4 text-slate-500"></i>
+                                        <span>Contact Support</span>
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Right: Security Badge & Contact -->
             <div class="flex items-center space-x-3 text-xs">
                 <button type="button" onclick="document.getElementById('security-modal').classList.remove('hidden')" 
-                    class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-700 font-semibold flex items-center gap-1.5 transition cursor-pointer">
+                    class="hidden sm:flex px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200 text-emerald-800 font-semibold items-center gap-1.5 transition cursor-pointer">
                     <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
-                    <span>Zero-Disk Retention Policy</span>
-                    <span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-mono font-bold">Pharma Safe 🔒</span>
+                    <span>Pharma Zero-Storage 🔒</span>
                 </button>
+
+                <a href="https://www.linkedin.com/in/shivam-rathore-medchem/" target="_blank"
+                    class="px-3.5 py-1.5 rounded-lg bg-[#0A66C2] hover:bg-[#084e96] text-white font-bold flex items-center gap-1.5 transition shadow-xs cursor-pointer">
+                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                    </svg>
+                    <span>Connect</span>
+                </a>
             </div>
         </div>
     </header>
 
-    <!-- 2. MAIN CONVERTER INTERFACE -->
-    <main class="flex-1 flex flex-col justify-center py-8 sm:py-12 px-4 sm:px-6">
+    <!-- 2. HERO SECTION (iLovePDF Clean Style) -->
+    <section class="pt-10 pb-6 sm:pt-14 sm:pb-8 text-center px-4 max-w-4xl mx-auto space-y-3">
+        <h1 class="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+            Every tool you need for <span class="text-blue-600">Computational Chemistry</span> in one place
+        </h1>
+        <p class="text-slate-600 text-sm sm:text-lg max-w-2xl mx-auto leading-relaxed">
+            100% free, secure, and in-memory tools to convert, sanitize, and prepare molecules for ORCA, Gaussian, AutoDock, PyMOL, and Crystallography in seconds.
+        </p>
+    </section>
+
+    <!-- 3. THE SIGNATURE iLoveChem TOOLS GRID (12 Clean Minimalist Cards - Exact iLovePDF Paradigm) -->
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 mb-12">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            
+            <!-- Card 1: ORCA Generator -->
+            <div onclick="selectToolFromGrid('orca', 'ORCA Input Generator', 'Build DFT .inp with automatic spin parity and %pal cores')"
+                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                        <i data-lucide="atom" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">ORCA Generator</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Build DFT .inp with automatic spin parity, def2-SVP, and %pal cores.</p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                    <span>Use ORCA</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Card 2: Gaussian Builder -->
+            <div onclick="selectToolFromGrid('gaussian', 'Gaussian Input Builder', 'Generate .com / .gjf keywords, charges, and coordinates')"
+                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                        <i data-lucide="cpu" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">Gaussian Builder</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Generate .com / .gjf route cards, memory directives, and coordinates.</p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                    <span>Use Gaussian</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Card 3: AutoDock PDBQT Prep -->
+            <div onclick="selectToolFromGrid('pdbqt', 'AutoDock PDBQT Prep', 'Prepare ligands & receptors for Vina with Gasteiger charges')"
+                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                        <i data-lucide="dna" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">AutoDock PDBQT</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Prepare ligands & proteins for AutoDock Vina with explicit hydrogens.</p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                    <span>Docking Prep</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Card 4: ChemDraw CDXML Unpacker -->
+            <div onclick="selectToolFromGrid('cdxml', 'ChemDraw CDXML Unpacker', 'Extract schemes, arrows, and multi-molecules into 3D files')"
+                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                        <i data-lucide="file-code" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">ChemDraw Unpacker</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Unpack multi-molecule reaction schemes & text annotations into 3D.</p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                    <span>Unpack CDXML</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Card 5: SDF Batch Splitter -->
+            <div onclick="selectToolFromGrid('sdf', 'SDF Batch Splitter', 'Decompose multi-molecule compound libraries into single files')"
+                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                        <i data-lucide="layers" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">SDF Batch Splitter</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Decompose multi-compound screening libraries into clean ZIP bundles.</p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                    <span>Split Library</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Card 6: CIF Crystallography -->
+            <div onclick="selectToolFromGrid('xyz', 'CIF Crystallography', 'Convert unit cells and asymmetric crystal files to Cartesian XYZ')"
+                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                        <i data-lucide="gem" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">CIF Crystallography</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Convert crystal unit cells with fractional coordinates into XYZ.</p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                    <span>Convert Crystal</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Card 7: Salt & Solvent Stripper -->
+            <div onclick="selectToolFromGrid('orca', 'Salt & Solvent Stripper', 'Isolate active parent drugs from counter-ions with coordination lock')"
+                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                        <i data-lucide="flask-conical" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">Salt & Solvent Stripper</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Remove spectator counter-ions while preserving organometallic bonds.</p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                    <span>Strip Salts</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Card 8: 3D Molecular Inspector -->
+            <div onclick="selectToolFromGrid('xyz', '3D Molecular Inspector', 'Interactive WebGL 3D inspection and valence verification')"
+                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                        <i data-lucide="eye" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">3D Inspector</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Interactive 3D WebGL inspection, stereochemistry, and formula audit.</p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                    <span>Inspect 3D</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Card 9: Lipinski & Drug Properties -->
+            <div onclick="selectToolFromGrid('mol2', 'Lipinski & Drug Properties', 'Compute MW, LogP, HBD, HBA, TPSA and Lipinski Rule of 5')"
+                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                        <i data-lucide="pill" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">Drug Properties</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Calculate MW, LogP, TPSA, and Lipinski Rule of 5 drug-likeness filters.</p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                    <span>Calculate Filters</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Card 10: Q-Chem / VASP Builder -->
+            <div onclick="selectToolFromGrid('qchem', 'Q-Chem & VASP Builder', 'Prepare solid-state and quantum chemistry inputs')"
+                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                        <i data-lucide="sparkles" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">Q-Chem / VASP</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Prepare density functional theory and periodic crystal lattice inputs.</p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                    <span>Use Q-Chem</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Card 11: SuperAtom Expander -->
+            <div onclick="selectToolFromGrid('xyz', 'SuperAtom Expander', 'Expand Boc, Ts, Ph, Cbz abbreviations into explicit atoms')"
+                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                        <i data-lucide="tag" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">SuperAtom Expander</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Expand protecting groups (Boc, Ts, Ph, Cbz) into full atom graphs.</p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                    <span>Expand Groups</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Card 12: Universal Any-to-Any -->
+            <div onclick="selectToolFromGrid('orca', 'Universal Converter', 'Convert between 20+ computational chemistry file formats')"
+                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                        <i data-lucide="repeat" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">Universal Any-to-Any</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Convert between PDB, SDF, CIF, XYZ, ORCA, Gaussian with 1 click.</p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                    <span>Universal Studio</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 4. CORE WORKSPACE & UPLOAD ZONE (iLovePDF Style) -->
+    <main id="workspace-section" class="flex-1 flex flex-col justify-center py-6 sm:py-8 px-4 sm:px-6">
         <div class="max-w-4xl w-full mx-auto space-y-6">
 
-            <!-- Hero Headline -->
-            <div class="text-center space-y-2.5 max-w-2xl mx-auto">
-                <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                    Universal Chemistry File Converter
-                </h1>
-                <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
-                    Convert ChemDraw schemes, Gaussian/ORCA logs, CIF crystals, and PDB structures with automatic 3D stereochemical locks, valence parity, and syntax repair.
-                </p>
+            <!-- Active Selected Tool Banner -->
+            <div id="active-tool-banner" class="p-4 rounded-2xl bg-blue-50/90 border border-blue-200/80 flex items-center justify-between text-xs transition">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold shadow-xs">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                            <span id="active-tool-title">ORCA Input Generator</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-200/60 text-blue-900 font-mono font-bold">Active Engine</span>
+                        </div>
+                        <div id="active-tool-desc" class="text-slate-600 text-xs">Drop or select any molecular structure below to generate output.</div>
+                    </div>
+                </div>
+                <button type="button" onclick="document.getElementById('workspace-section').scrollIntoView({behavior:'smooth'})" class="font-bold text-blue-700 hover:text-blue-800">
+                    Scroll to Upload ↓
+                </button>
             </div>
 
             <!-- Sleek Minimal Progress Step Indicator -->
@@ -199,35 +577,43 @@
                 </div>
             </div>
 
-            <!-- STEP 1: DROPZONE -->
+            <!-- STEP 1: DROPZONE (iLovePDF Signature Large Upload Button) -->
             <div id="upload-stage" class="panel-surface rounded-2xl p-10 sm:p-14 text-center border-2 border-dashed border-slate-300 hover:border-blue-500 transition-all duration-200 bg-white shadow-sm">
                 
                 <input type="file" id="file-selector" class="hidden" />
 
                 <div class="flex flex-col items-center space-y-4 max-w-md mx-auto">
-                    <div class="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
-                        <i data-lucide="upload-cloud" class="w-8 h-8 stroke-[2]"></i>
+                    <div class="w-20 h-20 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
+                        <i data-lucide="upload-cloud" class="w-10 h-10 stroke-[2]"></i>
                     </div>
 
                     <div class="space-y-1">
-                        <div class="text-base font-bold text-slate-900">
-                            Drag & drop your chemical file here
+                        <div class="text-lg font-bold text-slate-900">
+                            Select chemistry file or drop here
                         </div>
                         <div class="text-xs text-slate-500">
-                            Single molecules, reaction schemes, crystallography, or quantum logs
+                            PDB, PDBQT, SDF, CIF, ChemDraw CDXML, Gaussian/ORCA logs, or SMILES
                         </div>
                     </div>
 
+                    <!-- iLovePDF Signature Big Primary Button -->
                     <button type="button" onclick="document.getElementById('file-selector').click()"
-                        class="btn-brand-primary font-bold text-sm sm:text-base px-8 py-3.5 rounded-xl flex items-center space-x-2.5 cursor-pointer mt-2">
-                        <i data-lucide="folder-open" class="w-4 h-4"></i>
-                        <span>Select File from Computer</span>
+                        class="btn-brand-primary font-bold text-base sm:text-lg px-10 py-4 rounded-xl flex items-center space-x-3 cursor-pointer mt-2 shadow-lg hover:scale-[1.02] transition-transform">
+                        <i data-lucide="folder-open" class="w-5 h-5"></i>
+                        <span>Select Chemistry File</span>
                     </button>
                 </div>
 
                 <!-- Clean Format Badges Bar -->
                 <div class="mt-10 pt-6 border-t border-slate-100 flex flex-wrap items-center justify-center gap-2 text-[11px] font-mono text-slate-600">
                     <span class="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 font-semibold">ChemDraw (.cdxml, .cdx)</span>
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 font-semibold">Gaussian / ORCA (.log, .inp, .gjf)</span>
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 font-semibold">CIF & VASP POSCAR</span>
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 font-semibold">PDB, AutoDock & GROMACS</span>
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 font-semibold">SMILES & MOL/SDF</span>
+                </div>
+
+            </div>
                     <span class="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 font-semibold">Gaussian / ORCA (.log, .inp, .gjf)</span>
                     <span class="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 font-semibold">CIF & VASP POSCAR</span>
                     <span class="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 font-semibold">PDB, AutoDock & GROMACS</span>
@@ -528,36 +914,130 @@
         </div>
     </section>
 
-    <!-- 4. FOOTER -->
-    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 text-xs">
-        <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center space-x-2">
-                <span class="font-bold text-white text-sm">iLove<span class="text-blue-400">Chem</span></span>
-                <span>• Universal Computational Chemistry Converter</span>
-            </div>
-            <div class="flex flex-wrap items-center justify-center gap-3">
-                <span class="text-slate-400">Developed by <strong class="text-white font-semibold">Shivam Rathore</strong></span>
-                <a href="https://www.linkedin.com/in/shivam-rathore-medchem/" target="_blank" rel="noopener noreferrer"
-                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#0A66C2]/20 hover:bg-[#0A66C2]/40 text-sky-300 border border-[#0A66C2]/40 font-medium transition"
-                    title="Connect on LinkedIn">
-                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                    </svg>
-                    <span>LinkedIn ↗</span>
-                </a>
-
-                <a href="mailto:shivamrathore.medchem@gmail.com" id="footer-email-link"
-                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium transition"
-                    title="Contact via Email">
-                    <i data-lucide="mail" class="w-3.5 h-3.5 text-blue-400"></i>
-                    <span>Contact via Email</span>
-                </a>
-
-                <span class="text-slate-600 hidden sm:inline">•</span>
-                <div class="font-mono text-slate-500">
-                    OpenBabel · RDKit · ASE · cclib
+    <!-- 5. GLOBAL DARK MINIMALIST FOOTER (iLovePDF Style - Exact replica of Image 2) -->
+    <footer class="bg-[#18181B] text-slate-400 pt-16 pb-12 border-t border-slate-800 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
+            
+            <!-- 5 Columns Grid (Matching Image 2) -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
+                
+                <!-- Col 1: PRODUCT -->
+                <div class="space-y-3">
+                    <div class="text-white font-bold text-xs uppercase tracking-wider">Product</div>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="/" class="hover:text-white transition">Home</a></li>
+                        <li><a href="javascript:void(0)" onclick="selectToolFromGrid('orca', 'ORCA Generator', 'Generate DFT input files with spin parity')" class="hover:text-white transition">ORCA Generator</a></li>
+                        <li><a href="javascript:void(0)" onclick="selectToolFromGrid('gaussian', 'Gaussian Builder', 'Convert 2D/3D molecules into .com / .gjf')" class="hover:text-white transition">Gaussian Builder</a></li>
+                        <li><a href="javascript:void(0)" onclick="selectToolFromGrid('pdbqt', 'AutoDock PDBQT Prep', 'Prepare ligands & receptors for Vina')" class="hover:text-white transition">AutoDock PDBQT</a></li>
+                        <li><a href="javascript:void(0)" onclick="selectToolFromGrid('cdxml', 'ChemDraw Unpacker', 'Extract schemes & SuperAtoms into 3D')" class="hover:text-white transition">ChemDraw Unpacker</a></li>
+                        <li><a href="javascript:void(0)" onclick="selectToolFromGrid('xyz', 'CIF Crystallography', 'Convert crystal unit cells to XYZ')" class="hover:text-white transition">CIF Crystallography</a></li>
+                        <li><a href="javascript:void(0)" onclick="selectToolFromGrid('orca', 'Universal Converter', '20+ Chemistry file formats')" class="hover:text-white transition">All Chemistry Tools</a></li>
+                    </ul>
                 </div>
+
+                <!-- Col 2: RESOURCES -->
+                <div class="space-y-3">
+                    <div class="text-white font-bold text-xs uppercase tracking-wider">Resources</div>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="/api/convert/" target="_blank" class="hover:text-white transition">Python REST API</a></li>
+                        <li><a href="/audit/bundle/" target="_blank" class="hover:text-white transition">Source Bundle Docs</a></li>
+                        <li><a href="javascript:void(0)" onclick="document.getElementById('presets-catalog-modal').classList.remove('hidden')" class="hover:text-white transition">19 Test Benchmarks</a></li>
+                        <li><a href="/robots.txt" target="_blank" class="hover:text-white transition">Robots.txt Crawl</a></li>
+                        <li><a href="/sitemap.xml" target="_blank" class="hover:text-white transition">Sitemap Index</a></li>
+                        <li><a href="https://github.com/shivamrathore12336-dev/ilovechem" target="_blank" class="hover:text-white transition">GitHub Repository</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: SOLUTIONS -->
+                <div class="space-y-3">
+                    <div class="text-white font-bold text-xs uppercase tracking-wider">Solutions</div>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><span class="text-slate-300 font-semibold">Pharma & Biotech</span></li>
+                        <li><span class="text-slate-300 font-semibold">Medicinal Chemistry</span></li>
+                        <li><span class="text-slate-300 font-semibold">Quantum DFT Groups</span></li>
+                        <li><span class="text-slate-300 font-semibold">Molecular Docking (CADD)</span></li>
+                        <li><span class="text-slate-300 font-semibold">Academic Teaching Labs</span></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: LEGAL & SECURITY -->
+                <div class="space-y-3">
+                    <div class="text-white font-bold text-xs uppercase tracking-wider">Security & Legal</div>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="javascript:void(0)" onclick="document.getElementById('security-modal').classList.remove('hidden')" class="hover:text-white transition text-emerald-400 flex items-center gap-1.5 font-bold"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Zero-Disk Policy</a></li>
+                        <li><span class="hover:text-white transition">Volatile RAM Privacy</span></li>
+                        <li><span class="hover:text-white transition">Terms & Open License</span></li>
+                        <li><span class="hover:text-white transition">No Data Persistence</span></li>
+                        <li><span class="hover:text-white transition">Pharma-Grade Protection</span></li>
+                    </ul>
+                </div>
+
+                <!-- Col 5: COMPANY / CREATOR & PLATFORMS -->
+                <div class="space-y-4">
+                    <div class="text-white font-bold text-xs uppercase tracking-wider">Company & Author</div>
+                    <div class="space-y-2">
+                        <div class="text-slate-200 font-bold">Created by Shivam Rathore</div>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">
+                            Medicinal Chemist & CADD Developer dedicated to democratizing computational chemistry workflows.
+                        </p>
+                    </div>
+
+                    <!-- Platform Badges (Inspired by Image 2 App Store Badges) -->
+                    <div class="space-y-2 pt-2">
+                        <div class="p-2 rounded-lg bg-zinc-800/80 border border-zinc-700/80 flex items-center gap-2.5">
+                            <i data-lucide="cpu" class="w-4 h-4 text-sky-400"></i>
+                            <div>
+                                <div class="text-[10px] text-slate-400 uppercase">Engine Powered by</div>
+                                <div class="text-xs font-bold text-white">RDKit & OpenBabel</div>
+                            </div>
+                        </div>
+
+                        <div class="p-2 rounded-lg bg-zinc-800/80 border border-zinc-700/80 flex items-center gap-2.5">
+                            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+                            <div>
+                                <div class="text-[10px] text-slate-400 uppercase">Security Invariant</div>
+                                <div class="text-xs font-bold text-white">100% In-Memory RAM</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
+
+            <!-- Bottom Divider Bar (Exact Image 2 Layout) -->
+            <div class="pt-8 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                
+                <!-- Language Selector -->
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-800/70 border border-zinc-700/80 text-slate-300 font-semibold text-xs">
+                    <i data-lucide="globe" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span>English</span>
+                    <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i>
+                </div>
+
+                <!-- Social Icons / Links -->
+                <div class="flex items-center space-x-4">
+                    <a href="https://www.linkedin.com/in/shivam-rathore-medchem/" target="_blank" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-[#0A66C2] text-slate-300 hover:text-white flex items-center justify-center transition" title="LinkedIn">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                        </svg>
+                    </a>
+
+                    <a href="https://github.com/shivamrathore12336-dev/ilovechem" target="_blank" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition" title="GitHub">
+                        <i data-lucide="github" class="w-4 h-4"></i>
+                    </a>
+
+                    <a href="mailto:shivamrathore.medchem@gmail.com" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-blue-600 text-slate-300 hover:text-white flex items-center justify-center transition" title="Email">
+                        <i data-lucide="mail" class="w-4 h-4"></i>
+                    </a>
+                </div>
+
+                <!-- Copyright (iLovePDF Style) -->
+                <div class="text-slate-500 text-[11px] text-center sm:text-right font-medium">
+                    © iLoveChem 2026 ® • Universal Computational Chemistry Suite • Created by <strong class="text-slate-300 font-bold">Shivam Rathore</strong>
+                </div>
+
+            </div>
+
         </div>
     </footer>
 
@@ -1282,6 +1762,50 @@
 
         function resetToUpload() {
             cancelUpload();
+        }
+
+        // iLovePDF Mega-Dropdown and Grid Interactions
+        function toggleMegaDropdown() {
+            const dropdown = document.getElementById('mega-dropdown');
+            const arrow = document.getElementById('mega-arrow');
+            if (!dropdown) return;
+            const isHidden = dropdown.classList.contains('hidden');
+            if (isHidden) {
+                dropdown.classList.remove('hidden');
+                if (arrow) arrow.classList.add('rotate-180');
+            } else {
+                dropdown.classList.add('hidden');
+                if (arrow) arrow.classList.remove('rotate-180');
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('mega-dropdown');
+            const btn = document.getElementById('mega-menu-btn');
+            if (dropdown && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+                dropdown.classList.add('hidden');
+                const arrow = document.getElementById('mega-arrow');
+                if (arrow) arrow.classList.remove('rotate-180');
+            }
+        });
+
+        function selectToolFromGrid(format, name, desc) {
+            const sel = document.getElementById('target-format-select');
+            if (sel && format) {
+                sel.value = format;
+            }
+            const banner = document.getElementById('active-tool-banner');
+            if (banner) {
+                banner.classList.remove('hidden');
+                const titleEl = document.getElementById('active-tool-title');
+                const descEl = document.getElementById('active-tool-desc');
+                if (titleEl) titleEl.textContent = name;
+                if (descEl) descEl.textContent = desc;
+            }
+            const workspace = document.getElementById('workspace-section');
+            if (workspace) {
+                workspace.scrollIntoView({ behavior: 'smooth' });
+            }
         }
     </script>
 </body>
