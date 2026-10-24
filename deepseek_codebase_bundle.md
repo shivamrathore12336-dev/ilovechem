@@ -2856,7 +2856,7 @@ def audit_bundle_view(request):
                     <span>LinkedIn ↗</span>
                 </a>
 
-                <a href="mailto:shivamrathore.medchem@gmail.com" id="footer-email-link"
+                <a href="mailto:Shivamrathore12336@gmail.com" id="footer-email-link"
                     class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium transition"
                     title="Contact via Email">
                     <i data-lucide="mail" class="w-3.5 h-3.5 text-blue-400"></i>

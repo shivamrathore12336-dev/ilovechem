@@ -93,7 +93,7 @@ docker run -p 10000:10000 -e PORT=10000 ilovechem
 *Medicinal Chemist & CADD Developer*  
 - **LinkedIn:** [shivam-rathore-medchem](https://www.linkedin.com/in/shivam-rathore-medchem/)  
 - **GitHub:** [@shivamrathore12336-dev](https://github.com/shivamrathore12336-dev)  
-- **Email:** [shivamrathore.medchem@gmail.com](mailto:shivamrathore.medchem@gmail.com)
+- **Email:** [Shivamrathore12336@gmail.com](mailto:Shivamrathore12336@gmail.com)
 
 ---
 
