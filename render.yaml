@@ -9,3 +9,11 @@ services:
     envVars:
       - key: PYTHONUNBUFFERED
         value: "1"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: SITE_URL
+        value: https://ilovechem.onrender.com
+      # Free plan has 512 MB RAM; RDKit + OpenBabel + ASE + SciPy per worker is heavy.
+      # Raise on a paid plan.
+      - key: WEB_CONCURRENCY
+        value: "1"

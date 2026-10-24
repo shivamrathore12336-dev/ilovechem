@@ -30,3 +30,5 @@ Thumbs.db
 
 # Test evidence & audit artifacts
 audit/
+*.zip
+ilovechem_claude_*

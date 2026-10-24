@@ -799,7 +799,7 @@
                                 <label class="font-bold text-slate-700 block mb-1">QM Functional / Method</label>
                                 <input type="text" id="method-input" value="B3LYP" 
                                     class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-mono font-bold focus:outline-none focus:border-blue-500" />
-                                <span class="text-[10px] text-slate-400 mt-1 block">e.g. B3LYP, PBE0, wB97X-D, PBE</span>
+                                <span class="text-[10px] text-slate-400 mt-1 block">e.g. B3LYP, PBE0, wB97X-D3, PBE</span>
                             </div>
 
                             <div>
@@ -1910,10 +1910,20 @@
                     method: 'POST',
                     body: formData
                 });
-                const res = await response.json();
+                // The server can answer with a non-JSON page (502/504 from the host, an out-of-memory
+                // restart, a cold start). Parse defensively so users get a clear message.
+                let res = {};
+                try {
+                    res = await response.json();
+                } catch (parseErr) {
+                    res = {};
+                }
 
-                if (!response.ok) {
-                    showToast(res.error || "Failed to convert file.", "error", 4500);
+                if (!response.ok || !res || (!res.output_content && !res.zip_base64)) {
+                    const fallbackMsg = response.ok
+                        ? "The server returned an unexpected response. Please try again."
+                        : `Server error (${response.status}). The server may be waking up or busy, please retry in a moment.`;
+                    showToast((res && res.error) || fallbackMsg, "error", 5500);
                     return;
                 }
 
@@ -2311,10 +2321,15 @@
         window.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
             const presetParam = params.get('preset');
-            const targetParam = params.get('target');
+            // Accept legacy ?tool= links and friendly aliases; ignore values that are not real options.
+            const aliases = { gaussian: 'gjf', vina: 'pdbqt', autodock: 'pdbqt', chemdraw: 'cdxml' };
+            const rawTarget = params.get('target') || params.get('tool');
+            const targetParam = rawTarget ? (aliases[rawTarget.toLowerCase()] || rawTarget.toLowerCase()) : null;
             if (targetParam) {
                 const sel = document.getElementById('target-format-select');
-                if (sel) sel.value = targetParam;
+                if (sel && Array.from(sel.options).some(o => o.value === targetParam)) {
+                    sel.value = targetParam;
+                }
             }
             if (presetParam) {
                 setPresetShortcut(presetParam, targetParam || 'orca');

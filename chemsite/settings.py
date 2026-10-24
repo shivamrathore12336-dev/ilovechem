@@ -21,12 +21,29 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-dev-fallback-key-for-local-development-only-change-in-prod')
+_INSECURE_DEV_KEY = 'django-insecure-dev-fallback-key-for-local-development-only-change-in-prod'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', _INSECURE_DEV_KEY)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 't')
 
-ALLOWED_HOSTS = ['*']
+if SECRET_KEY == _INSECURE_DEV_KEY and not DEBUG:
+    import warnings
+    warnings.warn(
+        "DJANGO_SECRET_KEY is not set: running with the public fallback key. "
+        "Set DJANGO_SECRET_KEY in your hosting environment.",
+        RuntimeWarning,
+    )
+
+# Comma-separated list, e.g. ALLOWED_HOSTS=ilovechem.onrender.com,localhost
+# Defaults to '*' (previous behavior) so existing deployments keep working until it is set.
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '*').split(',') if h.strip()]
+
+# Canonical public origin used for robots.txt and sitemap.xml.
+SITE_URL = os.environ.get('SITE_URL', 'https://ilovechem.onrender.com')
+
+# Behind Render's TLS-terminating proxy, trust X-Forwarded-Proto so request.is_secure() is correct.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
@@ -142,7 +159,6 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
 # Security Hardening Headers
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'SAMEORIGIN'
-SECURE_BROWSER_XSS_FILTER = True
 
 
 CSRF_TRUSTED_ORIGINS = [

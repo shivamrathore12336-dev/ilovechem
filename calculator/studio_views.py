@@ -1,6 +1,7 @@
 import os
 import re
 import base64
+from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
@@ -122,6 +123,8 @@ def api_convert_file(request):
                     "mol_block_3d": viewer_molblock
                 }, status=status.HTTP_200_OK)
 
+        # The giant-log tail scanner above moves the file pointer; rewind before the full read.
+        uploaded_file.seek(0)
         file_bytes = uploaded_file.read()
         if not file_bytes.strip():
             return Response({"error": "Empty chemical file provided."}, status=status.HTTP_400_BAD_REQUEST)
@@ -283,50 +286,41 @@ def api_convert_file(request):
         return Response({"error": f"Conversion error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-from django.http import HttpResponse
-
-def audit_bundle_view(request):
-    bundle_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'deepseek_codebase_bundle.md')
-    if os.path.exists(bundle_path):
-        with open(bundle_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-        return HttpResponse(content, content_type="text/markdown; charset=utf-8")
-    return HttpResponse("Bundle file not found", status=404)
+def _site_url() -> str:
+    """Canonical public origin. Fixed by configuration (not the request Host header)
+    so robots.txt / sitemap.xml are always https and cannot be poisoned by a forged Host."""
+    return settings.SITE_URL.rstrip("/")
 
 
 def robots_txt_view(request):
-    scheme = "https" if request.is_secure() else "http"
-    host = request.get_host()
     lines = [
         "User-agent: *",
         "Allow: /",
-        f"Sitemap: {scheme}://{host}/sitemap.xml"
+        "Disallow: /admin/",
+        f"Sitemap: {_site_url()}/sitemap.xml"
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain; charset=utf-8")
 
 
 def sitemap_xml_view(request):
-    scheme = "https" if request.is_secure() else "http"
-    host = request.get_host()
-    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>{scheme}://{host}/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>{scheme}://{host}/downloads/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>{scheme}://{host}/properties/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-</urlset>"""
-    return HttpResponse(xml.strip(), content_type="application/xml; charset=utf-8")
+    base = _site_url()
+    pages = [
+        ("/", "weekly", "1.0"),
+        ("/downloads/", "weekly", "0.9"),
+        ("/about/", "monthly", "0.8"),
+        ("/properties/", "monthly", "0.7"),
+    ]
+    entries = "\n".join(
+        f"  <url>\n    <loc>{base}{path}</loc>\n    <changefreq>{freq}</changefreq>\n    <priority>{prio}</priority>\n  </url>"
+        for path, freq, prio in pages
+    )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{entries}\n"
+        "</urlset>"
+    )
+    return HttpResponse(xml, content_type="application/xml; charset=utf-8")
 
 
 def google_verification_view(request):

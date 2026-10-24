@@ -3,7 +3,6 @@ djangorestframework>=3.15.0
 openbabel-wheel>=3.1.1.23
 cclib>=1.8.1
 ase>=3.29.0
-pymatgen>=2024.1.1
 rdkit>=2023.9.1
 gunicorn>=22.0.0
 numpy

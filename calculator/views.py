@@ -8,8 +8,6 @@ from .chem_utils import (
     generate_3d_molblock,
     generate_2d_base64_image
 )
-from .models import MoleculeQuery
-from .serializers import MoleculeQuerySerializer
 
 def home_view(request):
     """
@@ -79,11 +77,3 @@ def api_calculate_properties(request):
         "mol_block": structure_3d.get("mol_block", ""),
         "image_2d": img_2d
     }, status=status.HTTP_200_OK)
-
-
-@api_view(['GET'])
-def api_history(request):
-    """Returns recent queries."""
-    queries = MoleculeQuery.objects.all()[:20]
-    serializer = MoleculeQuerySerializer(queries, many=True)
-    return Response(serializer.data)

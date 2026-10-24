@@ -664,23 +664,44 @@ class DeepContentSniffer:
         if "* O   R   C   A *" in text_head or "An Ab Initio, DFT and Semiempirical electronic structure package" in text_head:
             return "out", None
 
-        # 5. Gaussian Input (.gjf / .com)
+        # 5. ORCA Input (.inp) -- checked BEFORE Gaussian input because ORCA files
+        # routinely begin with '# comment' lines that must not look like a Gaussian route.
         lines = text_head.splitlines()
-        first_15 = [l.strip() for l in lines[:15] if l.strip()]
-        if any(l.startswith(("%chk=", "%nproc", "%mem=", "#p ", "#P ", "# ")) for l in first_15):
-            return "gjf", None
-
-        # 6. ORCA Input (.inp)
-        first_5 = [l.strip() for l in lines[:5] if l.strip()]
-        if any(l.startswith("!") and any(kw in l.lower() for kw in ["b3lyp", "pbe", "def2", "opt", "freq", "hf", "wb97x", "svp", "tzvp"]) for l in first_5):
+        first_30 = [l.strip() for l in lines[:30] if l.strip()]
+        orca_keywords = ["b3lyp", "pbe", "def2", "opt", "freq", "hf", "wb97x", "svp", "tzvp", "dft", "mp2", "ccsd", "d3bj", "tightscf"]
+        if any(l.startswith("!") and any(kw in l.lower() for kw in orca_keywords) for l in first_30):
             return "inp", None
+        if re.search(r"^\s*%(maxcore|pal)\b", text_head, re.IGNORECASE | re.MULTILINE) or \
+           re.search(r"^\s*\*\s*(xyz|xyzfile|int|gzmt)\s+-?\d+\s+\d+", text_head, re.IGNORECASE | re.MULTILINE):
+            return "inp", None
+
+        # 6. Gaussian Input (.gjf / .com)
+        # A route section is '#p ...', '#n ...', '#t ...' or '# <method>/<basis> ...'.
+        # A bare '# some comment' line is NOT enough.
+        gaussian_route_keywords = re.compile(
+            r"\b(opt|freq|sp|scf|td|nmr|irc|scan|force|geom|guess|pop|volume|stable|polar|counterpoise)\b",
+            re.IGNORECASE
+        )
+        # An XYZ file starts with a bare atom-count line; its comment line must never be read as a route.
+        is_xyz_like = bool(first_30) and first_30[0].isdigit()
+        for l in ([] if is_xyz_like else first_30):
+            if l.startswith(("%chk=", "%nproc", "%mem=", "%oldchk=")):
+                return "gjf", None
+            if l.startswith(("#p ", "#P ", "#n ", "#N ", "#t ", "#T ")):
+                return "gjf", None
+            if l.startswith("#") and ("/" in l or gaussian_route_keywords.search(l)) and not l.startswith("##"):
+                return "gjf", None
 
         # 7. Q-Chem Input
         if "$molecule" in text_head or "$rem" in text_head:
             return "qchem", None
 
         # 8a. AutoDock PDBQT (Must precede standard PDB check)
-        if filename.lower().endswith(".pdbqt") or "TORSDOF" in text_head or "BRANCH" in text_head or "ROOT" in text_head:
+        # Keywords must start a line (PDBQT records), so words like "BRANCHED" in a PDB
+        # COMPND/REMARK line are not mistaken for AutoDock torsion tree records.
+        if filename.lower().endswith(".pdbqt") or re.search(
+            r"^(TORSDOF|ROOT|ENDROOT|BRANCH|ENDBRANCH)(\s|$)", text_head, re.MULTILINE
+        ):
             return "pdbqt", None
 
         # 8b. Protein Data Bank (PDB)
@@ -719,8 +740,14 @@ class DeepContentSniffer:
         non_empty = [l.strip() for l in lines if l.strip()]
         if len(non_empty) == 1:
             s = non_empty[0]
-            if not ' ' in s and all(c in "BCNOFPSIClBrnHc1234567890()=@#+-\\[]./%" for c in s):
-                return "smi", None
+            # Full SMILES alphabet (any element symbol incl. lowercase aromatics s/o/p/se),
+            # validated by RDKit so arbitrary one-word text is not mistaken for a molecule.
+            if ' ' not in s and re.fullmatch(r"[A-Za-z0-9@+\-\[\]()\\/=#$%:.*~]+", s):
+                try:
+                    if Chem.MolFromSmiles(s) is not None:
+                        return "smi", None
+                except Exception:
+                    pass
 
         # Fallback to extension if content sniffing is inconclusive
         lower_fname = filename.lower()
