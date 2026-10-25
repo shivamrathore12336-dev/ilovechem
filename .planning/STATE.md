@@ -1,27 +1,36 @@
 # iLoveChem — Live Project State
 
-**Current Milestone:** Milestone 1.0 Complete ➔ Milestone 2.0 (Interactive 3D Viewer & Batch Queue)  
-**Last Updated:** 2026-10-24  
-**Author:** Shivam Rathore
+**Current Milestone:** Milestone 2.0: Inbuilt Molecular Docking Studio (AutoDock Vina Engine)  
+**Active Phase:** Phase 6: Docking Kernel & PDBQT Preprocessor (Phase 1 of Docking)  
+**Last Updated:** 2026-10-25  
+**Author:** Shivam Rathore  
 
 ---
 
 ## 📈 System Health & Metrics
 - **Live Production URL:** https://ilovechem.onrender.com/ (HTTP 200 OK)
-- **High-Availability Monitor:** UptimeRobot 5-min ping active (100% Uptime, zero cold-starts)
-- **Google Search Console Status:** Ownership verified (`google889b369925c8069a.html`), sitemap submitted
-- **Git Commit:** `2fd31b6` (sanitized, zero secrets, MIT License, public-ready)
-- **Test Invariants:** 20 / 20 GRAVITAS scientific probes passing (100%)
+- **Render Production Service:** `srv-dbe71cavcj2c73buidvg` (Commit `fb7a0df` LIVE)
+- **High-Availability Monitor:** 100% Uptime, zero cold-starts
+- **Codebase Mapping:** COMPLETE (7/7 documents in `.planning/codebase/` stamped at `fb7a0df`)
+- **Onboarding Status:** Ready (`.planning/onboarding/SUMMARY.md` committed)
+- **Test Invariants:**
+  - 11 / 11 Django unit tests passing
+  - 20 / 20 GRAVITAS scientific probes passing (100%)
+  - 20 / 20 Code review & security hardening findings patched
 
 ---
 
 ## 🧭 Active Context & Decisions
-- **Decision 1:** Software Downloads separated from homepage to dedicated `/downloads/` route to maintain strict iLovePDF aesthetic.
-- **Decision 2:** Zero-disk policy is absolute — user structures never touch physical disk, eliminating privacy risks.
-- **Decision 3:** ETKDGv3 embedding bounded by `maxAttempts=20` to prevent hanging on complex conjugated systems like Rhodamine B.
+- **Decision 1 (Pharma Zero-Storage Invariant):** All docking preparations (Receptor PDBQT, Ligand PDBQT, pocket sniffing, docking scoring) must run in volatile RAM buffers. No user structures or protein targets touch persistent disk.
+- **Decision 2 (Rigorous Redocking Benchmark):** Binding affinity scoring must use the AutoDock Vina scoring function with redocking RMSD $< 2.0\text{ \AA}$ against standard crystallographic complexes (e.g. 1HSG, 3ERT).
+- **Decision 3 (Smart Auto-Pocket Centroid):** Co-crystallized ligands in PDB files must be auto-detected to calculate the binding site centroid $(X, Y, Z)$ automatically, eliminating manual grid box guesswork for users.
 
 ---
 
-## 🎯 Next Recommended GSD Actions
-1. **Interactive 3D Viewer (Phase 6):** Add a toggleable 3D web viewer canvas (`3Dmol.js`) inside the studio so users can inspect their generated 3D conformers immediately after conversion.
-2. **Batch Converter (Phase 7):** Allow dropping multiple files simultaneously with 1-click ZIP export.
+## 🎯 Active Execution Plan: Phase 6 (Docking Kernel & PDBQT Preprocessor)
+1. **`calculator/docking_core.py`:** Create standalone, high-performance macromolecule preprocessor:
+   - `prepare_receptor_pdbqt(pdb_content_str)`: Strip crystallographic waters, detect alternate conformations, add polar hydrogens, assign Gasteiger charges, merge non-polar hydrogens into heavy carbons.
+   - `prepare_ligand_pdbqt(mol_input)`: Identify rotatable bonds, generate AutoDock torsion tree (`ROOT`, `BRANCH`, `TORSDOF`), assign partial charges.
+   - `detect_binding_pocket_centroid(pdb_content_str)`: Extract co-crystallized ligand HETATMs, compute bounding box & centroid $(X, Y, Z)$ with suggested search volume $(20\times 20\times 20\text{ \AA})$.
+2. **AutoDock Vina Engine Binding:** Connect Python Vina engine or lightweight execution bridge with in-memory pipes.
+3. **Verification Probes:** Test on HIV-1 Protease (`1HSG`) with Indinavir ligand, validating accurate PDBQT formatting and centroid extraction.
