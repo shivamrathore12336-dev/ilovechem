@@ -107,3 +107,71 @@ class SiteMetadataTests(TestCase):
         self.assertEqual(self.client.get("/audit/bundle/").status_code, 404)
         self.assertEqual(self.client.get("/api/history/").status_code, 404)
 
+
+
+class MolecularDockingEngineTests(TestCase):
+    def setUp(self):
+        self.mock_pdb = (
+            "CRYST1   40.000   40.000   40.000  90.00  90.00  90.00 P 1\n"
+            "ATOM      1  N   ASP A  25      10.000  10.000  10.000  1.00 20.00           N\n"
+            "ATOM      2  CA  ASP A  25      11.000  10.000  10.000  1.00 20.00           C\n"
+            "ATOM      3  C   ASP A  25      11.500  11.400  10.000  1.00 20.00           C\n"
+            "ATOM      4  O   ASP A  25      10.800  12.300  10.000  1.00 20.00           O\n"
+            "ATOM      5  CB  ASP A  25      11.700   9.000   9.000  1.00 20.00           C\n"
+            "ATOM      6  CG  ASP A  25      11.200   7.600   9.200  1.00 20.00           C\n"
+            "ATOM      7  OD1 ASP A  25      10.000   7.400   9.500  1.00 20.00           O\n"
+            "ATOM      8  OD2 ASP A  25      12.000   6.700   9.000  1.00 20.00           O\n"
+            "HETATM   20  C1  DRG A 100      11.000   7.500  12.000  1.00 15.00           C\n"
+            "HETATM   21  C2  DRG A 100      12.200   7.500  12.000  1.00 15.00           C\n"
+            "HETATM   22  O1  DRG A 100      10.500   6.400  11.500  1.00 15.00           O\n"
+            "HETATM   23  N1  DRG A 100      13.000   8.500  12.500  1.00 15.00           N\n"
+            "HETATM   24  C3  DRG A 100      14.200   8.500  12.500  1.00 15.00           C\n"
+            "HETATM   25  C4  DRG A 100      15.000   9.600  13.000  1.00 15.00           C\n"
+            "HETATM   26  O2  DRG A 100      14.500  10.800  13.000  1.00 15.00           O\n"
+            "HETATM   30  O   HOH A 201      25.000  25.000  25.000  1.00 18.00           O\n"
+            "END\n"
+        )
+
+    def test_centroid_sniffer_and_pocket_bounding_box(self):
+        from .docking_core import DockingEngine
+        info = DockingEngine.detect_co_crystallized_ligand_and_centroid(self.mock_pdb)
+        self.assertTrue(info["has_co_crystal_ligand"])
+        self.assertEqual(info["ligand_resname"], "DRG")
+        self.assertAlmostEqual(info["center_x"], 12.914, delta=0.5)
+        self.assertGreaterEqual(info["size_x"], 18.0)
+
+    def test_rigid_receptor_preparation_and_torsion_tree_ligand(self):
+        from .docking_core import DockingEngine
+        rec_pdbqt, meta = DockingEngine.prepare_receptor_pdbqt(self.mock_pdb)
+        self.assertNotIn("DRG", rec_pdbqt)
+        self.assertNotIn("HOH", rec_pdbqt)
+        self.assertNotIn("ROOT", rec_pdbqt)
+        self.assertNotIn("TORSDOF", rec_pdbqt)
+
+        lig_pdbqt, lig_meta = DockingEngine.prepare_ligand_pdbqt("CC(=O)Oc1ccccc1C(=O)O")
+        self.assertIn("ROOT", lig_pdbqt)
+        self.assertIn("ENDROOT", lig_pdbqt)
+        self.assertIn("TORSDOF", lig_pdbqt)
+
+    def test_autodock_vina_execution_pipeline(self):
+        from .docking_core import DockingEngine, find_vina_binary
+        vina_bin = find_vina_binary()
+        if not vina_bin:
+            self.skipTest("Vina binary not in local test environment")
+        rec_pdbqt, _ = DockingEngine.prepare_receptor_pdbqt(self.mock_pdb)
+        lig_pdbqt, _ = DockingEngine.prepare_ligand_pdbqt("CC(=O)Oc1ccccc1C(=O)O")
+        res = DockingEngine.run_docking(
+            receptor_pdbqt=rec_pdbqt,
+            ligand_pdbqt=lig_pdbqt,
+            center_x=12.914,
+            center_y=8.4,
+            center_z=12.357,
+            size_x=16.0,
+            size_y=16.0,
+            size_z=16.0,
+            exhaustiveness=1,
+            num_modes=2
+        )
+        self.assertTrue(res["success"])
+        self.assertGreater(res["poses_count"], 0)
+        self.assertIsNotNone(res["best_affinity_kcal_mol"])

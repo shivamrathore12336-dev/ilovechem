@@ -32,3 +32,7 @@ Thumbs.db
 audit/
 *.zip
 ilovechem_claude_*
+
+# Binaries
+calculator/bin/
+*.exe
