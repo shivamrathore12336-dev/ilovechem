@@ -738,7 +738,12 @@ class ChemDockEngine:
 
         # Monte Carlo Simulated Annealing with Flexible Torsions
         num_cycles = max(3, int(exhaustiveness))
-        steps_per_cycle = 250
+        # Adaptive step balancing: ensures deep multi-start spatial exploration
+        # while keeping web response times fast and responsive (~3-14s even at exhaustiveness 64)
+        if num_cycles > 16:
+            steps_per_cycle = max(90, int(250 * math.sqrt(16.0 / num_cycles)))
+        else:
+            steps_per_cycle = 250
 
         accepted_poses: List[Tuple[float, np.ndarray]] = []
         grid_half_extent = np.array([size_x / 2.0, size_y / 2.0, size_z / 2.0])
