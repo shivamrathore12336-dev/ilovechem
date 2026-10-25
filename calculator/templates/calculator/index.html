@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChemCompute AI — Computational Chemistry Workbench</title>
+    <title>iLoveChem — Computational Chemistry & Drug Workbench</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons CDN -->
@@ -30,7 +30,7 @@
                 </div>
                 <div>
                     <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400">
-                        ChemCompute Studio
+                        iLoveChem Studio
                     </span>
                     <span class="text-xs ml-2 px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800 font-medium">v1.0 Ready</span>
                 </div>
@@ -60,7 +60,7 @@
         <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
             <div class="absolute -right-16 -top-16 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
             
-            <form method="POST" action="/" class="space-y-4">
+            <form method="POST" action="/properties/" class="space-y-4">
                 {% csrf_token %}
                 <div class="flex flex-col md:flex-row gap-3">
                     <div class="relative flex-1">
@@ -101,6 +101,7 @@
         </section>
 
         {% if properties %}
+        {{ properties|json_script:"properties-json-data" }}
         <!-- Analysis View Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
@@ -272,7 +273,7 @@
 
     <!-- Footer -->
     <footer class="border-t border-slate-800/80 py-6 text-center text-xs text-slate-500 bg-slate-950">
-        ChemCompute Studio • Integrated RDKit Chemical Kernel & 3Dmol.js WebGL Graphics
+        iLoveChem Studio • Integrated RDKit Chemical Kernel & 3Dmol.js WebGL Graphics
     </footer>
 
     <!-- Scripts -->
@@ -331,7 +332,15 @@
         }
 
         function downloadJSON() {
-            const data = {{ properties|safe|default:"{}" }};
+            let data = {};
+            const propsEl = document.getElementById('properties-json-data');
+            if (propsEl) {
+                try {
+                    data = JSON.parse(propsEl.textContent);
+                } catch(e) {
+                    console.error("Failed to parse JSON data:", e);
+                }
+            }
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');

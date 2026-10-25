@@ -96,7 +96,16 @@ def sanitize_and_extract_all_fragments(raw_text: str) -> Tuple[List[Dict[str, An
 
             elem_attr = n.get('Element')
             elem = int(elem_attr) if elem_attr and elem_attr.isdigit() else 6
-            charge = int(n.get('Charge', '0'))
+            raw_c = str(n.get('Charge', '0')).strip()
+            charge = 0
+            if raw_c:
+                try:
+                    if raw_c.endswith('+'): charge = int(raw_c[:-1]) if len(raw_c) > 1 else 1
+                    elif raw_c.endswith('-'): charge = -int(raw_c[:-1]) if len(raw_c) > 1 else -1
+                    elif raw_c.startswith('+'): charge = int(raw_c[1:]) if len(raw_c) > 1 else 1
+                    elif raw_c.startswith('-'): charge = -int(raw_c[1:]) if len(raw_c) > 1 else -1
+                    else: charge = int(raw_c)
+                except Exception: charge = 0
             num_radicals = int(n.get('NumRadicals', '0'))
             radical_attr = n.get('Radical', '')
             if not num_radicals and radical_attr in ('Doublet', 'Radical', 'monoradical'):

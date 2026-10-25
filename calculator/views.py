@@ -63,17 +63,18 @@ def api_calculate_properties(request):
         return Response(props, status=status.HTTP_400_BAD_REQUEST)
 
     structure_3d = generate_3d_molblock(smiles)
-    if "error" in structure_3d:
-        return Response(
-            {"success": False, "error": structure_3d["error"]},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+    mol_block = structure_3d.get("mol_block", "")
+    warn_3d = structure_3d.get("error", None)
 
     img_2d = generate_2d_base64_image(smiles)
 
-    return Response({
+    resp_data = {
         "success": True,
         "properties": props,
-        "mol_block": structure_3d.get("mol_block", ""),
+        "mol_block": mol_block,
         "image_2d": img_2d
-    }, status=status.HTTP_200_OK)
+    }
+    if warn_3d:
+        resp_data["warning_3d"] = warn_3d
+
+    return Response(resp_data, status=status.HTTP_200_OK)

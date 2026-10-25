@@ -1,5 +1,10 @@
 import os
 import math
+if "BABEL_DATADIR" not in os.environ:
+    for _d in ["/usr/share/openbabel", "/usr/local/share/openbabel"]:
+        if os.path.exists(_d):
+            os.environ["BABEL_DATADIR"] = _d
+            break
 import re
 import io
 from typing import Dict, Any, Tuple, Optional, List
@@ -40,9 +45,19 @@ from .scientific_engine import (
 )
 
 def _rebuild_conformer_with_rdkit(mol: pybel.Molecule) -> Optional[pybel.Molecule]:
-    """Repair invalid generated coordinates using RDKit ETKDG and a supported force field."""
+    """Repair invalid generated coordinates using RDKit ETKDG and a supported force field, preserving stereocenters."""
     try:
-        rd_mol = Chem.MolFromMolBlock(mol.write("mol"), sanitize=True, removeHs=False)
+        can_smi = mol.write("can").strip()
+        rd_mol = None
+        if can_smi:
+            try:
+                rd_mol = Chem.MolFromSmiles(can_smi, sanitize=True)
+                if rd_mol is not None:
+                    rd_mol = Chem.AddHs(rd_mol)
+            except Exception:
+                rd_mol = None
+        if rd_mol is None:
+            rd_mol = Chem.MolFromMolBlock(mol.write("mol"), sanitize=True, removeHs=False)
         if rd_mol is None:
             return None
         rd_mol.RemoveAllConformers()
@@ -176,12 +191,21 @@ def parse_and_extract_atoms(
     if in_format == "inp" or (b"*" in input_bytes and (b"! " in input_bytes or b"%maxcore" in input_bytes or b"%pal" in input_bytes)):
         try:
             content_str = input_bytes.decode('utf-8', errors='ignore')
-            m = re.search(r'\*\s*(?:xyz|xyzfile|int|gzmt)\s+(-?\d+)\s+(\d+)\s*\n(.*?)\n\s*\*|\*\s*xyz\s+(-?\d+)\s+(\d+)\s*\n(.*)', content_str, re.DOTALL | re.IGNORECASE)
+            m = re.search(r'\*\s*xyz\s+(-?\d+)\s+(\d+)\s*\n(.*?)(?:\n\s*\*|$)', content_str, re.DOTALL | re.IGNORECASE)
             if m:
-                extracted_charge = int(m.group(1) or m.group(4) or 0)
-                extracted_mult = int(m.group(2) or m.group(5) or 1)
-                coords_text = (m.group(3) or m.group(6) or "").strip()
-                coord_lines = [l.strip() for l in coords_text.splitlines() if l.strip() and not l.strip().startswith('#') and not l.strip().startswith('*')]
+                extracted_charge = int(m.group(1) or 0)
+                extracted_mult = int(m.group(2) or 1)
+                coords_text = (m.group(3) or "").strip()
+                raw_lines = [l.strip() for l in coords_text.splitlines() if l.strip() and not l.strip().startswith('#') and not l.strip().startswith('*')]
+                coord_lines = []
+                for cl in raw_lines:
+                    parts = cl.split()
+                    if len(parts) >= 4:
+                        try:
+                            float(parts[1]), float(parts[2]), float(parts[3])
+                            coord_lines.append(cl)
+                        except ValueError:
+                            pass
                 if coord_lines:
                     xyz_payload = f"{len(coord_lines)}\nConverted from ORCA input\n" + "\n".join(coord_lines)
                     py_mol = pybel.readstring("xyz", xyz_payload)
@@ -753,7 +777,7 @@ def export_to_target_format(
             for line in pdbqt_str.splitlines():
                 if (line.startswith("ATOM") or line.startswith("HETATM")) and ("nan" in line.lower() or "inf" in line.lower()):
                     if len(line) >= 76:
-                        line = line[:70] + " +0.000" + line[76:]
+                        line = line[:70] + "+0.000" + line[76:]
                 clean_lines.append(line)
             pdbqt_str = "\n".join(clean_lines) + "\n"
             return _finalize(pdbqt_str, "docking_ligand.pdbqt")
