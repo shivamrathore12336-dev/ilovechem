@@ -153,14 +153,11 @@ class MolecularDockingEngineTests(TestCase):
         self.assertIn("ENDROOT", lig_pdbqt)
         self.assertIn("TORSDOF", lig_pdbqt)
 
-    def test_autodock_vina_execution_pipeline(self):
-        from .docking_core import DockingEngine, find_vina_binary
-        vina_bin = find_vina_binary()
-        if not vina_bin:
-            self.skipTest("Vina binary not in local test environment")
-        rec_pdbqt, _ = DockingEngine.prepare_receptor_pdbqt(self.mock_pdb)
-        lig_pdbqt, _ = DockingEngine.prepare_ligand_pdbqt("CC(=O)Oc1ccccc1C(=O)O")
-        res = DockingEngine.run_docking(
+    def test_inbuilt_chemdock_execution_pipeline(self):
+        from .docking_core import ChemDockEngine
+        rec_pdbqt, _ = ChemDockEngine.prepare_receptor_pdbqt(self.mock_pdb)
+        lig_pdbqt, _ = ChemDockEngine.prepare_ligand_pdbqt("CC(=O)Oc1ccccc1C(=O)O")
+        res = ChemDockEngine.run_docking(
             receptor_pdbqt=rec_pdbqt,
             ligand_pdbqt=lig_pdbqt,
             center_x=12.914,
@@ -169,9 +166,10 @@ class MolecularDockingEngineTests(TestCase):
             size_x=16.0,
             size_y=16.0,
             size_z=16.0,
-            exhaustiveness=1,
-            num_modes=2
+            exhaustiveness=2,
+            num_modes=3
         )
         self.assertTrue(res["success"])
+        self.assertIn("ChemDock", res["engine"])
         self.assertGreater(res["poses_count"], 0)
         self.assertIsNotNone(res["best_affinity_kcal_mol"])

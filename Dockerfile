@@ -8,8 +8,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxrender1 \
     libxext6 \
     curl \
-    && curl -L https://github.com/forlilab/AutoDock-Vina/releases/download/v1.2.7/vina_1.2.7_linux_x86_64 -o /usr/local/bin/vina \
-    && chmod +x /usr/local/bin/vina \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up non-root user (UID 1000) for security and Hugging Face Spaces compatibility
