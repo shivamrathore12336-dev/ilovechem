@@ -30,7 +30,8 @@ from rdkit.Chem import AllChem, Descriptors
 SOLVENT_AND_BUFFER_RESIDUES = {
     "HOH", "WAT", "DOD", "TIP", "TIP3", "SOL",
     "SO4", "PO4", "CL", "NA", "MG", "ZN", "CA", "MN", "FE", "K", "IOD",
-    "EDO", "DMS", "ACT", "FMT", "PEG", "PG4", "GOL", "BME", "MES", "HEPES"
+    "EDO", "DMS", "ACT", "FMT", "PEG", "PG4", "PGE", "GOL", "BME", "MES", "HEPES",
+    "NAG", "MAN", "BMA", "FUC", "NDG", "GLC", "PEF", "OGA", "TRS", "MPD"
 }
 
 # AutoDock Vina Empirical VDW Radii (Angstroms)
@@ -109,7 +110,7 @@ class ChemDockEngine:
     """
 
     @staticmethod
-    def detect_co_crystallized_ligand_and_centroid(pdb_str: str) -> Dict[str, Any]:
+    def detect_co_crystallized_ligand_and_centroid(pdb_str: str, preferred_ligand_resname: Optional[str] = None) -> Dict[str, Any]:
         """
         Inspects PDB records for co-crystallized drug ligands (HETATM).
         Calculates geometric centroid (center_x, center_y, center_z) and
@@ -141,13 +142,19 @@ class ChemDockEngine:
                     except (ValueError, IndexError):
                         pass
 
-        # Select the largest HETATM group (candidate drug/inhibitor ligand)
+        # Select candidate drug/inhibitor ligand (prefer specified ligand if present)
         chosen_res = None
         chosen_coords = []
-        for res, coords in het_coords.items():
-            if len(coords) >= 6 and len(coords) > len(chosen_coords):
-                chosen_res = res
-                chosen_coords = coords
+        pref_clean = preferred_ligand_resname.strip().upper() if preferred_ligand_resname else None
+
+        if pref_clean and pref_clean in het_coords and len(het_coords[pref_clean]) >= 4:
+            chosen_res = pref_clean
+            chosen_coords = het_coords[pref_clean]
+        else:
+            for res, coords in het_coords.items():
+                if len(coords) >= 6 and len(coords) > len(chosen_coords):
+                    chosen_res = res
+                    chosen_coords = coords
 
         if chosen_coords:
             arr = np.array(chosen_coords)
@@ -353,9 +360,20 @@ class ChemDockEngine:
             mol_block = Chem.MolToMolBlock(rd_mol)
             ob_mol = pybel.readstring("mol", mol_block)
         else:
-            fmt = "mol" if "\n" in s else "smi"
+            fmt_lower = input_format.lower().strip()
+            if fmt_lower in ["pdb", "ent"] or "ATOM" in s or "HETATM" in s:
+                fmt = "pdb"
+            elif fmt_lower in ["mol", "sdf"] or "$$$$" in s or "M  END" in s:
+                fmt = "mol"
+            else:
+                fmt = "smi"
+
             ob_mol = pybel.readstring(fmt, s)
-            ob_mol.make3D(forcefield='mmff94', steps=300)
+            if fmt == "smi":
+                try:
+                    ob_mol.make3D(forcefield='mmff94', steps=300)
+                except Exception:
+                    pass
 
         for a in ob_mol.atoms:
             try:
@@ -561,10 +579,13 @@ class ChemDockEngine:
         grid_half_extent = np.array([size_x / 2.0, size_y / 2.0, size_z / 2.0])
 
         for cycle in range(num_cycles):
-            # Random initial position inside box + random 3D orientation
-            init_offset = np.random.uniform(-0.6, 0.6, size=3) * grid_half_extent
-            R_init = _random_quaternion_rotation()
-            curr_coords = np.dot(centered_lig, R_init.T) + (target_center + init_offset)
+            if cycle == 0:
+                init_offset = np.zeros(3)
+                curr_coords = centered_lig + target_center
+            else:
+                init_offset = np.random.uniform(-0.5, 0.5, size=3) * grid_half_extent
+                R_init = _random_quaternion_rotation()
+                curr_coords = np.dot(centered_lig, R_init.T) + (target_center + init_offset)
 
             curr_energy = cls.evaluate_vina_score(
                 rec_coords, rec_types_list, rec_radii,
