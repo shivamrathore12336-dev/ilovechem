@@ -66,6 +66,29 @@ class FormatSniffingRegressionTests(TestCase):
         self.assertEqual(meta["parsed_by"], "ORCA Input Coordinate Extractor")
         self.assertEqual(len(mol.atoms), 2)
 
+    def test_pdbqt_gasteiger_charges_and_organometallic_properties(self):
+        from openbabel import pybel
+        from .converter_core import export_to_target_format
+        from .chem_utils import calculate_properties, validate_smiles, generate_3d_molblock
+
+        # 1. PDBQT Gasteiger Partial Charge Verification
+        m = pybel.readstring("smi", "CC(=O)O")
+        m.make3D()
+        pdbqt_str, _, _ = export_to_target_format(m, "pdbqt")
+        atom_lines = [l for l in pdbqt_str.splitlines() if l.startswith("ATOM") or l.startswith("HETATM")]
+        self.assertGreater(len(atom_lines), 0)
+        has_nonzero_charge = any(abs(float(l[70:76].strip())) > 0.001 for l in atom_lines)
+        self.assertTrue(has_nonzero_charge, "PDBQT exporter must assign non-zero Gasteiger partial charges")
+
+        # 2. Organometallic Ferrocene Cheminformatics Verification
+        fc_smi = "[Fe+2].[c-]1cccc1.[c-]1cccc1"
+        self.assertTrue(validate_smiles(fc_smi))
+        props = calculate_properties(fc_smi)
+        self.assertNotIn("error", props)
+        self.assertGreater(props.get("molecular_weight", 0), 150.0)
+        res_3d = generate_3d_molblock(fc_smi)
+        self.assertIn("mol_block", res_3d)
+
 
 class SiteMetadataTests(TestCase):
     @override_settings(SITE_URL="https://example.org", ALLOWED_HOSTS=["evil.example"])

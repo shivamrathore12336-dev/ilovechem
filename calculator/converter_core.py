@@ -1,4 +1,5 @@
 import os
+import math
 import re
 import io
 from typing import Dict, Any, Tuple, Optional, List
@@ -740,7 +741,21 @@ def export_to_target_format(
     # 7. AutoDock PDBQT (Issue 18)
     if target_format in ["pdbqt", "vina"]:
         try:
+            for a in mol.atoms:
+                try:
+                    q = a.OBAtom.GetPartialCharge()
+                    if math.isnan(q) or math.isinf(q):
+                        a.OBAtom.SetPartialCharge(0.0)
+                except Exception:
+                    a.OBAtom.SetPartialCharge(0.0)
             pdbqt_str = mol.write("pdbqt")
+            clean_lines = []
+            for line in pdbqt_str.splitlines():
+                if (line.startswith("ATOM") or line.startswith("HETATM")) and ("nan" in line.lower() or "inf" in line.lower()):
+                    if len(line) >= 76:
+                        line = line[:70] + " +0.000" + line[76:]
+                clean_lines.append(line)
+            pdbqt_str = "\n".join(clean_lines) + "\n"
             return _finalize(pdbqt_str, "docking_ligand.pdbqt")
         except Exception:
             pass
