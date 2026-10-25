@@ -107,7 +107,7 @@ def api_run_docking(request):
         size_x = float(data.get("size_x", 20.0))
         size_y = float(data.get("size_y", 20.0))
         size_z = float(data.get("size_z", 20.0))
-        exhaustiveness = max(1, min(16, int(data.get("exhaustiveness", 6))))
+        exhaustiveness = max(1, min(64, int(data.get("exhaustiveness", 8))))
         num_modes = max(1, min(15, int(data.get("num_modes", 9))))
     except (ValueError, TypeError) as e:
         return Response(
