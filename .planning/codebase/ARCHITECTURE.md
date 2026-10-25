@@ -1,4 +1,11 @@
+---
+last_mapped_commit: fb7a0df1088938b104f273279d7d7919077adbcf
+last_mapped_at: 2026-10-25
+---
 # iLoveChem — Architectural Blueprint & Codebase Map
+
+**Analysis Date:** 2026-10-25  
+<!-- refreshed: 2026-10-25 -->
 
 ## System Topology
 
@@ -35,6 +42,7 @@
 ```
 
 ## Directory Structure
+
 - `calculator/`: Main Django application
   - `studio_views.py`: Primary HTTP views for Studio, Downloads, Sitemap, Robots, Google Verification, and `/api/convert/`
   - `views.py`: Physicochemical properties calculation API (`/api/calculate/`)
@@ -46,3 +54,5 @@
 - `chemsite/`: Django project configuration (`settings.py`, `urls.py`, `wsgi.py`)
 - `Dockerfile`: Debian-slim container with pre-compiled RDKit and OpenBabel libraries
 - `.planning/`: GSD autonomous planning directory (`PROJECT.md`, `REQUIREMENTS.md`, `ROADMAP.md`, `STATE.md`)
+
+*Automated codebase analysis: 2026-10-25*
