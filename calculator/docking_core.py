@@ -185,7 +185,7 @@ class ChemDockEngine:
         }
 
     @classmethod
-    def prepare_receptor_pdbqt(cls, pdb_str: str, strip_co_crystal_ligands: bool = True) -> Tuple[str, Dict[str, Any]]:
+    def prepare_receptor_pdbqt(cls, pdb_str: str, strip_co_crystal_ligands: bool = True, pocket_center: Optional[Tuple[float, float, float]] = None, pocket_radius: float = 24.0) -> Tuple[str, Dict[str, Any]]:
         """
         Prepares a rigid macromolecular target receptor in PDBQT format:
         1. Strips solvent waters and buffer artifacts.
@@ -201,6 +201,11 @@ class ChemDockEngine:
         waters_stripped = 0
         ligands_stripped = 0
 
+        pocket_cx = pocket_center[0] if pocket_center else (co_crystal_info.get("center_x") if co_crystal_info.get("has_co_crystal_ligand") else None)
+        pocket_cy = pocket_center[1] if pocket_center else (co_crystal_info.get("center_y") if co_crystal_info.get("has_co_crystal_ligand") else None)
+        pocket_cz = pocket_center[2] if pocket_center else (co_crystal_info.get("center_z") if co_crystal_info.get("has_co_crystal_ligand") else None)
+        max_dist_sq = (pocket_radius**2) if (pocket_cx is not None and pocket_radius > 0) else None
+
         for line in pdb_str.splitlines():
             rec = line[0:6].strip()
             if rec in ["ATOM", "HETATM"]:
@@ -211,6 +216,16 @@ class ChemDockEngine:
                 if lig_res and resname == lig_res:
                     ligands_stripped += 1
                     continue
+                if max_dist_sq is not None:
+                    try:
+                        x = float(line[30:38].strip())
+                        y = float(line[38:46].strip())
+                        z = float(line[46:54].strip())
+                        d2 = (x - pocket_cx)**2 + (y - pocket_cy)**2 + (z - pocket_cz)**2
+                        if d2 > max_dist_sq:
+                            continue
+                    except Exception:
+                        pass
                 cleaned_lines.append(line)
             elif rec in ["CRYST1", "SCALE", "ORIGX", "TER", "END"]:
                 cleaned_lines.append(line)
@@ -245,6 +260,7 @@ class ChemDockEngine:
         pdbqt_str = "\n".join(formatted_lines) + "\n"
         meta = {
             "atom_count": atom_count,
+            "atoms_count": atom_count,
             "waters_stripped": waters_stripped,
             "ligands_stripped": ligands_stripped,
             "formula": mol.formula
@@ -301,10 +317,20 @@ class ChemDockEngine:
             clean_lines.append(line)
 
         final_pdbqt = "\n".join(clean_lines) + "\n"
+        rot_bonds = 0
+        for line in final_pdbqt.splitlines():
+            if line.startswith("TORSDOF"):
+                try:
+                    rot_bonds = int(line.split()[1])
+                except Exception:
+                    pass
+
         meta = {
             "formula": ob_mol.formula,
             "molecular_weight": round(float(ob_mol.molwt), 2),
-            "atom_count": len(ob_mol.atoms)
+            "atom_count": len(ob_mol.atoms),
+            "num_atoms": len(ob_mol.atoms),
+            "num_rotatable_bonds": rot_bonds
         }
         return final_pdbqt, meta
 
@@ -471,8 +497,8 @@ class ChemDockEngine:
 
         # Monte Carlo Simulated Annealing
         # Number of cycles scaled with exhaustiveness
-        num_cycles = max(3, int(exhaustiveness)) * 3
-        steps_per_cycle = 400
+        num_cycles = max(2, int(exhaustiveness)) * 2
+        steps_per_cycle = 250
 
         accepted_poses: List[Tuple[float, np.ndarray]] = []
         grid_half_extent = np.array([size_x / 2.0, size_y / 2.0, size_z / 2.0])

@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inbuilt Molecular Docking Studio — iLoveChem</title>
+    
+    <!-- Primary SEO Meta Tags -->
+    <meta name="title" content="Inbuilt Molecular Docking Studio — iLoveChem">
+    <meta name="description" content="Free, 100% in-browser and native molecular docking studio. Compute binding affinities (kcal/mol), search pocket conformational space, inspect 3D active sites, and calculate hydrogen bonds in real-time. Zero disk storage.">
+    <meta name="keywords" content="molecular docking, autodock vina, binding affinity, protein-ligand docking, cadd, drug discovery, rcsb pdb, in-silico screening, chembl, computational chemistry, Shivam Rathore, ilovechem">
+    <meta name="author" content="Shivam Rathore">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#2563EB">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%232563EB'/%3E%3Cstop offset='100%25' stop-color='%234F46E5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%23ffffff' stroke-width='2.5'/%3E%3Cpath d='M16 4v6M16 22v6M4 16h6M22 16h6' stroke='%23ffffff' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%2360A5FA'/%3E%3C/svg%3E">
+
+    <!-- Google Fonts: Plus Jakarta Sans + JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#2563EB',
+                            blueHover: '#1D4ED8',
+                            dark: '#0F172A',
+                            slate: '#1E293B',
+                            border: '#E2E8F0',
+                            accent: '#3B82F6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- 3Dmol.js WebGL Engine -->
+    <script src="https://3dmol.org/build/3Dmol-min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; 
+            background-color: #FAFAFC; 
+            color: #0F172A;
+            -webkit-font-smoothing: antialiased;
+            background-image: radial-gradient(rgba(148, 163, 184, 0.18) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #F1F5F9;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+        .viewer-box {
+            position: relative;
+            width: 100%;
+            height: 520px;
+            background: radial-gradient(circle at center, #0F172A 0%, #020617 100%);
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 0.4; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+        .pulsing-grid {
+            animation: pulse-ring 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-full flex flex-col justify-between">
+
+    <!-- 1. APP HEADER -->
+    <header class="bg-white/95 backdrop-blur-md border-b border-slate-200/90 sticky top-0 z-40 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            
+            <!-- Left: Logo & Nav Links -->
+            <div class="flex items-center space-x-6 sm:space-x-8">
+                <a href="/" class="flex items-center space-x-2.5 group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-blue-500 flex items-center justify-center text-white shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform shrink-0">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 2v5.5L4.5 18a2.5 2.5 0 0 0 2.2 3.5h10.6a2.5 2.5 0 0 0 2.2-3.5L14 7.5V2" />
+                            <path d="M8.5 2h7" />
+                            <path d="M7 14.5c2.5-1 4.5 1 7 0" />
+                            <circle cx="12" cy="11" r="1.2" fill="currentColor" />
+                        </svg>
+                    </div>
+                    <div class="flex items-baseline space-x-1.5">
+                        <span class="text-2xl font-black tracking-tight text-slate-900">iLove<span class="text-blue-600">Chem</span></span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                    </div>
+                </a>
+
+                <!-- Navigation Links -->
+                <nav class="hidden md:flex items-center space-x-1 text-sm font-semibold text-slate-700">
+                    <a href="/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="flask-conical" class="w-4 h-4 text-slate-500"></i>
+                        <span>Converter Studio</span>
+                    </a>
+                    <a href="/docking/" class="px-3 py-2 rounded-lg bg-blue-50 text-blue-600 font-bold transition flex items-center gap-1.5 shadow-2xs">
+                        <i data-lucide="crosshair" class="w-4 h-4 text-blue-600"></i>
+                        <span>Molecular Docking</span>
+                        <span class="px-1.5 py-0.5 text-[9px] uppercase font-mono tracking-wider font-extrabold bg-blue-600 text-white rounded-md">New</span>
+                    </a>
+                    <a href="/downloads/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="download" class="w-4 h-4 text-slate-500"></i>
+                        <span>Downloads</span>
+                    </a>
+                    <a href="/about/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="info" class="w-4 h-4 text-slate-500"></i>
+                        <span>About</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Right Actions -->
+            <div class="flex items-center space-x-2.5 text-xs">
+                <button type="button" onclick="document.getElementById('security-modal').classList.remove('hidden')" 
+                    class="hidden sm:flex px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200 text-emerald-800 font-semibold items-center gap-1.5 transition cursor-pointer">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+                    <span>Zero-Storage Docking 🔒</span>
+                </button>
+
+                <a href="https://www.linkedin.com/in/shivam-rathore-medchem/" target="_blank"
+                    class="px-3.5 py-1.5 rounded-lg bg-[#0A66C2] hover:bg-[#084e96] text-white font-bold flex items-center gap-1.5 transition shadow-xs cursor-pointer" rel="noopener noreferrer">
+                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                    </svg>
+                    <span>Connect</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. HERO / BADGE STRIP -->
+    <div class="border-b border-slate-200/80 bg-white py-4 shadow-2xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                        <i data-lucide="cpu" class="w-3 h-3 text-blue-600"></i>
+                        In-Process ChemDock Engine 2.0
+                    </span>
+                    <span class="text-xs text-slate-500 font-mono">Zero External Binaries • 100% Volatile RAM</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                    Inbuilt Molecular Docking Studio
+                </h1>
+                <p class="text-xs sm:text-sm text-slate-600 mt-0.5 max-w-3xl">
+                    High-accuracy empirical free energy scoring (&Delta;G in kcal/mol), Monte Carlo simulated annealing, 
+                    real-time 3D pocket exploration, and automated hydrogen bond contact profiling.
+                </p>
+            </div>
+            
+            <div class="flex items-center gap-2 shrink-0">
+                <button type="button" onclick="loadBenchmark('1HSG', 'indinavir')" 
+                    class="px-3 py-1.5 rounded-xl border border-slate-300 hover:border-blue-500 hover:bg-blue-50 text-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs">
+                    <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500"></i>
+                    <span>Quick HIV-1 Benchmark (1HSG)</span>
+                </button>
+                <button type="button" onclick="document.getElementById('methodology-modal').classList.remove('hidden')" 
+                    class="px-3 py-1.5 rounded-xl border border-slate-300 hover:border-slate-400 bg-white text-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs">
+                    <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span>Scoring Algorithm</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. MAIN WORKSPACE (TWO COLUMNS) -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- LEFT COLUMN: INPUT CONTROLS & GRID BOX (5 Cols) -->
+            <div class="lg:col-span-5 space-y-5">
+                
+                <!-- CARD 1: TARGET RECEPTOR (PDB) -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-black">1</span>
+                            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Target Macromolecule</h2>
+                        </div>
+                        <span id="receptor-status-badge" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-slate-100 text-slate-500">
+                            No Receptor
+                        </span>
+                    </div>
+
+                    <!-- RCSB PDB ID 1-Click Fetch -->
+                    <div class="mb-3">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">
+                            Fetch from RCSB Protein Data Bank
+                        </label>
+                        <div class="flex gap-2">
+                            <div class="relative flex-1">
+                                <input type="text" id="pdb-id-input" placeholder="e.g. 1HSG, 6LU7, 3ERT" maxlength="4"
+                                    class="w-full uppercase font-mono px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition" />
+                                <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-mono">PDB</span>
+                            </div>
+                            <button type="button" id="btn-fetch-pdb" onclick="fetchRCSBStructure()"
+                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow-xs cursor-pointer">
+                                <i data-lucide="cloud-download" class="w-4 h-4"></i>
+                                <span>Fetch</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Popular Benchmark Presets -->
+                    <div class="mb-3.5">
+                        <div class="text-[11px] font-semibold text-slate-500 mb-1">Standard Benchmark Targets:</div>
+                        <div class="flex flex-wrap gap-1.5 text-xs">
+                            <button type="button" onclick="loadBenchmark('1HSG', 'indinavir')" 
+                                class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 font-mono text-[11px] font-semibold transition border border-slate-200">
+                                1HSG (HIV-1 Protease)
+                            </button>
+                            <button type="button" onclick="loadBenchmark('6LU7', 'n3')" 
+                                class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 font-mono text-[11px] font-semibold transition border border-slate-200">
+                                6LU7 (SARS-CoV-2 Mpro)
+                            </button>
+                            <button type="button" onclick="loadBenchmark('3ERT', 'tamoxifen')" 
+                                class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 font-mono text-[11px] font-semibold transition border border-slate-200">
+                                3ERT (Estrogen Receptor)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- File Drop / Raw PDB Upload -->
+                    <div>
+                        <div class="flex items-center justify-between text-xs text-slate-500 mb-1">
+                            <span class="font-semibold">Or upload custom PDB / mmCIF file:</span>
+                            <button type="button" onclick="toggleReceptorPasteArea()" class="text-blue-600 hover:underline font-medium text-[11px]">
+                                Paste Raw Text
+                            </button>
+                        </div>
+                        <input type="file" id="receptor-file-input" accept=".pdb,.cif,.ent" class="hidden" onchange="handleReceptorFileUpload(event)" />
+                        <div onclick="document.getElementById('receptor-file-input').click()"
+                            class="border-2 border-dashed border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-blue-50/40 rounded-xl p-3 text-center cursor-pointer transition group">
+                            <i data-lucide="upload" class="w-5 h-5 text-slate-400 group-hover:text-blue-600 mx-auto mb-1 transition"></i>
+                            <div class="text-xs font-semibold text-slate-700 group-hover:text-blue-700">Click to select PDB file</div>
+                            <div class="text-[10px] text-slate-400">Standard RCSB .pdb, .ent, or .cif (up to 20MB)</div>
+                        </div>
+
+                        <!-- Collapsible Raw PDB Textarea -->
+                        <div id="receptor-raw-wrapper" class="hidden mt-2">
+                            <textarea id="receptor-raw-text" rows="4" placeholder="Paste PDB lines (ATOM / HETATM)..."
+                                class="w-full font-mono text-[11px] p-2 bg-slate-900 text-slate-200 rounded-xl border border-slate-700 focus:outline-none custom-scrollbar" onchange="onRawReceptorChanged()"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Receptor Pocket Centroid Pill -->
+                    <div id="detected-pocket-box" class="hidden mt-3 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="target" class="w-4 h-4 text-amber-600 shrink-0"></i>
+                            <div>
+                                <span class="font-bold" id="pocket-ligand-name">Co-Crystal Pocket Detected</span>
+                                <div class="text-[10px] text-amber-700 font-mono" id="pocket-ligand-coords">Auto-centered at active site</div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="applyDetectedPocket()" class="px-2 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-[10px] font-bold transition">
+                            Apply Center
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CARD 2: SMALL MOLECULE LIGAND -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-black">2</span>
+                            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Ligand Small Molecule</h2>
+                        </div>
+                        <span id="ligand-status-badge" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-slate-100 text-slate-500">
+                            No Ligand
+                        </span>
+                    </div>
+
+                    <!-- SMILES Input -->
+                    <div class="mb-3">
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="text-xs font-semibold text-slate-700">Ligand SMILES or Structure:</label>
+                            <span class="text-[11px] text-slate-400 font-mono">RDKit 3D ETKDGv3</span>
+                        </div>
+                        <textarea id="ligand-input-text" rows="2" placeholder="e.g. CC(=O)Oc1ccccc1C(=O)O (Aspirin)"
+                            class="w-full font-mono text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition custom-scrollbar"
+                            oninput="updateLigandStatus()"></textarea>
+                    </div>
+
+                    <!-- Sample Ligand Pills -->
+                    <div class="mb-3">
+                        <div class="text-[11px] font-semibold text-slate-500 mb-1">Popular Drug Presets:</div>
+                        <div class="flex flex-wrap gap-1 text-xs">
+                            <button type="button" onclick="setLigandPreset('indinavir')" 
+                                class="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 font-semibold text-[11px] transition border border-slate-200">
+                                Indinavir (HIV-1)
+                            </button>
+                            <button type="button" onclick="setLigandPreset('aspirin')" 
+                                class="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 font-semibold text-[11px] transition border border-slate-200">
+                                Aspirin
+                            </button>
+                            <button type="button" onclick="setLigandPreset('paracetamol')" 
+                                class="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 font-semibold text-[11px] transition border border-slate-200">
+                                Paracetamol
+                            </button>
+                            <button type="button" onclick="setLigandPreset('tamoxifen')" 
+                                class="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 font-semibold text-[11px] transition border border-slate-200">
+                                4-OHT (Tamoxifen)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- File Upload Alternative -->
+                    <div>
+                        <input type="file" id="ligand-file-input" accept=".sdf,.mol,.pdbqt,.pdb" class="hidden" onchange="handleLigandFileUpload(event)" />
+                        <button type="button" onclick="document.getElementById('ligand-file-input').click()" 
+                            class="w-full py-1.5 px-3 rounded-xl border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                            <i data-lucide="file-code" class="w-3.5 h-3.5 text-slate-400"></i>
+                            <span>Upload .sdf / .mol / .pdbqt</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CARD 3: SEARCH SPACE GRID BOX -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-black">3</span>
+                            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Search Space (Grid Box)</h2>
+                        </div>
+                        <span class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                            Interactive 3D Bounding Box
+                        </span>
+                    </div>
+
+                    <!-- Center Coordinates (X, Y, Z) -->
+                    <div class="mb-4">
+                        <div class="text-xs font-semibold text-slate-700 mb-2 flex items-center justify-between">
+                            <span>Grid Center (Ångströms):</span>
+                            <button type="button" onclick="centerBoxOnReceptor()" class="text-[11px] text-blue-600 hover:underline font-semibold flex items-center gap-1">
+                                <i data-lucide="maximize" class="w-3 h-3"></i>
+                                <span>Center on Target</span>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="text-[10px] font-mono font-bold text-slate-500 block mb-0.5">X Centroid</label>
+                                <input type="number" id="grid-center-x" step="0.5" value="0.0" 
+                                    class="w-full px-2.5 py-1.5 font-mono text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:bg-white focus:border-blue-600 outline-none"
+                                    onchange="onGridParamsChanged()" />
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-mono font-bold text-slate-500 block mb-0.5">Y Centroid</label>
+                                <input type="number" id="grid-center-y" step="0.5" value="0.0" 
+                                    class="w-full px-2.5 py-1.5 font-mono text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:bg-white focus:border-blue-600 outline-none"
+                                    onchange="onGridParamsChanged()" />
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-mono font-bold text-slate-500 block mb-0.5">Z Centroid</label>
+                                <input type="number" id="grid-center-z" step="0.5" value="0.0" 
+                                    class="w-full px-2.5 py-1.5 font-mono text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:bg-white focus:border-blue-600 outline-none"
+                                    onchange="onGridParamsChanged()" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Size Dimensions (Size X, Y, Z) -->
+                    <div class="mb-2">
+                        <div class="text-xs font-semibold text-slate-700 mb-2 flex items-center justify-between">
+                            <span>Grid Dimensions (Ångströms):</span>
+                            <span class="text-[11px] font-mono text-slate-500" id="box-volume-label">20 × 20 × 20 Å (8000 Å³)</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="text-[10px] font-mono font-bold text-slate-500 block mb-0.5">Size X (Å)</label>
+                                <input type="number" id="grid-size-x" min="10" max="40" step="1" value="20.0" 
+                                    class="w-full px-2.5 py-1.5 font-mono text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:bg-white focus:border-blue-600 outline-none"
+                                    onchange="onGridParamsChanged()" />
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-mono font-bold text-slate-500 block mb-0.5">Size Y (Å)</label>
+                                <input type="number" id="grid-size-y" min="10" max="40" step="1" value="20.0" 
+                                    class="w-full px-2.5 py-1.5 font-mono text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:bg-white focus:border-blue-600 outline-none"
+                                    onchange="onGridParamsChanged()" />
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-mono font-bold text-slate-500 block mb-0.5">Size Z (Å)</label>
+                                <input type="number" id="grid-size-z" min="10" max="40" step="1" value="20.0" 
+                                    class="w-full px-2.5 py-1.5 font-mono text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:bg-white focus:border-blue-600 outline-none"
+                                    onchange="onGridParamsChanged()" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 4: ENGINE CONFIGURATION & LAUNCH BUTTON -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-black">4</span>
+                            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Search Thoroughness</h2>
+                        </div>
+                    </div>
+
+                    <!-- Exhaustiveness Selector -->
+                    <div class="grid grid-cols-3 gap-2 mb-4">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="exhaustiveness" value="4" class="peer hidden" />
+                            <div class="peer-checked:border-blue-600 peer-checked:bg-blue-50/70 border border-slate-200 rounded-xl p-2.5 text-center transition">
+                                <div class="text-xs font-bold text-slate-800">Fast</div>
+                                <div class="text-[10px] text-slate-500">4 Cycles (~2s)</div>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="exhaustiveness" value="6" class="peer hidden" checked />
+                            <div class="peer-checked:border-blue-600 peer-checked:bg-blue-50/70 border border-slate-200 rounded-xl p-2.5 text-center transition">
+                                <div class="text-xs font-bold text-blue-700">Balanced</div>
+                                <div class="text-[10px] text-blue-600 font-semibold">6 Cycles (Rec.)</div>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="exhaustiveness" value="10" class="peer hidden" />
+                            <div class="peer-checked:border-blue-600 peer-checked:bg-blue-50/70 border border-slate-200 rounded-xl p-2.5 text-center transition">
+                                <div class="text-xs font-bold text-slate-800">Thorough</div>
+                                <div class="text-[10px] text-slate-500">10 Cycles (~8s)</div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- RUN DOCKING BUTTON -->
+                    <button type="button" id="btn-run-docking" onclick="runMolecularDocking()"
+                        class="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-xl font-bold text-sm shadow-md shadow-blue-500/25 flex items-center justify-center gap-2 transition-all transform active:scale-[0.99] cursor-pointer">
+                        <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                        <span>Start Molecular Docking</span>
+                    </button>
+
+                    <!-- Execution Status / Progress -->
+                    <div id="docking-progress-banner" class="hidden mt-3 p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <div class="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                            <span class="font-bold" id="docking-progress-text">Preparing 3D structures &amp; torsion trees...</span>
+                        </div>
+                        <div class="w-full bg-blue-200/60 rounded-full h-1.5 overflow-hidden">
+                            <div id="docking-progress-bar" class="bg-blue-600 h-1.5 rounded-full transition-all duration-300 w-1/4"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: 3D WEBGL VIEWPORT & DOCKING RESULTS (7 Cols) -->
+            <div class="lg:col-span-7 space-y-5">
+                
+                <!-- 3D WEBGL VIEWPORT CARD -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs">
+                    
+                    <!-- Viewport Header & Controls -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="box" class="w-4 h-4 text-blue-600"></i>
+                            <h2 class="text-sm font-bold text-slate-900">3D Interaction Viewport</h2>
+                            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-bold">3Dmol.js</span>
+                        </div>
+                        
+                        <!-- Toolbar Controls -->
+                        <div class="flex items-center gap-1.5 text-xs">
+                            <button type="button" onclick="toggleStyleMode()" id="btn-toggle-style" title="Switch Ribbon Style"
+                                class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition flex items-center gap-1">
+                                <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                                <span id="style-mode-label">Cartoon</span>
+                            </button>
+                            <button type="button" onclick="toggleGridBoxVisibility()" id="btn-toggle-gridbox" title="Toggle Grid Box"
+                                class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-semibold transition flex items-center gap-1 border border-blue-200">
+                                <i data-lucide="grid" class="w-3.5 h-3.5"></i>
+                                <span>Grid Box</span>
+                            </button>
+                            <button type="button" onclick="toggleHbondsVisibility()" id="btn-toggle-hbonds" title="Toggle H-Bonds"
+                                class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 font-semibold transition flex items-center gap-1 border border-amber-200">
+                                <i data-lucide="link" class="w-3.5 h-3.5"></i>
+                                <span>H-Bonds</span>
+                            </button>
+                            <button type="button" onclick="resetViewportCamera()" title="Reset Camera View"
+                                class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3D WebGL Canvas Container -->
+                    <div id="docking-viewer-container" class="viewer-box shadow-inner border border-slate-800">
+                        <div id="viewer-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 text-slate-400">
+                            <div class="w-16 h-16 rounded-2xl bg-slate-800/80 border border-slate-700 flex items-center justify-center text-blue-400 mb-3 shadow-lg">
+                                <i data-lucide="atom" class="w-8 h-8"></i>
+                            </div>
+                            <h3 class="text-sm font-bold text-slate-200 mb-1">Interactive 3D Viewport Ready</h3>
+                            <p class="text-xs text-slate-400 max-w-sm">
+                                Fetch a PDB target (e.g. 1HSG) or load a benchmark preset to visualize macromolecular ribbons and active site residues.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Viewport Legend / Status Footer -->
+                    <div class="flex flex-wrap items-center justify-between text-[11px] text-slate-500 mt-2 px-1 gap-2">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex items-center gap-1">
+                                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span> Receptor Ribbon
+                            </span>
+                            <span class="inline-flex items-center gap-1">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Docked Ligand Pose
+                            </span>
+                            <span class="inline-flex items-center gap-1">
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Active Site Pocket
+                            </span>
+                            <span class="inline-flex items-center gap-1">
+                                <span class="w-2.5 h-0.5 bg-yellow-400"></span> H-Bonds
+                            </span>
+                        </div>
+                        <div class="text-[10px] font-mono text-slate-400">
+                            Drag: Rotate • Shift+Drag: Pan • Scroll: Zoom
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DOCKING RESULTS & POSES CARD -->
+                <div id="results-card" class="hidden bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+                    
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="award" class="w-4 h-4 text-emerald-600"></i>
+                                <h3 class="text-base font-bold text-slate-900">Ranked Docking Poses</h3>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-0.5" id="docking-summary-stats">
+                                Calculations completed in 2.4s. Click any pose row to display its 3D conformation.
+                            </p>
+                        </div>
+
+                        <!-- 1-Click Complex Download -->
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="downloadDockedComplexPDB()" 
+                                class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                                <span>Download Complex (.PDB)</span>
+                            </button>
+                            <button type="button" onclick="downloadLigandPosesPDBQT()" 
+                                class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                                <span>Ligand PDBQT</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Ranked Poses Table -->
+                    <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl mb-4">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 font-mono">
+                                <tr>
+                                    <th class="py-2.5 px-3">Mode</th>
+                                    <th class="py-2.5 px-3">Affinity (&Delta;G)</th>
+                                    <th class="py-2.5 px-3">RMSD l.b.</th>
+                                    <th class="py-2.5 px-3">RMSD u.b.</th>
+                                    <th class="py-2.5 px-3">H-Bonds</th>
+                                    <th class="py-2.5 px-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="poses-table-body" class="divide-y divide-slate-100 font-mono">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Contact & Hydrogen Bond Inspector -->
+                    <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500"></i>
+                                Active Pose Hydrogen Bond Interactions:
+                            </span>
+                            <span id="active-pose-tag" class="text-[10px] font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">
+                                Pose #1
+                            </span>
+                        </div>
+                        <div id="hbonds-detail-list" class="space-y-1.5 text-xs">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- 4. ZERO STORAGE PRIVACY MODAL -->
+    <div id="security-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">Pharma Zero-Storage Invariant</h3>
+                        <p class="text-xs text-slate-500">Strict Computational Chemistry Privacy</p>
+                    </div>
+                </div>
+                <button type="button" onclick="document.getElementById('security-modal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="text-xs text-slate-600 space-y-2.5 leading-relaxed">
+                <p>
+                    <strong>100% Volatile RAM Execution:</strong> When you perform molecular docking on iLoveChem, your macromolecular receptor PDB and ligand chemical structures are parsed directly in volatile server memory.
+                </p>
+                <p>
+                    <strong>Zero Disk or Database Persistence:</strong> We do not log, persist, or store your target receptors, SMILES strings, or docked conformations on server disks or databases. Once the HTTP response finishes, all memory buffers are garbage-collected.
+                </p>
+                <p>
+                    <strong>No External Binary Wrappers:</strong> Docking calculations are carried out entirely in-process using our vectorized empirical scoring engine, eliminating security vulnerabilities associated with running untrusted subprocess binaries.
+                </p>
+            </div>
+            <div class="pt-2 text-right">
+                <button type="button" onclick="document.getElementById('security-modal').classList.add('hidden')" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition">
+                    Understood
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. METHODOLOGY MODAL -->
+    <div id="methodology-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+                        <i data-lucide="book-open" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">ChemDock Scoring Algorithm</h3>
+                        <p class="text-xs text-slate-500">AutoDock Empirical Free Energy Formulation</p>
+                    </div>
+                </div>
+                <button type="button" onclick="document.getElementById('methodology-modal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="text-xs text-slate-600 space-y-3 leading-relaxed">
+                <p>
+                    ChemDock implements the empirical free energy of binding scoring function (Trott & Olson, 2010):
+                </p>
+                <div class="bg-slate-900 text-cyan-300 p-3 rounded-xl font-mono text-[11px] overflow-x-auto">
+                    &Delta;G = c_inter &Sigma; (f_gauss1 + f_gauss2 + f_repulsion + f_hydrophobic + f_hbond) / (1 + 0.05846 &middot; N_rot)
+                </div>
+                <ul class="list-disc pl-5 space-y-1 text-slate-600">
+                    <li><strong>Steric Attractions (Gauss 1 &amp; Gauss 2):</strong> Short and intermediate range dispersion and attractive van der Waals interactions.</li>
+                    <li><strong>Steric Repulsion:</strong> Quadratic penalties for atomic inter-penetration and clash prevention.</li>
+                    <li><strong>Hydrophobic Interactions:</strong> Energetic bonus for pairs of non-polar carbon and halogen atoms in close proximity.</li>
+                    <li><strong>Directional Hydrogen Bonding:</strong> Linear ramp rewarding favorable hydrogen bond donor/acceptor contact pairs within 1.9 &ndash; 2.5 Å.</li>
+                    <li><strong>Torsional Entropy Penalty:</strong> Free energy penalty scaled by the number of active rotatable bonds (N_rot) in the ligand torsion tree.</li>
+                </ul>
+            </div>
+            <div class="pt-2 text-right">
+                <button type="button" onclick="document.getElementById('methodology-modal').classList.add('hidden')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. FOOTER -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-8 text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-800">iLoveChem</span>
+                <span>• Inbuilt Molecular Docking Studio</span>
+                <span>• Designed &amp; Developed by <a href="https://www.linkedin.com/in/shivam-rathore-medchem/" target="_blank" class="text-blue-600 font-bold hover:underline">Shivam Rathore</a></span>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="/" class="hover:text-blue-600 font-semibold transition">Converter Studio</a>
+                <a href="/downloads/" class="hover:text-blue-600 font-semibold transition">Downloads</a>
+                <a href="/about/" class="hover:text-blue-600 font-semibold transition">About &amp; Capabilities</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- CLIENT JAVASCRIPT STATE ENGINE -->
+    <script>
+        // State Store
+        const State = {
+            receptorPdb: "",
+            receptorMeta: null,
+            ligandInput: "",
+            ligandFormat: "smiles",
+            viewer: null,
+            gridBoxMesh: null,
+            dockingResults: null,
+            activePoseIdx: 0,
+            showGridBox: true,
+            showHbonds: true,
+            styleMode: "cartoon", // "cartoon" | "line" | "surface"
+            isDocking: false
+        };
+
+        // Presets Library
+        const BENCHMARK_PRESETS = {
+            "1HSG": {
+                name: "HIV-1 Protease",
+                ligandName: "Indinavir",
+                smiles: "CC(C)(C)NC(=O)[C@@H]1C[C@@H]2CCCC[C@@H]2CN1C[C@@H](O)C[C@@H](CC3=CC=CC=C3)C(=O)N[C@@H]4CC5=CC=CC=C5[C@H]4O",
+                center: [16.0, 25.0, 4.0],
+                size: [22.0, 22.0, 22.0]
+            },
+            "6LU7": {
+                name: "SARS-CoV-2 Mpro",
+                ligandName: "N3 Inhibitor",
+                smiles: "CC(C)C[C@H](NC(=O)[C@H](CC1=CC=CC=C1)NC(=O)[C@@H]2CC[C@H](NC(=O)OCC3=CC=CC=C3)O2)C(=O)N[C@@H](CC4CCNC4=O)C(=O)/C=C/C(=O)OCC",
+                center: [-11.0, 12.0, 68.0],
+                size: [24.0, 24.0, 24.0]
+            },
+            "3ERT": {
+                name: "Estrogen Receptor Alpha",
+                ligandName: "4-Hydroxytamoxifen",
+                smiles: "CC/C(=C(\\c1ccc(O)cc1)/c2ccccc2)c3ccc(OCCN(C)C)cc3",
+                center: [30.0, -1.5, 24.5],
+                size: [20.0, 20.0, 20.0]
+            }
+        };
+
+        const DRUG_PRESETS = {
+            "indinavir": "CC(C)(C)NC(=O)[C@@H]1C[C@@H]2CCCC[C@@H]2CN1C[C@@H](O)C[C@@H](CC3=CC=CC=C3)C(=O)N[C@@H]4CC5=CC=CC=C5[C@H]4O",
+            "aspirin": "CC(=O)Oc1ccccc1C(=O)O",
+            "paracetamol": "CC(=O)Nc1ccc(O)cc1",
+            "tamoxifen": "CC/C(=C(\\c1ccc(O)cc1)/c2ccccc2)c3ccc(OCCN(C)C)cc3"
+        };
+
+        // Initialize on DOM load
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            init3DViewer();
+        });
+
+        function init3DViewer() {
+            const container = document.getElementById("docking-viewer-container");
+            container.innerHTML = ""; // clear placeholder
+            
+            const config = { backgroundColor: '#020617' };
+            State.viewer = $3Dmol.createViewer(container, config);
+            State.viewer.render();
+        }
+
+        // Fetch PDB from RCSB
+        async function fetchRCSBStructure(pdbIdOverride) {
+            const pdbInput = document.getElementById("pdb-id-input");
+            const pdbId = (pdbIdOverride || pdbInput.value).trim().toUpperCase();
+
+            if (!pdbId || pdbId.length !== 4) {
+                alert("Please enter a valid 4-character PDB ID (e.g. 1HSG, 6LU7, 3ERT).");
+                return;
+            }
+
+            const fetchBtn = document.getElementById("btn-fetch-pdb");
+            const originalBtnHtml = fetchBtn.innerHTML;
+            fetchBtn.disabled = true;
+            fetchBtn.innerHTML = `<span class="inline-block animate-spin mr-1">⌛</span> Fetching...`;
+
+            try {
+                const resp = await fetch(`/api/dock/fetch-pdb/${pdbId}/`);
+                const data = await resp.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || "Failed to fetch PDB.");
+                }
+
+                State.receptorPdb = data.pdb_content;
+                pdbInput.value = pdbId;
+
+                // Update status badge
+                const statusBadge = document.getElementById("receptor-status-badge");
+                statusBadge.className = "px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300";
+                statusBadge.innerText = `PDB: ${pdbId}`;
+
+                // Handle pocket detection
+                if (data.pocket && data.pocket.found_co_crystallized_ligand) {
+                    const pocketBox = document.getElementById("detected-pocket-box");
+                    pocketBox.classList.remove("hidden");
+                    document.getElementById("pocket-ligand-name").innerText = `Pocket Found: ${data.pocket.co_crystallized_ligand_resname} (${data.pocket.co_crystallized_atoms_count} atoms)`;
+                    document.getElementById("pocket-ligand-coords").innerText = `Centroid: (${data.pocket.centroid_x.toFixed(1)}, ${data.pocket.centroid_y.toFixed(1)}, ${data.pocket.centroid_z.toFixed(1)})`;
+                    
+                    // Auto-fill grid box center
+                    document.getElementById("grid-center-x").value = data.pocket.centroid_x.toFixed(1);
+                    document.getElementById("grid-center-y").value = data.pocket.centroid_y.toFixed(1);
+                    document.getElementById("grid-center-z").value = data.pocket.centroid_z.toFixed(1);
+                }
+
+                // Render in 3Dmol
+                renderReceptorIn3D();
+
+            } catch (err) {
+                alert(`Error fetching structure: ${err.message}`);
+            } finally {
+                fetchBtn.disabled = false;
+                fetchBtn.innerHTML = originalBtnHtml;
+                lucide.createIcons();
+            }
+        }
+
+        // Render Receptor & Pocket in 3Dmol
+        function renderReceptorIn3D() {
+            if (!State.viewer || !State.receptorPdb) return;
+
+            State.viewer.clear();
+
+            // Load receptor macromolecule
+            State.viewer.addModel(State.receptorPdb, "pdb");
+
+            // Style: Ribbon Cartoon
+            if (State.styleMode === "cartoon") {
+                State.viewer.setStyle({}, { cartoon: { color: 'spectrum', opacity: 0.85 } });
+            } else if (State.styleMode === "surface") {
+                State.viewer.setStyle({}, { cartoon: { color: 'cyan', opacity: 0.5 } });
+                State.viewer.addSurface($3Dmol.SurfaceType.MS, { opacity: 0.4, color: 'white' });
+            } else {
+                State.viewer.setStyle({}, { line: { color: 'spectrum' } });
+            }
+
+            // Highlight Active Site Pocket Residues (within 6Å of Grid Center)
+            const cx = parseFloat(document.getElementById("grid-center-x").value) || 0.0;
+            const cy = parseFloat(document.getElementById("grid-center-y").value) || 0.0;
+            const cz = parseFloat(document.getElementById("grid-center-z").value) || 0.0;
+
+            State.viewer.setStyle(
+                { within: { distance: 6.5, sel: { center: { x: cx, y: cy, z: cz } } } },
+                { 
+                    cartoon: { color: 'cyan' },
+                    stick: { colorscheme: 'amino', radius: 0.15 } 
+                }
+            );
+
+            // Draw Grid Box Wireframe
+            drawGridBox3D();
+
+            // If a docked pose is active, overlay it
+            if (State.dockingResults && State.dockingResults.poses && State.dockingResults.poses.length > 0) {
+                overlayDockedPose(State.activePoseIdx);
+            }
+
+            State.viewer.zoomTo();
+            State.viewer.render();
+        }
+
+        // Draw Interactive 3D Grid Box
+        function drawGridBox3D() {
+            if (!State.viewer || !State.showGridBox) return;
+
+            const cx = parseFloat(document.getElementById("grid-center-x").value) || 0.0;
+            const cy = parseFloat(document.getElementById("grid-center-y").value) || 0.0;
+            const cz = parseFloat(document.getElementById("grid-center-z").value) || 0.0;
+            const sx = parseFloat(document.getElementById("grid-size-x").value) || 20.0;
+            const sy = parseFloat(document.getElementById("grid-size-y").value) || 20.0;
+            const sz = parseFloat(document.getElementById("grid-size-z").value) || 20.0;
+
+            const hx = sx / 2.0;
+            const hy = sy / 2.0;
+            const hz = sz / 2.0;
+
+            // 8 Box Vertices
+            const p1 = { x: cx - hx, y: cy - hy, z: cz - hz };
+            const p2 = { x: cx + hx, y: cy - hy, z: cz - hz };
+            const p3 = { x: cx + hx, y: cy + hy, z: cz - hz };
+            const p4 = { x: cx - hx, y: cy + hy, z: cz - hz };
+            const p5 = { x: cx - hx, y: cy - hy, z: cz + hz };
+            const p6 = { x: cx + hx, y: cy - hy, z: cz + hz };
+            const p7 = { x: cx + hx, y: cy + hy, z: cz + hz };
+            const p8 = { x: cx - hx, y: cy + hy, z: cz + hz };
+
+            // 12 Edges as cylinders
+            const edges = [
+                [p1, p2], [p2, p3], [p3, p4], [p4, p1],
+                [p5, p6], [p6, p7], [p7, p8], [p8, p5],
+                [p1, p5], [p2, p6], [p3, p7], [p4, p8]
+            ];
+
+            edges.forEach(edge => {
+                State.viewer.addCylinder({
+                    start: edge[0],
+                    end: edge[1],
+                    radius: 0.12,
+                    color: '#3B82F6',
+                    wireframe: true,
+                    dashed: true
+                });
+            });
+
+            // Center crosshair marker
+            State.viewer.addSphere({
+                center: { x: cx, y: cy, z: cz },
+                radius: 0.4,
+                color: '#EF4444'
+            });
+        }
+
+        // Overlay Docked Ligand Pose & Hydrogen Bonds
+        function overlayDockedPose(poseIdx) {
+            if (!State.dockingResults || !State.dockingResults.poses) return;
+            const pose = State.dockingResults.poses[poseIdx];
+            if (!pose) return;
+
+            // Add ligand model
+            const ligModel = State.viewer.addModel(pose.pdbqt_block, "pdbqt");
+            State.viewer.setStyle({ model: ligModel }, {
+                stick: {
+                    colorscheme: 'greenCarbon',
+                    radius: 0.28
+                }
+            });
+
+            // Draw Hydrogen Bonds as yellow dashed cylinders
+            if (State.showHbonds && pose.contacts && pose.contacts.length > 0) {
+                pose.contacts.forEach(contact => {
+                    State.viewer.addCylinder({
+                        start: { x: contact.receptor_x, y: contact.receptor_y, z: contact.receptor_z },
+                        end: { x: contact.ligand_x, y: contact.ligand_y, z: contact.ligand_z },
+                        radius: 0.08,
+                        color: '#FACC15',
+                        dashed: true
+                    });
+                });
+            }
+        }
+
+        // Execute Inbuilt Molecular Docking
+        async function runMolecularDocking() {
+            if (State.isDocking) return;
+
+            if (!State.receptorPdb) {
+                alert("Please fetch or upload a Target Macromolecule (Receptor PDB) first.");
+                return;
+            }
+
+            const ligandText = document.getElementById("ligand-input-text").value.trim();
+            if (!ligandText) {
+                alert("Please enter a Ligand SMILES string or upload a small molecule structure.");
+                return;
+            }
+
+            const cx = parseFloat(document.getElementById("grid-center-x").value) || 0.0;
+            const cy = parseFloat(document.getElementById("grid-center-y").value) || 0.0;
+            const cz = parseFloat(document.getElementById("grid-center-z").value) || 0.0;
+            const sx = parseFloat(document.getElementById("grid-size-x").value) || 20.0;
+            const sy = parseFloat(document.getElementById("grid-size-y").value) || 20.0;
+            const sz = parseFloat(document.getElementById("grid-size-z").value) || 20.0;
+            
+            const exhaustivenessRadio = document.querySelector('input[name="exhaustiveness"]:checked');
+            const exhaustiveness = exhaustivenessRadio ? parseInt(exhaustivenessRadio.value) : 6;
+
+            const runBtn = document.getElementById("btn-run-docking");
+            const progressBanner = document.getElementById("docking-progress-banner");
+            const progressBar = document.getElementById("docking-progress-bar");
+            const progressText = document.getElementById("docking-progress-text");
+
+            State.isDocking = true;
+            runBtn.disabled = true;
+            runBtn.classList.add("opacity-60", "cursor-not-allowed");
+            progressBanner.classList.remove("hidden");
+            progressBar.style.width = "25%";
+            progressText.innerText = "Step 1/3: Preparing rigid receptor & flexible ligand torsion tree...";
+
+            const startTime = performance.now();
+
+            try {
+                // Progress simulation tick
+                setTimeout(() => {
+                    if (State.isDocking) {
+                        progressBar.style.width = "65%";
+                        progressText.innerText = "Step 2/3: Vectorized Monte Carlo Simulated Annealing & Scoring...";
+                    }
+                }, 800);
+
+                const payload = {
+                    receptor_pdb: State.receptorPdb,
+                    ligand_input: ligandText,
+                    ligand_format: State.ligandFormat,
+                    center_x: cx,
+                    center_y: cy,
+                    center_z: cz,
+                    size_x: sx,
+                    size_y: sy,
+                    size_z: sz,
+                    exhaustiveness: exhaustiveness,
+                    num_modes: 9
+                };
+
+                const resp = await fetch("/api/dock/run/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCsrfToken()
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await resp.json();
+
+                if (!resp.ok || !data.success) {
+                    throw new Error(data.error || "Docking calculation encountered an error.");
+                }
+
+                progressBar.style.width = "100%";
+                progressText.innerText = "Step 3/3: Clustering poses & analyzing hydrogen bonds...";
+
+                const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
+                State.dockingResults = data;
+                State.activePoseIdx = 0;
+
+                // Populate results UI
+                displayDockingResults(data, elapsed);
+
+                // Render in 3D
+                renderReceptorIn3D();
+
+            } catch (err) {
+                alert(`Docking Failed: ${err.message}`);
+            } finally {
+                State.isDocking = false;
+                runBtn.disabled = false;
+                runBtn.classList.remove("opacity-60", "cursor-not-allowed");
+                setTimeout(() => {
+                    progressBanner.classList.add("hidden");
+                }, 1000);
+            }
+        }
+
+        // Display Results Table & Interactions
+        function displayDockingResults(results, elapsed) {
+            const resultsCard = document.getElementById("results-card");
+            resultsCard.classList.remove("hidden");
+
+            const statsLabel = document.getElementById("docking-summary-stats");
+            statsLabel.innerText = `Found ${results.num_poses} unique docked poses in ${elapsed}s (Exhaustiveness: ${results.exhaustiveness}). Zero disk storage.`;
+
+            const tbody = document.getElementById("poses-table-body");
+            tbody.innerHTML = "";
+
+            results.poses.forEach((pose, idx) => {
+                const tr = document.createElement("tr");
+                const isActive = (idx === State.activePoseIdx);
+                tr.className = `cursor-pointer transition hover:bg-blue-50/70 ${isActive ? 'bg-blue-50 border-l-4 border-l-blue-600 font-bold' : ''}`;
+                tr.onclick = () => selectPose(idx);
+
+                // Color-code affinity badge
+                const aff = pose.affinity_kcal_mol;
+                let badgeClass = "bg-emerald-100 text-emerald-800 border-emerald-300";
+                if (aff > -6.0) badgeClass = "bg-amber-100 text-amber-800 border-amber-300";
+                if (aff < -8.5) badgeClass = "bg-indigo-100 text-indigo-800 border-indigo-300";
+
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3">
+                        <span class="inline-flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded-full ${isActive ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-700'} flex items-center justify-center text-[10px] font-bold">
+                                ${pose.mode}
+                            </span>
+                        </span>
+                    </td>
+                    <td class="py-2.5 px-3">
+                        <span class="px-2 py-0.5 rounded-md text-xs font-bold border ${badgeClass}">
+                            ${aff.toFixed(2)} kcal/mol
+                        </span>
+                    </td>
+                    <td class="py-2.5 px-3 text-slate-600">${pose.rmsd_lower_bound.toFixed(2)}</td>
+                    <td class="py-2.5 px-3 text-slate-600">${pose.rmsd_upper_bound.toFixed(2)}</td>
+                    <td class="py-2.5 px-3">
+                        <span class="inline-flex items-center gap-1 font-semibold text-amber-600">
+                            <i data-lucide="link" class="w-3 h-3"></i>
+                            ${pose.num_h_bonds}
+                        </span>
+                    </td>
+                    <td class="py-2.5 px-3 text-right">
+                        <button type="button" class="px-2 py-1 text-[11px] rounded bg-white hover:bg-blue-600 hover:text-white border border-slate-300 text-slate-700 font-bold transition">
+                            ${isActive ? 'Active Pose' : 'Show 3D'}
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Update Hydrogen Bonds list for active pose
+            updateHbondsList(State.activePoseIdx);
+            lucide.createIcons();
+        }
+
+        function selectPose(idx) {
+            State.activePoseIdx = idx;
+            renderReceptorIn3D();
+            
+            // Re-render table active state
+            const rows = document.getElementById("poses-table-body").children;
+            for (let i = 0; i < rows.length; i++) {
+                if (i === idx) {
+                    rows[i].className = "cursor-pointer transition bg-blue-50 border-l-4 border-l-blue-600 font-bold";
+                } else {
+                    rows[i].className = "cursor-pointer transition hover:bg-blue-50/70";
+                }
+            }
+
+            document.getElementById("active-pose-tag").innerText = `Pose #${idx + 1}`;
+            updateHbondsList(idx);
+        }
+
+        function updateHbondsList(poseIdx) {
+            const listContainer = document.getElementById("hbonds-detail-list");
+            listContainer.innerHTML = "";
+
+            if (!State.dockingResults || !State.dockingResults.poses) return;
+            const pose = State.dockingResults.poses[poseIdx];
+
+            if (!pose || !pose.contacts || pose.contacts.length === 0) {
+                listContainer.innerHTML = `<div class="text-[11px] text-slate-400 italic">No direct hydrogen bonds detected for this conformation (steric and hydrophobic binding forces predominate).</div>`;
+                return;
+            }
+
+            pose.contacts.forEach((contact, idx) => {
+                const item = document.createElement("div");
+                item.className = "flex items-center justify-between p-1.5 rounded-lg bg-white border border-slate-200/80 font-mono text-[11px]";
+                item.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        <span class="font-bold text-slate-800">${contact.receptor_atom}</span>
+                        <span class="text-slate-400">&bull;&bull;&bull;</span>
+                        <span class="font-bold text-indigo-700">${contact.ligand_atom}</span>
+                    </div>
+                    <span class="px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 font-bold border border-amber-200">
+                        ${contact.distance_angstrom.toFixed(2)} Å
+                    </span>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        // Preset Loaders
+        function loadBenchmark(pdbId, drugKey) {
+            const benchmark = BENCHMARK_PRESETS[pdbId];
+            if (!benchmark) return;
+
+            document.getElementById("pdb-id-input").value = pdbId;
+            document.getElementById("ligand-input-text").value = benchmark.smiles;
+            State.ligandFormat = "smiles";
+            updateLigandStatus();
+
+            document.getElementById("grid-center-x").value = benchmark.center[0];
+            document.getElementById("grid-center-y").value = benchmark.center[1];
+            document.getElementById("grid-center-z").value = benchmark.center[2];
+            document.getElementById("grid-size-x").value = benchmark.size[0];
+            document.getElementById("grid-size-y").value = benchmark.size[1];
+            document.getElementById("grid-size-z").value = benchmark.size[2];
+            onGridParamsChanged();
+
+            fetchRCSBStructure(pdbId);
+        }
+
+        function setLigandPreset(drugKey) {
+            const smiles = DRUG_PRESETS[drugKey];
+            if (smiles) {
+                document.getElementById("ligand-input-text").value = smiles;
+                State.ligandFormat = "smiles";
+                updateLigandStatus();
+            }
+        }
+
+        function updateLigandStatus() {
+            const text = document.getElementById("ligand-input-text").value.trim();
+            const badge = document.getElementById("ligand-status-badge");
+            if (text) {
+                badge.className = "px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-blue-100 text-blue-800 border border-blue-200";
+                badge.innerText = `${State.ligandFormat.toUpperCase()} Loaded`;
+            } else {
+                badge.className = "px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-slate-100 text-slate-500";
+                badge.innerText = "No Ligand";
+            }
+        }
+
+        function onGridParamsChanged() {
+            const sx = parseFloat(document.getElementById("grid-size-x").value) || 20.0;
+            const sy = parseFloat(document.getElementById("grid-size-y").value) || 20.0;
+            const sz = parseFloat(document.getElementById("grid-size-z").value) || 20.0;
+            const vol = (sx * sy * sz).toFixed(0);
+            document.getElementById("box-volume-label").innerText = `${sx} × ${sy} × ${sz} Å (${vol} Å³)`;
+            renderReceptorIn3D();
+        }
+
+        function applyDetectedPocket() {
+            // Apply detected centroid from badge
+            onGridParamsChanged();
+        }
+
+        function centerBoxOnReceptor() {
+            if (!State.viewer) return;
+            // Center viewer and grid box
+            renderReceptorIn3D();
+        }
+
+        function toggleGridBoxVisibility() {
+            State.showGridBox = !State.showGridBox;
+            const btn = document.getElementById("btn-toggle-gridbox");
+            if (State.showGridBox) {
+                btn.className = "px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-semibold transition flex items-center gap-1 border border-blue-200";
+            } else {
+                btn.className = "px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500 font-semibold transition flex items-center gap-1";
+            }
+            renderReceptorIn3D();
+        }
+
+        function toggleHbondsVisibility() {
+            State.showHbonds = !State.showHbonds;
+            const btn = document.getElementById("btn-toggle-hbonds");
+            if (State.showHbonds) {
+                btn.className = "px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 font-semibold transition flex items-center gap-1 border border-amber-200";
+            } else {
+                btn.className = "px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500 font-semibold transition flex items-center gap-1";
+            }
+            renderReceptorIn3D();
+        }
+
+        function toggleStyleMode() {
+            const modes = ["cartoon", "surface", "line"];
+            const currIdx = modes.indexOf(State.styleMode);
+            State.styleMode = modes[(currIdx + 1) % modes.length];
+            document.getElementById("style-mode-label").innerText = State.styleMode.charAt(0).toUpperCase() + State.styleMode.slice(1);
+            renderReceptorIn3D();
+        }
+
+        function resetViewportCamera() {
+            if (State.viewer) {
+                State.viewer.zoomTo();
+                State.viewer.render();
+            }
+        }
+
+        function toggleReceptorPasteArea() {
+            const wrapper = document.getElementById("receptor-raw-wrapper");
+            wrapper.classList.toggle("hidden");
+        }
+
+        function onRawReceptorChanged() {
+            const val = document.getElementById("receptor-raw-text").value.trim();
+            if (val) {
+                State.receptorPdb = val;
+                const statusBadge = document.getElementById("receptor-status-badge");
+                statusBadge.className = "px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300";
+                statusBadge.innerText = "Custom Raw PDB";
+                renderReceptorIn3D();
+            }
+        }
+
+        function handleReceptorFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                State.receptorPdb = e.target.result;
+                const statusBadge = document.getElementById("receptor-status-badge");
+                statusBadge.className = "px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300";
+                statusBadge.innerText = file.name;
+                renderReceptorIn3D();
+            };
+            reader.readAsText(file);
+        }
+
+        function handleLigandFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById("ligand-input-text").value = e.target.result;
+                State.ligandFormat = file.name.endsWith(".pdbqt") ? "pdbqt" : (file.name.endsWith(".pdb") ? "pdb" : "sdf");
+                updateLigandStatus();
+            };
+            reader.readAsText(file);
+        }
+
+        // Downloads
+        function downloadDockedComplexPDB() {
+            if (!State.dockingResults || !State.dockingResults.consolidated_complex_pdb) {
+                alert("No docked complex structure available to download.");
+                return;
+            }
+            const blob = new Blob([State.dockingResults.consolidated_complex_pdb], { type: "chemical/x-pdb" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `docked_complex_pose_${State.activePoseIdx + 1}.pdb`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadLigandPosesPDBQT() {
+            if (!State.dockingResults || !State.dockingResults.poses) {
+                alert("No ligand poses available to download.");
+                return;
+            }
+            let content = "";
+            State.dockingResults.poses.forEach(p => {
+                content += p.pdbqt_block + "\n";
+            });
+            const blob = new Blob([content], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "docked_ligand_poses.pdbqt";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function getCsrfToken() {
+            const cookies = document.cookie.split(';');
+            for (let c of cookies) {
+                c = c.trim();
+                if (c.startsWith("csrftoken=")) {
+                    return c.substring("csrftoken=".length);
+                }
+            }
+            return "";
+        }
+    </script>
+</body>
+</html>

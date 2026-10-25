@@ -173,3 +173,48 @@ class MolecularDockingEngineTests(TestCase):
         self.assertIn("ChemDock", res["engine"])
         self.assertGreater(res["poses_count"], 0)
         self.assertIsNotNone(res["best_affinity_kcal_mol"])
+
+    def test_docking_studio_view_renders(self):
+        resp = self.client.get('/docking/')
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Molecular Docking Studio")
+        self.assertContains(resp, "3Dmol.js")
+
+    def test_api_fetch_rcsb_pdb_validation(self):
+        resp = self.client.get('/api/dock/fetch-pdb/INVALID_TOO_LONG/')
+        self.assertEqual(resp.status_code, 400)
+        self.assertFalse(resp.json()["success"])
+
+    def test_api_run_docking_validation(self):
+        # Missing receptor
+        resp = self.client.post('/api/dock/run/', {}, content_type="application/json")
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("error", resp.json())
+
+        # Missing ligand
+        resp = self.client.post('/api/dock/run/', {"receptor_pdb": self.mock_pdb}, content_type="application/json")
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("error", resp.json())
+
+    def test_api_run_docking_success(self):
+        payload = {
+            "receptor_pdb": self.mock_pdb,
+            "ligand_input": "CC(=O)Oc1ccccc1C(=O)O",
+            "ligand_format": "smiles",
+            "center_x": 12.9,
+            "center_y": 8.4,
+            "center_z": 12.3,
+            "size_x": 16.0,
+            "size_y": 16.0,
+            "size_z": 16.0,
+            "exhaustiveness": 2,
+            "num_modes": 3
+        }
+        resp = self.client.post('/api/dock/run/', payload, content_type="application/json")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertTrue(data["success"])
+        self.assertGreater(data["num_poses"], 0)
+        self.assertIsNotNone(data["best_affinity_kcal_mol"])
+        self.assertIn("consolidated_complex_pdb", data)
+        self.assertIn("HETATM", data["consolidated_complex_pdb"])
