@@ -31,6 +31,14 @@ SOLVENT_AND_BUFFER_RESIDUES = {
     "GOL", "TRS", "CIT", "FMT", "ACE", "NME"
 }
 
+# Structural protein cofactors that must NOT be confused with dockable drug ligands
+STRUCTURAL_COFACTORS = {
+    "HEM", "HEA", "HEC", "FAD", "FMN", "NAD", "NAP", "NDP",
+    "COA", "PLP", "SAM", "SAH", "GTP", "GDP", "F42", "TPP"
+}
+
+CATALYTIC_METAL_IONS = {"ZN", "MG", "MN", "FE", "CA", "CU", "NI", "CO"}
+
 PDB_TO_AUTODOCK_ATOM_TYPES: Dict[Tuple[str, str], str] = {
     ("ARG", "NE"): "N", ("ARG", "NH1"): "N", ("ARG", "NH2"): "N",
     ("ASN", "OD1"): "OA", ("ASN", "ND2"): "N",
@@ -366,11 +374,23 @@ class ChemDockEngine:
                 chosen_coords = het_instances[chosen_key]
 
         if not chosen_coords:
-            candidates = [(k, coords) for k, coords in het_instances.items() if len(coords) >= 6]
-            if candidates:
-                candidates.sort(key=lambda x: len(x[1]), reverse=True)
-                chosen_key = candidates[0][0]
-                chosen_coords = candidates[0][1]
+            # Filter out structural cofactors (HEM, FAD, NAD, etc.) and metals so true small-molecule drug inhibitors are prioritized!
+            drug_candidates = [
+                (k, coords) for k, coords in het_instances.items()
+                if len(coords) >= 6 and k[2] not in STRUCTURAL_COFACTORS and k[2] not in CATALYTIC_METAL_IONS
+            ]
+            if drug_candidates:
+                # Rank candidates by drug-like atom count (typically 12 to 55 heavy atoms)
+                drug_candidates.sort(key=lambda x: abs(len(x[1]) - 30))
+                chosen_key = drug_candidates[0][0]
+                chosen_coords = drug_candidates[0][1]
+            else:
+                # Fallback to any non-solvent HETATM >= 6
+                candidates = [(k, coords) for k, coords in het_instances.items() if len(coords) >= 6]
+                if candidates:
+                    candidates.sort(key=lambda x: len(x[1]), reverse=True)
+                    chosen_key = candidates[0][0]
+                    chosen_coords = candidates[0][1]
 
         if chosen_coords and chosen_key:
             arr = np.array(chosen_coords)
@@ -462,7 +482,7 @@ class ChemDockEngine:
                     if lig_res and resname == lig_res:
                         ligands_stripped += 1
                         continue
-                    if resname not in ESSENTIAL_METALS and resname not in {"HEM", "FAD", "NAD", "NAP", "COA"}:
+                    if resname not in ESSENTIAL_METALS and resname not in STRUCTURAL_COFACTORS:
                         if pocket_cx is not None:
                             try:
                                 x = float(line[30:38].strip())
@@ -787,7 +807,7 @@ class ChemDockEngine:
         grid_half_extent = target_size / 2.0
 
         # Step 3: Build In-Memory 3D Potential Grid Map (~250 KB RAM)
-        grid_spacing = 0.70
+        grid_spacing = 0.75
         inv_spacing = float(1.0 / grid_spacing)
         grid_maps, grid_origin, nx, ny, nz = _build_pocket_potential_grid(
             rec_coords, rec_types_list, rec_radii,
@@ -806,22 +826,24 @@ class ChemDockEngine:
             return raw / torsion_penalty
 
         # Step 4: High-Throughput Iterated Local Search (ILS)
-        # Deep sampling scaling: exhaustiveness 8 => 24 cycles x 400 steps = 9,600 poses;
-        # exhaustiveness 32 => 64 cycles x 400 steps = 25,600 poses;
-        # exhaustiveness 64 => 128 cycles x 350 steps = 44,800 poses.
+        # Deep sampling scaling calibrated for fast web responsiveness:
+        # exhaustiveness 8  => 16 cycles x 300 steps = 4,800 poses (~2-3s)
+        # exhaustiveness 16 => 32 cycles x 300 steps = 9,600 poses (~4-6s)
+        # exhaustiveness 32 => 48 cycles x 300 steps = 14,400 poses (~7-9s)
+        # exhaustiveness 64 => 64 cycles x 300 steps = 19,200 poses (~10-14s)
         user_ex = max(3, int(exhaustiveness))
         if user_ex <= 8:
-            num_cycles = 24
-            steps_per_cycle = 400
+            num_cycles = 16
+            steps_per_cycle = 300
         elif user_ex <= 16:
-            num_cycles = 48
-            steps_per_cycle = 400
+            num_cycles = 32
+            steps_per_cycle = 300
         elif user_ex <= 32:
-            num_cycles = 64
-            steps_per_cycle = 400
+            num_cycles = 48
+            steps_per_cycle = 300
         else:
-            num_cycles = 96
-            steps_per_cycle = 350
+            num_cycles = 64
+            steps_per_cycle = 300
 
         candidate_poses: List[Tuple[float, np.ndarray]] = []
 
