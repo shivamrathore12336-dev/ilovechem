@@ -172,6 +172,8 @@ def api_run_docking(request):
             p["num_h_bonds"] = 0
 
     dock_results["num_poses"] = dock_results.get("poses_count", len(poses))
+    dock_results["exhaustiveness"] = exhaustiveness
+    dock_results["rotatable_bonds"] = lig_meta.get("num_torsions", 0)
     dock_results["receptor_meta"] = rec_meta
     dock_results["ligand_meta"] = lig_meta
     dock_results["consolidated_complex_pdb"] = consolidated_complex_pdb
