@@ -1,3 +1,19 @@
+PDB_TO_AUTODOCK_ATOM_TYPES = {
+    ("ASP", "OD1"): "OA", ("ASP", "OD2"): "OA",
+    ("GLU", "OE1"): "OA", ("GLU", "OE2"): "OA",
+    ("ASN", "OD1"): "OA", ("GLN", "OE1"): "OA",
+    ("SER", "OG"): "OA", ("THR", "OG1"): "OA", ("TYR", "OH"): "OA",
+    ("HIS", "ND1"): "NA", ("HIS", "NE2"): "NA",
+    ("ARG", "NE"): "N", ("ARG", "NH1"): "N", ("ARG", "NH2"): "N",
+    ("LYS", "NZ"): "N", ("TRP", "NE1"): "N",
+    ("ASN", "ND2"): "N", ("GLN", "NE2"): "N",
+    ("CYS", "SG"): "SA", ("MET", "SD"): "SA",
+    ("PHE", "CG"): "A", ("PHE", "CD1"): "A", ("PHE", "CD2"): "A", ("PHE", "CE1"): "A", ("PHE", "CE2"): "A", ("PHE", "CZ"): "A",
+    ("TYR", "CG"): "A", ("TYR", "CD1"): "A", ("TYR", "CD2"): "A", ("TYR", "CE1"): "A", ("TYR", "CE2"): "A",
+    ("TRP", "CG"): "A", ("TRP", "CD1"): "A", ("TRP", "CD2"): "A", ("TRP", "CE2"): "A", ("TRP", "CE3"): "A", ("TRP", "CZ2"): "A", ("TRP", "CZ3"): "A", ("TRP", "CH2"): "A",
+    ("HIS", "CG"): "A", ("HIS", "CD2"): "A",
+}
+
 import os
 import sys
 import math
@@ -229,6 +245,47 @@ class ChemDockEngine:
                 cleaned_lines.append(line)
             elif rec in ["CRYST1", "SCALE", "ORIGX", "TER", "END"]:
                 cleaned_lines.append(line)
+
+        # Fast in-process PDB-to-PDBQT translation (instantaneous in-memory execution)
+        fast_pdbqt_lines = []
+        atom_count = 0
+        for line in cleaned_lines:
+            rec = line[0:6].strip()
+            if rec in ["ATOM", "HETATM"]:
+                try:
+                    resname = line[17:20].strip().upper()
+                    atom_name = line[12:16].strip().upper()
+                    elem = line[76:78].strip().upper() or atom_name[:1]
+                    ad_type = PDB_TO_AUTODOCK_ATOM_TYPES.get((resname, atom_name))
+                    if not ad_type:
+                        if atom_name in ["O", "OXT"] or elem == "O":
+                            ad_type = "OA"
+                        elif atom_name == "N" or elem == "N":
+                            ad_type = "N"
+                        elif elem == "S":
+                            ad_type = "SA"
+                        elif elem == "C":
+                            ad_type = "C"
+                        elif elem == "H":
+                            ad_type = "HD"
+                        else:
+                            ad_type = elem[:2]
+                    pdbqt_line = f"{line[:70]:<70s} +0.000 {ad_type:>2s}"
+                    fast_pdbqt_lines.append(pdbqt_line)
+                    atom_count += 1
+                except Exception:
+                    pass
+
+        if fast_pdbqt_lines and atom_count >= 10:
+            pdbqt_str = "\n".join(fast_pdbqt_lines) + "\n"
+            meta = {
+                "atom_count": atom_count,
+                "atoms_count": atom_count,
+                "waters_stripped": waters_stripped,
+                "ligands_stripped": ligands_stripped,
+                "formula": f"Protein ({atom_count} atoms)"
+            }
+            return pdbqt_str, meta
 
         clean_pdb = "\n".join(cleaned_lines) + "\n"
 
@@ -497,8 +554,8 @@ class ChemDockEngine:
 
         # Monte Carlo Simulated Annealing
         # Number of cycles scaled with exhaustiveness
-        num_cycles = max(2, int(exhaustiveness)) * 2
-        steps_per_cycle = 250
+        num_cycles = max(2, int(exhaustiveness))
+        steps_per_cycle = 200
 
         accepted_poses: List[Tuple[float, np.ndarray]] = []
         grid_half_extent = np.array([size_x / 2.0, size_y / 2.0, size_z / 2.0])
