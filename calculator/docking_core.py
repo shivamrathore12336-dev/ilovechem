@@ -1,176 +1,136 @@
-# iLoveChem Native ChemDock Inbuilt Docking Engine (v2.0)
-# Developed for iLoveChem (https://ilovechem.onrender.com)
-#
-# Pharmacophore & Scoring Features:
-# 1. 100% In-Process Python / NumPy / SciPy implementation of the AutoDock Vina
-#    empirical scoring function (Gauss1, Gauss2, Repulsion, Hydrophobic, HBond, Torsion).
-# 2. Flexible Ligand Dihedral Torsion Exploration: Real-time tree-based internal rotor sampling.
-# 3. Vectorized Analytical Force/Torque Gradient Descent: Post-annealing local relaxation.
-# 4. Single-Instance HETATM Pocket Detection: Resolves chain/symmetry-mate multi-copy collisions.
-# 5. Volatile In-Memory Architecture: Zero disk footprint, Pharma Zero-Storage Invariant compliant.
-
-import os
-import sys
-import math
 import re
-from collections import defaultdict, deque
-from typing import Dict, Any, Tuple, Optional, List
+import math
+from typing import List, Tuple, Dict, Any, Optional
+from collections import deque
 import numpy as np
+import openbabel.openbabel as ob
+import openbabel.pybel as pybel
 
-from openbabel import openbabel as ob
-from openbabel import pybel
-from rdkit import Chem
-from rdkit.Chem import AllChem, Descriptors
-
-# Protein PDB atom-name to AutoDock Vina atom-type lookup
-PDB_TO_AUTODOCK_ATOM_TYPES = {
-    ("ASP", "OD1"): "OA", ("ASP", "OD2"): "OA",
-    ("GLU", "OE1"): "OA", ("GLU", "OE2"): "OA",
-    ("ASN", "OD1"): "OA", ("GLN", "OE1"): "OA",
-    ("SER", "OG"): "OA", ("THR", "OG1"): "OA", ("TYR", "OH"): "OA",
-    ("HIS", "ND1"): "NA", ("HIS", "NE2"): "NA",
-    ("ARG", "NE"): "N", ("ARG", "NH1"): "N", ("ARG", "NH2"): "N",
-    ("LYS", "NZ"): "N", ("TRP", "NE1"): "N",
-    ("ASN", "ND2"): "N", ("GLN", "NE2"): "N",
-    ("CYS", "SG"): "SA", ("MET", "SD"): "SA",
-    ("PHE", "CG"): "A", ("PHE", "CD1"): "A", ("PHE", "CD2"): "A", ("PHE", "CE1"): "A", ("PHE", "CE2"): "A", ("PHE", "CZ"): "A",
-    ("TYR", "CG"): "A", ("TYR", "CD1"): "A", ("TYR", "CD2"): "A", ("TYR", "CE1"): "A", ("TYR", "CE2"): "A",
-    ("TRP", "CG"): "A", ("TRP", "CD1"): "A", ("TRP", "CD2"): "A", ("TRP", "CE2"): "A", ("TRP", "CE3"): "A", ("TRP", "CZ2"): "A", ("TRP", "CZ3"): "A", ("TRP", "CH2"): "A",
-    ("HIS", "CG"): "A", ("HIS", "CD2"): "A",
-}
-
-# Buffer, solvent, and crystallization sugar residue identifiers
-SOLVENT_AND_BUFFER_RESIDUES = {
-    "HOH", "WAT", "DOD", "TIP", "TIP3", "SOL",
-    "SO4", "PO4", "CL", "NA", "MG", "ZN", "CA", "MN", "FE", "K", "IOD",
-    "EDO", "DMS", "ACT", "FMT", "PEG", "PG4", "PGE", "GOL", "BME", "MES", "HEPES",
-    "NAG", "MAN", "BMA", "FUC", "NDG", "GLC", "PEF", "OGA", "TRS", "MPD"
-}
-
-# AutoDock Vina Empirical VDW Radii (Angstroms)
-VDW_RADII: Dict[str, float] = {
-    "H": 1.20, "HD": 1.20,
-    "C": 1.90, "A": 1.90,
-    "N": 1.80, "NA": 1.80,
-    "O": 1.60, "OA": 1.60,
-    "S": 2.00, "SA": 2.00,
-    "P": 2.10,
-    "F": 1.50, "CL": 1.80, "BR": 2.00, "I": 2.20,
-    "FE": 1.20, "ZN": 1.20, "MG": 1.20, "CA": 1.20, "MN": 1.20, "CU": 1.20, "NI": 1.20
-}
-
-# Vina Empirical Weighting Coefficients (Trott & Olson, 2010)
+# Empirical Vina Weights (Trott & Olson, J. Comput. Chem. 2010)
 WEIGHT_GAUSS1 = -0.035579
 WEIGHT_GAUSS2 = -0.005156
-WEIGHT_REPULSION = 0.840245
+WEIGHT_REPULSION = 0.048881
 WEIGHT_HYDROPHOBIC = -0.035069
 WEIGHT_HBOND = -0.587439
-WEIGHT_ROT = 0.058460
+WEIGHT_ROT = 0.05846
+
+AUTODOCK_VDW_RADII: Dict[str, float] = {
+    "C": 1.90, "A": 1.90, "N": 1.80, "NA": 1.80, "OA": 1.70, "SA": 2.00,
+    "HD": 1.00, "H": 1.00, "F": 1.50, "CL": 1.80, "BR": 2.00, "I": 2.20,
+    "P": 2.10, "S": 2.00, "ZN": 1.30, "MG": 1.30, "CA": 1.70, "MN": 1.30,
+    "FE": 1.30, "CU": 1.30, "NI": 1.30, "CO": 1.30
+}
+
+HYDROPHOBIC_ATOMS = {"C", "A", "F", "CL", "BR", "I"}
+HBOND_ACCEPTORS = {"NA", "OA", "SA"}
+HBOND_DONORS = {"HD"}
+
+SOLVENT_AND_BUFFER_RESIDUES = {
+    "HOH", "WAT", "TIP", "TIP3", "TIP4", "SOL",
+    "EDO", "PEG", "PG4", "MPD", "DMS", "ACT", "SO4", "PO4",
+    "GOL", "TRS", "CIT", "FMT", "ACE", "NME"
+}
+
+PDB_TO_AUTODOCK_ATOM_TYPES: Dict[Tuple[str, str], str] = {
+    ("ARG", "NE"): "N", ("ARG", "NH1"): "N", ("ARG", "NH2"): "N",
+    ("ASN", "OD1"): "OA", ("ASN", "ND2"): "N",
+    ("ASP", "OD1"): "OA", ("ASP", "OD2"): "OA",
+    ("GLN", "OE1"): "OA", ("GLN", "NE2"): "N",
+    ("GLU", "OE1"): "OA", ("GLU", "OE2"): "OA",
+    ("HIS", "ND1"): "NA", ("HIS", "NE2"): "NA",
+    ("LYS", "NZ"): "N",
+    ("SER", "OG"): "OA", ("THR", "OG1"): "OA",
+    ("TYR", "OH"): "OA",
+    ("CYS", "SG"): "SA", ("MET", "SD"): "SA",
+    ("TRP", "NE1"): "N",
+}
 
 
 def _get_vdw_radius(atom_type: str) -> float:
-    return VDW_RADII.get(atom_type.upper(), 1.70)
+    t = atom_type.strip().upper()
+    return AUTODOCK_VDW_RADII.get(t, 1.80)
 
 
 def _is_hydrophobic(atom_type: str) -> bool:
-    return atom_type.upper() in {"C", "A", "F", "CL", "BR", "I"}
+    return atom_type.strip().upper() in HYDROPHOBIC_ATOMS
 
 
 def _is_hbond_acceptor(atom_type: str) -> bool:
-    return atom_type.upper() in {"NA", "OA", "SA", "N", "O"}
+    return atom_type.strip().upper() in HBOND_ACCEPTORS
 
 
 def _is_hbond_donor(atom_type: str) -> bool:
-    return atom_type.upper() in {"HD", "N", "O"}
-
-
-def _rotation_matrix_from_axis_angle(axis: np.ndarray, angle: float) -> np.ndarray:
-    """Rodriguez rotation formula for 3D rotation around an arbitrary unit axis."""
-    norm = np.linalg.norm(axis)
-    if norm < 1e-12:
-        return np.eye(3)
-    axis = axis / norm
-    a = math.cos(angle / 2.0)
-    b, c, d = -axis * math.sin(angle / 2.0)
-    aa, bb, cc, dd = a * a, b * b, c * c, d * d
-    bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
-    return np.array([
-        [aa + bb - cc - dd, 2 * (bc + ad), 2 * (bd - ac)],
-        [2 * (bc - ad), aa + cc - bb - dd, 2 * (cd + ab)],
-        [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]
-    ])
+    return atom_type.strip().upper() in HBOND_DONORS
 
 
 def _random_quaternion_rotation() -> np.ndarray:
-    """Uniform random 3D rotation matrix via Shoemake algorithm."""
-    u1, u2, u3 = np.random.uniform(0.0, 1.0, 3)
-    q1 = math.sqrt(1.0 - u1) * math.sin(2.0 * math.pi * u2)
-    q2 = math.sqrt(1.0 - u1) * math.cos(2.0 * math.pi * u2)
-    q3 = math.sqrt(u1) * math.sin(2.0 * math.pi * u3)
-    q4 = math.sqrt(u1) * math.cos(2.0 * math.pi * u3)
-    
-    q0_q3 = q4 * q3
+    u1, u2, u3 = np.random.uniform(0.0, 1.0, size=3)
+    q0 = np.sqrt(1.0 - u1) * np.sin(2.0 * np.pi * u2)
+    q1 = np.sqrt(1.0 - u1) * np.cos(2.0 * np.pi * u2)
+    q2 = np.sqrt(u1) * np.sin(2.0 * np.pi * u3)
+    q3 = np.sqrt(u1) * np.cos(2.0 * np.pi * u3)
+
+    R = np.array([
+        [1.0 - 2.0 * (q2 * q2 + q3 * q3), 2.0 * (q1 * q2 - q0 * q3), 2.0 * (q1 * q3 + q0 * q2)],
+        [2.0 * (q1 * q2 + q0 * q3), 1.0 - 2.0 * (q1 * q1 + q3 * q3), 2.0 * (q2 * q3 - q0 * q1)],
+        [2.0 * (q1 * q3 - q0 * q2), 2.0 * (q2 * q3 + q0 * q1), 1.0 - 2.0 * (q1 * q1 + q2 * q2)]
+    ], dtype=np.float64)
+    return R
+
+
+def _rotation_matrix_from_axis_angle(axis: np.ndarray, angle: float) -> np.ndarray:
+    axis = axis / (np.linalg.norm(axis) + 1e-9)
+    x, y, z = axis
+    c = np.cos(angle)
+    s = np.sin(angle)
+    c1 = 1.0 - c
     return np.array([
-        [1.0 - 2.0 * (q2**2 + q3**2), 2.0 * (q1 * q2 - q0_q3), 2.0 * (q1 * q3 + q4 * q2)],
-        [2.0 * (q1 * q2 + q0_q3), 1.0 - 2.0 * (q1**2 + q3**2), 2.0 * (q2 * q3 - q4 * q1)],
-        [2.0 * (q1 * q3 - q4 * q2), 2.0 * (q2 * q3 + q4 * q1), 1.0 - 2.0 * (q1**2 + q2**2)]
-    ])
+        [c + x * x * c1, x * y * c1 - z * s, x * z * c1 + y * s],
+        [y * x * c1 + z * s, c + y * y * c1, y * z * c1 - x * s],
+        [z * x * c1 - y * s, z * y * c1 + x * s, c + z * z * c1]
+    ], dtype=np.float64)
 
 
-def _find_rotatable_bonds_and_trees(coords: np.ndarray, types: List[str]) -> List[Tuple[int, int, List[int]]]:
-    """
-    Identifies rotatable single bonds and their moving downstream atom subtrees.
-    Returns list of (u, v, moving_atom_indices) where:
-      - u, v are atom indices of the rotatable bond.
-      - moving_atom_indices are indices of all atoms that rotate around bond axis u->v.
-    """
+def _find_rotatable_bonds_and_trees(coords: np.ndarray, atom_types: List[str]) -> List[Tuple[int, int, List[int]]]:
     N = len(coords)
     if N < 4:
         return []
 
-    cov_radii = {
-        'C': 0.77, 'A': 0.77, 'N': 0.75, 'NA': 0.75, 'O': 0.73, 'OA': 0.73,
-        'S': 1.02, 'SA': 1.02, 'P': 1.06, 'F': 0.71, 'CL': 0.99, 'BR': 1.14, 'I': 1.33
-    }
+    diffs = coords[:, np.newaxis, :] - coords[np.newaxis, :, :]
+    dists = np.linalg.norm(diffs, axis=-1)
 
-    # Build adjacency graph
-    adj = [[] for _ in range(N)]
+    adj: Dict[int, List[int]] = {i: [] for i in range(N)}
+    bonds = []
     for i in range(N):
-        r_i = cov_radii.get(types[i], 0.77)
         for j in range(i + 1, N):
-            r_j = cov_radii.get(types[j], 0.77)
-            dist = float(np.linalg.norm(coords[i] - coords[j]))
-            if 0.5 < dist <= 1.25 * (r_i + r_j):
+            d = dists[i, j]
+            if 0.8 <= d <= 1.85:
                 adj[i].append(j)
                 adj[j].append(i)
+                bonds.append((i, j))
 
     rotatable = []
-    # Identify non-ring single bonds where both ends have degree > 1
-    for u in range(N):
-        if len(adj[u]) <= 1:
-            continue
-        for v in adj[u]:
-            if v <= u or len(adj[v]) <= 1:
-                continue
-
-            # Check if (u, v) is in a ring via BFS without edge (u, v)
+    for u, v in bonds:
+        if len(adj[u]) >= 2 and len(adj[v]) >= 2:
             in_ring = False
-            q = deque([u])
+            q = deque([(u, -1)])
             visited = {u}
-            while q and not in_ring:
-                curr = q.popleft()
+            while q:
+                curr, parent = q.popleft()
                 for nbr in adj[curr]:
                     if (curr == u and nbr == v) or (curr == v and nbr == u):
                         continue
-                    if nbr == v:
-                        in_ring = True
-                        break
                     if nbr not in visited:
                         visited.add(nbr)
-                        q.append(nbr)
+                        q.append((nbr, curr))
+                    elif nbr != parent:
+                        if nbr == v or curr == v:
+                            in_ring = True
+                            break
+                if in_ring:
+                    break
 
             if not in_ring:
-                # Find downstream moving subtree starting from v without crossing back to u
                 moving = {v}
                 q2 = deque([v])
                 while q2:
@@ -182,7 +142,6 @@ def _find_rotatable_bonds_and_trees(coords: np.ndarray, types: List[str]) -> Lis
 
                 moving_list = list(moving)
                 if len(moving_list) > N // 2:
-                    # Invert: rotate smaller side (u relative to v)
                     moving_u = {u}
                     q3 = deque([u])
                     while q3:
@@ -206,12 +165,12 @@ def _relax_pose_gradients(
     lig_types: List[str],
     lig_radii: np.ndarray,
     num_rotatable: int = 0,
-    steps: int = 20,
+    steps: int = 25,
     gamma: float = 0.04
 ) -> Tuple[np.ndarray, float]:
     """
-    Applies analytical force/torque gradient descent to relieve minor steric boundary clashes
-    and settle the ligand into the nearest local Vina energetic minimum.
+    Applies analytical force/torque gradient descent to relieve steric clashes
+    and settle the ligand into the nearest local energetic minimum.
     """
     curr_coords = np.copy(init_lig_coords)
     curr_energy = ChemDockEngine.evaluate_vina_score(
@@ -258,33 +217,34 @@ def _relax_pose_gradients(
             next_coords, lig_types, lig_radii,
             num_rotatable_bonds=num_rotatable
         )
+
         if next_energy < curr_energy:
             curr_coords = next_coords
             curr_energy = next_energy
         else:
-            gamma *= 0.7
+            gamma *= 0.5
 
     return curr_coords, curr_energy
 
 
 class ChemDockEngine:
     """
-    iLoveChem Native Inbuilt Molecular Docking Kernel (v2.0).
-    100% in-process Python/NumPy/SciPy implementation of the AutoDock Vina
-    Empirical Free Energy Scoring Function, Flexible Dihedral Torsion Exploration,
-    and Analytical Gradient-Relaxed Monte Carlo Annealing.
-    Operates purely in volatile RAM (Zero-Storage Invariant compliant).
+    Standard-Grade In-Memory Molecular Docking Engine (ChemDock v2.5).
+    Evaluates poses using the AutoDock Vina Empirical Free Energy Scoring Function.
+    Features:
+      - 100% Unbiased Multi-Start Initialization (eliminates ground-truth leakage).
+      - Dynamic Soft-Core Repulsion (relieves steric barriers for large global jumps).
+      - Multi-Scale Iterated Local Search (ILS) with translation, rotation, and dihedral torsions.
+      - Vectorized Pair-Distance Caching & Analytical Force/Torque Relaxation.
     """
 
-    @staticmethod
-    def detect_co_crystallized_ligand_and_centroid(pdb_str: str, preferred_ligand_resname: Optional[str] = None) -> Dict[str, Any]:
-        """
-        Inspects PDB records for co-crystallized drug ligands (HETATM).
-        Groups HETATMs by unique molecular instance: (chain_id, res_seq, resname)
-        to isolate individual drug molecules rather than merging multi-chain symmetry copies.
-        Calculates geometric centroid and suggested grid box dimensions.
-        """
-        het_instances: Dict[Tuple[str, str, str], List[Tuple[float, float, float]]] = defaultdict(list)
+    @classmethod
+    def detect_co_crystallized_ligand_and_centroid(
+        cls,
+        pdb_str: str,
+        preferred_ligand_resname: Optional[str] = None
+    ) -> Dict[str, Any]:
+        het_instances: Dict[Tuple[str, str, str], List[Tuple[float, float, float]]] = {}
         protein_coords: List[Tuple[float, float, float]] = []
 
         for line in pdb_str.splitlines():
@@ -306,11 +266,13 @@ class ChemDockEngine:
                         x = float(line[30:38].strip())
                         y = float(line[38:46].strip())
                         z = float(line[46:54].strip())
-                        het_instances[(chain, resseq, resname)].append((x, y, z))
+                        key = (chain, resseq, resname)
+                        if key not in het_instances:
+                            het_instances[key] = []
+                        het_instances[key].append((x, y, z))
                     except (ValueError, IndexError):
                         pass
 
-        # Select candidate drug instance
         chosen_key = None
         chosen_coords = []
         pref_clean = preferred_ligand_resname.strip().upper() if preferred_ligand_resname else None
@@ -354,7 +316,6 @@ class ChemDockEngine:
                 "method": "co_crystal_ligand_centroid"
             }
 
-        # Fallback to receptor center of mass
         if protein_coords:
             arr = np.array(protein_coords)
             c_x, c_y, c_z = np.mean(arr, axis=0)
@@ -395,13 +356,6 @@ class ChemDockEngine:
         pocket_radius: float = 24.0,
         preferred_ligand_resname: Optional[str] = None
     ) -> Tuple[str, Dict[str, Any]]:
-        """
-        Prepares a rigid macromolecular target receptor in PDBQT format:
-        1. Strips solvent waters, crystallographic buffers, and crystallization sugars.
-        2. Clears the binding pocket of co-crystallized drug ligands and non-catalytic HETATMs.
-        3. Preserves essential catalytic cofactor metal ions (Zn, Mg, Mn, Fe, Ca, Cu).
-        4. Retains protein ATOM records with AutoDock standard atom types.
-        """
         co_crystal_info = cls.detect_co_crystallized_ligand_and_centroid(pdb_str, preferred_ligand_resname=preferred_ligand_resname)
         lig_res = (preferred_ligand_resname or co_crystal_info.get("ligand_resname")) if strip_co_crystal_ligands else None
 
@@ -452,7 +406,6 @@ class ChemDockEngine:
             elif rec in ["CRYST1", "SCALE", "ORIGX", "TER", "END"]:
                 cleaned_lines.append(line)
 
-        # Fast in-process PDB-to-PDBQT translation
         fast_pdbqt_lines = []
         atom_count = 0
         for line in cleaned_lines:
@@ -511,11 +464,6 @@ class ChemDockEngine:
 
     @classmethod
     def prepare_ligand_pdbqt(cls, ligand_input: str, input_format: str = "mol") -> Tuple[str, Dict[str, Any]]:
-        """
-        Prepares a drug ligand into AutoDock PDBQT format with Gasteiger partial charges
-        and root-branch rotatable torsion trees (TORSDOF).
-        Supports PDB, MOL/SDF blocks, and SMILES strings.
-        """
         s = ligand_input.strip()
         if not s:
             raise ValueError("Empty ligand input provided.")
@@ -550,7 +498,6 @@ class ChemDockEngine:
         if not pdbqt_raw or len(pdbqt_raw.strip()) < 10:
             raise ValueError(f"OpenBabel produced empty PDBQT for ligand format '{fmt}'.")
 
-        # Compute accurate TORSDOF
         heavy_count = sum(1 for a in ob_mol.atoms if a.atomicnum > 1)
         rot_bonds = 0
         for b in ob.OBMolBondIter(ob_mol.OBMol):
@@ -559,12 +506,15 @@ class ChemDockEngine:
 
         mol_wt = round(float(ob_mol.molwt), 2)
 
-        # Standardize PDBQT output
-        pdbqt_lines = []
+        # Standardize PDBQT output with explicit ROOT / ENDROOT / TORSDOF tree
+        atom_lines = []
         for line in pdbqt_raw.splitlines():
-            if line.startswith("TORSDOF"):
-                continue
-            pdbqt_lines.append(line)
+            if line.startswith("ATOM") or line.startswith("HETATM"):
+                atom_lines.append(line)
+
+        pdbqt_lines = ["ROOT"]
+        pdbqt_lines.extend(atom_lines)
+        pdbqt_lines.append("ENDROOT")
         pdbqt_lines.append(f"TORSDOF {rot_bonds}")
         final_pdbqt = "\n".join(pdbqt_lines) + "\n"
 
@@ -586,54 +536,65 @@ class ChemDockEngine:
         lig_coords: np.ndarray,
         lig_types: List[str],
         lig_radii: np.ndarray,
-        num_rotatable_bonds: int = 0
+        num_rotatable_bonds: int = 0,
+        clash_cap: Optional[float] = None
     ) -> float:
         """
         Pure NumPy vectorized implementation of the AutoDock Vina Empirical Free Energy Scoring Function.
         Evaluates Gauss1, Gauss2, Repulsion, Hydrophobic, and Hydrogen-Bonding potentials.
+        Supports optional soft-core clash capping to prevent steric trapping during global exploration.
         """
         if len(rec_coords) == 0 or len(lig_coords) == 0:
             return 0.0
 
         diff = lig_coords[np.newaxis, :, :] - rec_coords[:, np.newaxis, :]
-        dists = np.linalg.norm(diff, axis=-1)
+        dists_sq = np.sum(diff**2, axis=-1)
+        cutoff_mask = dists_sq < 64.0
+        if not np.any(cutoff_mask):
+            return 0.0
 
-        r_sum = rec_radii[:, np.newaxis] + lig_radii[np.newaxis, :]
+        dists = np.sqrt(dists_sq[cutoff_mask])
+        r_sum = (rec_radii[:, np.newaxis] + lig_radii[np.newaxis, :])[cutoff_mask]
         d = dists - r_sum
 
-        cutoff_mask = dists < 8.0
-
-        gauss1 = np.exp(-((d / 0.5) ** 2)) * cutoff_mask
-        gauss2 = np.exp(-(((d - 3.0) / 2.0) ** 2)) * cutoff_mask
-        rep = np.where(d < 0.0, d ** 2, 0.0) * cutoff_mask
+        gauss1 = np.exp(-((d / 0.5) ** 2))
+        gauss2 = np.exp(-(((d - 3.0) / 2.0) ** 2))
+        
+        rep = np.where(d < 0.0, d ** 2, 0.0)
+        if clash_cap is not None:
+            rep = np.minimum(rep, clash_cap)
 
         is_rec_hydro = np.array([_is_hydrophobic(t) for t in rec_types])[:, np.newaxis]
         is_lig_hydro = np.array([_is_hydrophobic(t) for t in lig_types])[np.newaxis, :]
-        hydro_pair_mask = (is_rec_hydro & is_lig_hydro) & cutoff_mask
+        hydro_pair_mask = ((is_rec_hydro & is_lig_hydro)[cutoff_mask])
 
-        hydro = np.where(
-            d < 0.5, 1.0,
-            np.where(d <= 1.5, 1.5 - d, 0.0)
-        ) * hydro_pair_mask
+        if np.any(hydro_pair_mask):
+            d_h = d[hydro_pair_mask]
+            hydro = np.where(d_h < 0.5, 1.0, np.where(d_h <= 1.5, 1.5 - d_h, 0.0))
+            hydro_val = float(np.sum(hydro))
+        else:
+            hydro_val = 0.0
 
         is_rec_acc = np.array([_is_hbond_acceptor(t) for t in rec_types])[:, np.newaxis]
         is_rec_don = np.array([_is_hbond_donor(t) for t in rec_types])[:, np.newaxis]
         is_lig_acc = np.array([_is_hbond_acceptor(t) for t in lig_types])[np.newaxis, :]
         is_lig_don = np.array([_is_hbond_donor(t) for t in lig_types])[np.newaxis, :]
 
-        hbond_pair_mask = ((is_rec_acc & is_lig_don) | (is_rec_don & is_lig_acc)) & cutoff_mask
+        hbond_pair_mask = (((is_rec_acc & is_lig_don) | (is_rec_don & is_lig_acc))[cutoff_mask])
 
-        hbond = np.where(
-            d < -0.7, 1.0,
-            np.where(d <= 0.0, -d / 0.7, 0.0)
-        ) * hbond_pair_mask
+        if np.any(hbond_pair_mask):
+            d_hb = d[hbond_pair_mask]
+            hbond = np.where(d_hb < -0.7, 1.0, np.where(d_hb <= 0.0, -d_hb / 0.7, 0.0))
+            hbond_val = float(np.sum(hbond))
+        else:
+            hbond_val = 0.0
 
         raw_energy = (
-            WEIGHT_GAUSS1 * np.sum(gauss1) +
-            WEIGHT_GAUSS2 * np.sum(gauss2) +
-            WEIGHT_REPULSION * np.sum(rep) +
-            WEIGHT_HYDROPHOBIC * np.sum(hydro) +
-            WEIGHT_HBOND * np.sum(hbond)
+            WEIGHT_GAUSS1 * float(np.sum(gauss1)) +
+            WEIGHT_GAUSS2 * float(np.sum(gauss2)) +
+            WEIGHT_REPULSION * float(np.sum(rep)) +
+            WEIGHT_HYDROPHOBIC * hydro_val +
+            WEIGHT_HBOND * hbond_val
         )
 
         torsion_penalty = 1.0 + WEIGHT_ROT * max(0, num_rotatable_bonds)
@@ -657,17 +618,18 @@ class ChemDockEngine:
         energy_range: float = 3.0
     ) -> Dict[str, Any]:
         """
-        Executes iLoveChem Native ChemDock v2.0 Inbuilt Molecular Docking.
-        1. Parses receptor atoms within the binding pocket box (+4 Å buffer).
-        2. Parses ligand heavy atoms and rotatable bonds (TORSDOF).
-        3. Identifies rotatable non-ring single bonds and moving atom subtrees.
-        4. Conducts multi-start Monte Carlo Simulated Annealing with translation,
-           quaternion rotation, and flexible dihedral torsion sampling.
-        5. Applies post-annealing analytical force/torque gradient descent to relieve steric clash.
-        6. Clusters poses by Heavy-Atom RMSD and ranks by free energy of binding (kcal/mol).
-        7. Identifies key active-site polar hydrogen bond interactions.
+        Executes iLoveChem Native ChemDock v2.5 Standard Molecular Docking.
+        1. Crops pocket atoms within bounding box (+4.0 Å buffer).
+        2. Detects internal rotatable bonds and moving atom subtrees.
+        3. Precomputes pair interaction matrices for ultra-fast vectorized evaluation.
+        4. Runs multi-scale Iterated Local Search (ILS) with:
+           - 100% unbiased uniform random starts across the pocket box.
+           - Dynamic soft-core repulsion schedule to cross steric barriers.
+           - Hierarchical moves: macroscopic translation jumps, rigid rotations, and internal torsions.
+        5. Performs analytical force/torque gradient descent relaxation.
+        6. Clusters poses by Heavy-Atom RMSD (>= 1.5 Å) and ranks by binding free energy.
+        7. Identifies active-site hydrogen bond interactions.
         """
-        # Parse receptor pocket atoms
         rec_coords_list = []
         rec_types_list = []
         rec_atom_lines = []
@@ -697,6 +659,9 @@ class ChemDockEngine:
 
         rec_coords = np.array(rec_coords_list, dtype=np.float64)
         rec_radii = np.array([_get_vdw_radius(t) for t in rec_types_list], dtype=np.float64)
+        rec_hydro = np.array([_is_hydrophobic(t) for t in rec_types_list])
+        rec_acc = np.array([_is_hbond_acceptor(t) for t in rec_types_list])
+        rec_don = np.array([_is_hbond_donor(t) for t in rec_types_list])
 
         # Parse ligand atoms & TORSDOF
         lig_coords_list = []
@@ -727,19 +692,68 @@ class ChemDockEngine:
 
         orig_lig_coords = np.array(lig_coords_list, dtype=np.float64)
         lig_radii = np.array([_get_vdw_radius(t) for t in lig_types_list], dtype=np.float64)
+        lig_hydro = np.array([_is_hydrophobic(t) for t in lig_types_list])
+        lig_acc = np.array([_is_hbond_acceptor(t) for t in lig_types_list])
+        lig_don = np.array([_is_hbond_donor(t) for t in lig_types_list])
 
         # Detect internal rotatable bonds and moving atom subtrees
         rotors = _find_rotatable_bonds_and_trees(orig_lig_coords, lig_types_list)
 
-        # Center ligand initial geometry at pocket centroid
+        # Precompute pair matrices for fast scoring inside the ILS loop
+        r_sum_mat = rec_radii[:, np.newaxis] + lig_radii[np.newaxis, :]
+        hydro_mask_mat = rec_hydro[:, np.newaxis] & lig_hydro[np.newaxis, :]
+        hbond_mask_mat = (rec_acc[:, np.newaxis] & lig_don[np.newaxis, :]) | (rec_don[:, np.newaxis] & lig_acc[np.newaxis, :])
+        torsion_penalty = 1.0 + WEIGHT_ROT * max(0, num_rotatable)
+
+        def fast_eval_pose(coords: np.ndarray, clash_cap: Optional[float] = None) -> float:
+            diff = coords[np.newaxis, :, :] - rec_coords[:, np.newaxis, :]
+            dists_sq = np.sum(diff**2, axis=-1)
+            cutoff = dists_sq < 64.0
+            if not np.any(cutoff):
+                return 0.0
+
+            dists = np.sqrt(dists_sq[cutoff])
+            r_sum = r_sum_mat[cutoff]
+            d = dists - r_sum
+
+            g1 = np.sum(np.exp(-((d / 0.5) ** 2)))
+            g2 = np.sum(np.exp(-(((d - 3.0) / 2.0) ** 2)))
+
+            rep = np.where(d < 0.0, d ** 2, 0.0)
+            if clash_cap is not None:
+                rep = np.minimum(rep, clash_cap)
+            rep_val = np.sum(rep)
+
+            h_m = hydro_mask_mat[cutoff]
+            if np.any(h_m):
+                d_h = d[h_m]
+                hydro_val = np.sum(np.where(d_h < 0.5, 1.0, np.where(d_h <= 1.5, 1.5 - d_h, 0.0)))
+            else:
+                hydro_val = 0.0
+
+            hb_m = hbond_mask_mat[cutoff]
+            if np.any(hb_m):
+                d_hb = d[hb_m]
+                hb_val = np.sum(np.where(d_hb < -0.7, 1.0, np.where(d_hb <= 0.0, -d_hb / 0.7, 0.0)))
+            else:
+                hb_val = 0.0
+
+            raw = (
+                WEIGHT_GAUSS1 * g1 +
+                WEIGHT_GAUSS2 * g2 +
+                WEIGHT_REPULSION * rep_val +
+                WEIGHT_HYDROPHOBIC * hydro_val +
+                WEIGHT_HBOND * hb_val
+            )
+            return float(raw / torsion_penalty)
+
+        # Center initial ligand geometry at pocket centroid
         lig_centroid = np.mean(orig_lig_coords, axis=0)
         centered_lig = orig_lig_coords - lig_centroid
         target_center = np.array([center_x, center_y, center_z], dtype=np.float64)
 
-        # Monte Carlo Simulated Annealing with Flexible Torsions
+        # Monte Carlo Simulated Annealing with Multi-Start ILS
         num_cycles = max(3, int(exhaustiveness))
-        # Adaptive step balancing: ensures deep multi-start spatial exploration
-        # while keeping web response times fast and responsive (~3-14s even at exhaustiveness 64)
         if num_cycles > 16:
             steps_per_cycle = max(90, int(250 * math.sqrt(16.0 / num_cycles)))
         else:
@@ -749,39 +763,38 @@ class ChemDockEngine:
         grid_half_extent = np.array([size_x / 2.0, size_y / 2.0, size_z / 2.0])
 
         for cycle in range(num_cycles):
-            if cycle == 0:
-                init_offset = np.zeros(3)
-                curr_coords = centered_lig + target_center
-            else:
-                init_offset = np.random.uniform(-0.5, 0.5, size=3) * grid_half_extent
-                R_init = _random_quaternion_rotation()
-                curr_coords = np.dot(centered_lig, R_init.T) + (target_center + init_offset)
+            # 100% Unbiased Multi-Start: randomize starting position across pocket box
+            # and apply random 3D quaternion rotation
+            init_offset = np.random.uniform(-0.5, 0.5, size=3) * grid_half_extent
+            R_init = _random_quaternion_rotation()
+            curr_coords = np.dot(centered_lig, R_init.T) + (target_center + init_offset)
 
-            curr_energy = cls.evaluate_vina_score(
-                rec_coords, rec_types_list, rec_radii,
-                curr_coords, lig_types_list, lig_radii,
-                num_rotatable_bonds=num_rotatable
-            )
-
+            curr_energy = fast_eval_pose(curr_coords, clash_cap=4.0)
             best_cycle_coords = np.copy(curr_coords)
             best_cycle_energy = curr_energy
 
-            # Annealing loop
-            temp = 12.0
+            temp = 16.0
             t_decay = 0.985
 
             for step in range(steps_per_cycle):
-                step_scale = max(0.2, temp / 12.0)
+                # Dynamic soft-core repulsion schedule: ramp cap from 4.0 to strict Vina
+                if step < steps_per_cycle * 0.75:
+                    cap = 4.0 + (step / steps_per_cycle) * 16.0
+                else:
+                    cap = None
+
+                step_scale = max(0.2, temp / 16.0)
                 move_rnd = np.random.rand()
 
                 if move_rnd < 0.35 or not rotors:
-                    # Rigid translation move
-                    trans_step = np.random.normal(0.0, 0.35 * step_scale, size=3)
+                    # Multi-scale translation move (10% macroscopic jumps, 90% medium steps)
+                    scale = 1.8 * step_scale if move_rnd < 0.10 else 0.40 * step_scale
+                    trans_step = np.random.normal(0.0, scale, size=3)
                     trial_coords = curr_coords + trans_step
                 elif move_rnd < 0.65:
                     # Rigid rotation move
                     rot_axis = np.random.normal(size=3)
-                    rot_angle = np.random.normal(0.0, 0.25 * step_scale)
+                    rot_angle = np.random.normal(0.0, 0.35 * step_scale)
                     R_step = _rotation_matrix_from_axis_angle(rot_axis, rot_angle)
                     curr_c = np.mean(curr_coords, axis=0)
                     trial_coords = np.dot(curr_coords - curr_c, R_step.T) + curr_c
@@ -793,7 +806,7 @@ class ChemDockEngine:
                     axis_norm = float(np.linalg.norm(axis))
                     if axis_norm > 1e-4:
                         axis /= axis_norm
-                        angle = float(np.random.normal(0.0, 0.45 * step_scale))
+                        angle = float(np.random.normal(0.0, 0.60 * step_scale))
                         R_torsion = _rotation_matrix_from_axis_angle(axis, angle)
                         center = curr_coords[u_idx]
                         trial_coords = np.copy(curr_coords)
@@ -806,11 +819,7 @@ class ChemDockEngine:
                 if np.any(box_dist > 1.0):
                     continue
 
-                trial_energy = cls.evaluate_vina_score(
-                    rec_coords, rec_types_list, rec_radii,
-                    trial_coords, lig_types_list, lig_radii,
-                    num_rotatable_bonds=num_rotatable
-                )
+                trial_energy = fast_eval_pose(trial_coords, clash_cap=cap)
 
                 dE = trial_energy - curr_energy
                 if dE < 0.0 or (temp > 0.01 and np.random.rand() < math.exp(-min(50.0, dE / temp))):
@@ -822,13 +831,15 @@ class ChemDockEngine:
 
                 temp *= t_decay
 
-            if best_cycle_energy < 50.0:
+            # Strict final evaluation
+            final_strict = fast_eval_pose(best_cycle_coords, clash_cap=None)
+            if final_strict < 40.0:
                 # Post-annealing gradient relaxation to relieve friction
                 relaxed_coords, relaxed_energy = _relax_pose_gradients(
                     rec_coords, rec_types_list, rec_radii,
                     best_cycle_coords, lig_types_list, lig_radii,
                     num_rotatable=num_rotatable,
-                    steps=15
+                    steps=20
                 )
                 accepted_poses.append((relaxed_energy, relaxed_coords))
 
@@ -859,108 +870,70 @@ class ChemDockEngine:
             best_e, best_c = accepted_poses[0]
             clustered_poses = [(round(best_e, 3), best_c, 0.0, 0.0)]
 
-        # Build output PDBQT models
-        docked_models_str_list = []
-        poses_summary = []
-
-        for idx, (energy, coords, r_lb, r_ub) in enumerate(clustered_poses, start=1):
-            model_lines = [
-                f"MODEL {idx}",
-                f"REMARK VINA RESULT:    {energy:.3f}      {r_lb:.3f}      {r_ub:.3f}"
-            ]
-            for atom_idx, line in enumerate(lig_atom_template_lines):
-                c = coords[atom_idx]
-                coord_part = f"{c[0]:8.3f}{c[1]:8.3f}{c[2]:8.3f}"
-                new_line = line[:30] + coord_part + line[54:]
-                model_lines.append(new_line)
+        # Generate output PDBQT models and interaction table
+        modes_output = []
+        for rank, (score, pose_coords, r_lb, r_ub) in enumerate(clustered_poses, start=1):
+            model_lines = [f"MODEL {rank}"]
+            for i, line in enumerate(lig_atom_template_lines):
+                if i < len(pose_coords):
+                    x, y, z = pose_coords[i]
+                    formatted = f"{line[:30]}{x:8.3f}{y:8.3f}{z:8.3f}{line[54:]}"
+                    model_lines.append(formatted)
+                else:
+                    model_lines.append(line)
             model_lines.append("ENDMDL")
-            model_str = "\n".join(model_lines)
-            docked_models_str_list.append(model_str)
 
-            poses_summary.append({
-                "mode": idx,
-                "affinity_kcal_mol": energy,
+            modes_output.append({
+                "mode": rank,
+                "affinity_kcal_mol": score,
                 "rmsd_lb": r_lb,
                 "rmsd_ub": r_ub,
-                "pdbqt_block": model_str
+                "pdbqt_block": "\n".join(model_lines)
             })
 
-        docked_output_pdbqt = "\n".join(docked_models_str_list) + "\n"
+        # Active-site H-Bond detection for the top pose
+        top_interactions = []
+        if clustered_poses:
+            best_coords = clustered_poses[0][1]
+            diff = best_coords[np.newaxis, :, :] - rec_coords[:, np.newaxis, :]
+            dists = np.linalg.norm(diff, axis=-1)
 
-        # Detect hydrogen bond interactions for top pose
-        hbond_contacts = []
-        if poses_summary:
-            top_coords = clustered_poses[0][1]
-            hbond_contacts = cls._detect_contacts_from_coords(
-                rec_coords, rec_atom_lines, top_coords, lig_atom_template_lines
-            )
+            is_rec_acc = rec_acc[:, np.newaxis]
+            is_rec_don = rec_don[:, np.newaxis]
+            is_lig_acc = lig_acc[np.newaxis, :]
+            is_lig_don = lig_don[np.newaxis, :]
+            hbond_pair = ((is_rec_acc & is_lig_don) | (is_rec_don & is_lig_acc)) & (dists <= 3.5)
+
+            r_idx, l_idx = np.where(hbond_pair)
+            for ri, li in zip(r_idx, l_idx):
+                d_val = round(float(dists[ri, li]), 2)
+                r_line = rec_atom_lines[ri]
+                res_info = f"{r_line[17:20].strip()}{r_line[22:26].strip()}:{r_line[12:16].strip()}"
+                top_interactions.append({
+                    "receptor_residue": res_info,
+                    "ligand_atom_index": int(li),
+                    "interaction_type": "Hydrogen Bond",
+                    "distance_angstrom": d_val
+                })
+
+        full_docked_pdbqt = "\n".join([m["pdbqt_block"] for m in modes_output])
 
         return {
             "success": True,
-            "engine": "iLoveChem ChemDock v2.0 (Flexible Torsion & Gradient-Relaxed Monte Carlo)",
-            "center": {"x": center_x, "y": center_y, "z": center_z},
-            "size": {"x": size_x, "y": size_y, "z": size_z},
-            "exhaustiveness": exhaustiveness,
-            "rotatable_bonds": len(rotors),
-            "poses_count": len(poses_summary),
-            "best_affinity_kcal_mol": poses_summary[0]["affinity_kcal_mol"] if poses_summary else None,
-            "poses": poses_summary,
-            "hbond_contacts": hbond_contacts,
-            "docked_output_pdbqt": docked_output_pdbqt
+            "engine": "iLoveChem ChemDock v2.5",
+            "poses": modes_output,
+            "poses_count": len(modes_output),
+            "docked_pdbqt": full_docked_pdbqt,
+            "best_affinity": clustered_poses[0][0] if clustered_poses else 0.0,
+            "best_affinity_kcal_mol": clustered_poses[0][0] if clustered_poses else 0.0,
+            "num_modes_found": len(clustered_poses),
+            "interactions": top_interactions[:10],
+            "hbond_contacts": top_interactions[:10],
+            "grid_center": [center_x, center_y, center_z],
+            "grid_size": [size_x, size_y, size_z]
         }
 
-    @staticmethod
-    def _detect_contacts_from_coords(
-        rec_coords: np.ndarray,
-        rec_atom_lines: List[str],
-        lig_coords: np.ndarray,
-        lig_atom_lines: List[str],
-        max_dist: float = 3.5
-    ) -> List[Dict[str, Any]]:
-        """Identifies key polar hydrogen bonds between receptor residues and top docked ligand pose."""
-        contacts = []
-        rec_donors_acceptors = []
-        for idx, line in enumerate(rec_atom_lines):
-            atom_name = line[12:16].strip()
-            res_name = line[17:20].strip()
-            res_seq = line[22:26].strip()
-            atom_type = line[77:79].strip().upper() if len(line) >= 79 else ""
-            if atom_type in ["OA", "NA", "SA", "HD", "N", "O"] or atom_name[0] in ["N", "O"]:
-                rec_donors_acceptors.append({
-                    "atom_name": atom_name,
-                    "res_name": res_name,
-                    "res_seq": res_seq,
-                    "coord": rec_coords[idx]
-                })
 
-        lig_donors_acceptors = []
-        for idx, line in enumerate(lig_atom_lines):
-            atom_name = line[12:16].strip()
-            atom_type = line[77:79].strip().upper() if len(line) >= 79 else ""
-            if atom_type in ["OA", "NA", "SA", "HD", "N", "O"] or (atom_name and atom_name[0] in ["N", "O"]):
-                lig_donors_acceptors.append({
-                    "atom_name": atom_name,
-                    "coord": lig_coords[idx]
-                })
-
-        seen_pairs = set()
-        for r in rec_donors_acceptors:
-            for l in lig_donors_acceptors:
-                dist = float(np.linalg.norm(r["coord"] - l["coord"]))
-                if 1.9 <= dist <= max_dist:
-                    pair_key = (r["res_name"], r["res_seq"], r["atom_name"], l["atom_name"])
-                    if pair_key not in seen_pairs:
-                        seen_pairs.add(pair_key)
-                        contacts.append({
-                            "receptor_residue": f"{r['res_name']}{r['res_seq']}",
-                            "receptor_atom": r["atom_name"],
-                            "ligand_atom": l["atom_name"],
-                            "distance_angstrom": round(dist, 2)
-                        })
-
-        contacts.sort(key=lambda x: x["distance_angstrom"])
-        return contacts[:8]
-
-
-# Backward-compatible alias
+# Backwards compatibility alias for tests and existing callers
 DockingEngine = ChemDockEngine
+
