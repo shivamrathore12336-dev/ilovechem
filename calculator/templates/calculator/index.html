@@ -24,22 +24,27 @@
     <!-- Top Navigation Bar -->
     <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
+            <a href="/" class="flex items-center space-x-3 hover:opacity-90 transition">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
                     <i data-lucide="atom" class="w-6 h-6 text-white animate-spin-slow"></i>
                 </div>
                 <div>
                     <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400">
-                        iLoveChem Studio
+                        iLoveChem
                     </span>
-                    <span class="text-xs ml-2 px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800 font-medium">v1.0 Ready</span>
+                    <span class="text-xs ml-2 px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800 font-medium">Properties</span>
                 </div>
-            </div>
+            </a>
             <div class="flex items-center space-x-4 text-sm">
-                <a href="#quick-docs" class="text-slate-400 hover:text-cyan-400 transition-colors">Documentation</a>
-                <a href="/about/" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">REST API</a>
-                <span class="text-xs text-emerald-400 flex items-center gap-1.5 bg-emerald-950/60 border border-emerald-800/80 px-2.5 py-1 rounded-full">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> RDKit Engine Online
+                <a href="/" class="text-slate-400 hover:text-cyan-400 font-semibold transition-colors">Converter</a>
+                <a href="/docking/" class="text-slate-400 hover:text-cyan-400 font-semibold transition-colors flex items-center gap-1.5">
+                    <span>Docking</span>
+                    <span class="px-1.5 py-0.2 bg-blue-600 text-white rounded text-[9px] font-mono font-bold uppercase">New</span>
+                </a>
+                <a href="/downloads/" class="text-slate-400 hover:text-cyan-400 font-semibold transition-colors">Downloads</a>
+                <a href="/about/" class="text-slate-400 hover:text-cyan-400 font-semibold transition-colors">About</a>
+                <span class="hidden md:inline-flex text-xs text-emerald-400 items-center gap-1.5 bg-emerald-950/60 border border-emerald-800/80 px-2.5 py-1 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> RDKit Online
                 </span>
             </div>
         </div>
