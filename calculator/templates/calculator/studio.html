@@ -904,6 +904,12 @@
                         <span>Cite</span>
                     </button>
 
+                    <button type="button" id="send-docking-btn" onclick="sendConvertedToDocking()"
+                        class="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm flex items-center justify-center space-x-2 shadow-sm transition cursor-pointer" title="Send converted molecule directly into Molecular Docking Studio">
+                        <i data-lucide="crosshair" class="w-4 h-4"></i>
+                        <span>Dock Molecule</span>
+                    </button>
+
                     <button type="button" onclick="resetToUpload()"
                         class="text-xs text-blue-600 font-bold hover:underline py-2 sm:px-3">
                         Convert Another File
@@ -2231,6 +2237,15 @@
                 a.download = finalOutputName;
                 a.click();
                 showToast(`Downloaded ${finalOutputName}! 📥`, "success", 2500);
+            }
+        }
+
+        function sendConvertedToDocking() {
+            if (finalOutputText) {
+                sessionStorage.setItem("ilovechem_dock_ligand", finalOutputText);
+                window.open("/docking/?from_converter=1", "_blank");
+            } else {
+                window.open("/docking/", "_blank");
             }
         }
 
