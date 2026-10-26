@@ -18,5 +18,6 @@ urlpatterns = [
     # Inbuilt Molecular Docking Studio (Phase 2)
     path('docking/', docking_views.docking_studio_view, name='docking_studio'),
     path('api/dock/fetch-pdb/<str:pdb_id>/', docking_views.api_fetch_rcsb_pdb, name='api_fetch_pdb'),
+    path('api/dock/rcsb/<str:pdb_id>/', docking_views.api_fetch_rcsb_pdb, name='api_fetch_rcsb_pdb_alias'),
     path('api/dock/run/', docking_views.api_run_docking, name='api_run_docking'),
 ]

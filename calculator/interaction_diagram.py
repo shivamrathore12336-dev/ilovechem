@@ -231,7 +231,7 @@ def generate_2d_interaction_svg(
     
     <!-- Title and Subtitle -->
     <g transform="translate(18, 22)">
-        <text x="0" y="0" fill="{text_color}" font-size="12" font-weight="bold" font-family="system-ui, sans-serif">2D Interaction Map (PoseView &bull; Maestro Standard)</text>
+        <text x="0" y="0" fill="{text_color}" font-size="12" font-weight="bold" font-family="system-ui, sans-serif">2D Interaction Map (PoseView &#8226; Maestro Standard)</text>
         <text x="0" y="15" fill="{subtext_color}" font-size="9.5" font-family="system-ui, sans-serif">Click any amino acid badge to zoom &amp; inspect residue in 3D viewport</text>
     </g>
 
