@@ -365,7 +365,7 @@
     </section>
 
     <!-- 3. THE SIGNATURE iLoveChem TOOLS GRID (12 Clean Minimalist Cards - Exact iLovePDF Paradigm) -->
-    <section class="max-w-6xl mx-auto px-4 sm:px-6 mb-12">
+    <section id="tools-grid" class="max-w-6xl mx-auto px-4 sm:px-6 mb-12">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             
             <!-- Card 1: ORCA Generator -->
@@ -1085,14 +1085,14 @@
                     <div class="text-white font-bold text-xs uppercase tracking-wider">Product</div>
                     <ul class="space-y-2 text-slate-400">
                         <li><a href="/" class="hover:text-white transition">Home</a></li>
+                        <li><a href="/docking/" class="hover:text-white transition text-blue-400 font-bold flex items-center gap-1.5"><span>Molecular Docking</span><span class="px-1.5 py-0.2 bg-blue-600 text-white rounded text-[8px] font-mono font-bold uppercase">New</span></a></li>
                         <li><a href="/about/" class="hover:text-white transition text-indigo-400 font-bold">About &amp; Capabilities</a></li>
                         <li><a href="/downloads/" class="hover:text-white transition text-blue-400 font-bold">Software Downloads</a></li>
                         <li><a href="javascript:void(0)" onclick="selectToolFromGrid('orca', 'ORCA Generator', 'Generate DFT input files with spin parity')" class="hover:text-white transition">ORCA Generator</a></li>
                         <li><a href="javascript:void(0)" onclick="selectToolFromGrid('gjf', 'Gaussian Builder', 'Convert 2D/3D molecules into .com / .gjf')" class="hover:text-white transition">Gaussian Builder</a></li>
                         <li><a href="javascript:void(0)" onclick="selectToolFromGrid('pdbqt', 'AutoDock PDBQT Prep', 'Prepare ligands & receptors for Vina')" class="hover:text-white transition">AutoDock PDBQT</a></li>
-                        <li><a href="javascript:void(0)" onclick="selectToolFromGrid('cdxml', 'ChemDraw Unpacker', 'Extract schemes & SuperAtoms into 3D')" class="hover:text-white transition">ChemDraw Unpacker</a></li>
                         <li><a href="javascript:void(0)" onclick="selectToolFromGrid('xyz', 'CIF Crystallography', 'Convert crystal unit cells to XYZ')" class="hover:text-white transition">CIF Crystallography</a></li>
-                        <li><a href="javascript:void(0)" onclick="selectToolFromGrid('orca', 'Universal Converter', '20+ Chemistry file formats')" class="hover:text-white transition">All Chemistry Tools</a></li>
+                        <li><a href="#tools-grid" onclick="scrollToToolsGrid(event)" class="hover:text-white transition">All Chemistry Tools</a></li>
                     </ul>
                 </div>
 
@@ -2309,6 +2309,14 @@
             if (str == null) return '';
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
+        function scrollToToolsGrid(e) {
+            if (e) e.preventDefault();
+            const el = document.getElementById('tools-grid');
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
         function selectToolFromGrid(format, name, desc) {
             if (format === 'gaussian') format = 'gjf';
             if (format === 'cdxml') format = 'sdf';
