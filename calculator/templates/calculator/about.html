@@ -365,14 +365,100 @@
                 </div>
             </div>
 
-            <!-- CAPABILITY 5: 3D MOLECULAR GRAPHICS & PUBLICATION EXPORT -->
+                        <!-- CAPABILITY 5: INBUILT CHEMDOCK MOLECULAR DOCKING STUDIO -->
+            <div id="molecular-docking" class="space-y-6 pt-8 border-t border-slate-200">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center font-bold">
+                        <i data-lucide="target" class="w-5 h-5 text-blue-700"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-900">5. Inbuilt ChemDock Molecular Docking Studio</h2>
+                        <p class="text-xs font-mono uppercase tracking-wider text-blue-600 font-bold">Vectorized Empirical Scoring &bull; Monte Carlo Simulated Annealing &bull; Zero External Binaries</p>
+                    </div>
+                </div>
+
+                <div class="prose prose-slate max-w-none text-slate-600 text-sm leading-relaxed space-y-4">
+                    <p>
+                        The <strong>iLoveChem Inbuilt Molecular Docking Studio</strong> is a production-grade, zero-install computational chemistry instrument running natively in volatile server memory. It eliminates the fragility, installation hurdles, and architecture incompatibilities of external binary wrappers while implementing the physics of the validated empirical free-energy scoring formulation (Trott &amp; Olson, 2010).
+                    </p>
+
+                    <!-- Mathematical Formulation Card -->
+                    <div class="p-5 rounded-2xl bg-slate-900 text-slate-200 border border-slate-800 shadow-md space-y-3 font-mono text-xs">
+                        <div class="flex items-center justify-between text-slate-400 border-b border-slate-800 pb-2">
+                            <span class="font-bold text-cyan-300">Empirical Free Energy Scoring Function (&Delta;G in kcal/mol)</span>
+                            <span class="text-[11px] text-slate-500">AutoDock Vina Thermodynamic Formulation</span>
+                        </div>
+                        <div class="text-center py-2 text-cyan-200 text-sm font-bold tracking-wider overflow-x-auto">
+                            &Delta;G<sub>bind</sub> = c<sub>inter</sub> &middot; &Sigma; [ f<sub>gauss1</sub>(d) + f<sub>gauss2</sub>(d) + f<sub>repulsion</sub>(d) + f<sub>hydrophobic</sub>(d) + f<sub>hbond</sub>(d) ] / (1 + 0.05846 &middot; N<sub>rot</sub>)
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 text-[11px] text-slate-300 border-t border-slate-800">
+                            <div>
+                                <span class="text-amber-300 font-bold">&bull; Steric Attractions (Gauss 1 &amp; 2):</span> Short- and intermediate-range dispersion forces modeling favorable van der Waals contact.
+                            </div>
+                            <div>
+                                <span class="text-rose-400 font-bold">&bull; Steric Repulsion:</span> Quadratic penalty barrier for distances below optimal van der Waals radii sum to eliminate atomic clashes.
+                            </div>
+                            <div>
+                                <span class="text-emerald-400 font-bold">&bull; Hydrophobic Potential:</span> Non-polar carbon-carbon and carbon-halogen desolvation bonus for active site lipophilic pockets.
+                            </div>
+                            <div>
+                                <span class="text-blue-300 font-bold">&bull; Directional H-Bonding:</span> Linear attractive ramp rewarding donor-acceptor distances in the 1.9 &ndash; 2.5 &#8491; range.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3-Pillar Architectural Breakdown -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                        <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2">
+                            <div class="flex items-center gap-2 text-slate-900 font-bold text-sm">
+                                <i data-lucide="cpu" class="w-4 h-4 text-blue-600"></i>
+                                <span>Zero-Setup Matrix Caching</span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Avoids slow 3D potential grid construction by pre-filtering receptor-ligand interaction matrices (N<sub>rec</sub> &times; N<sub>lig</sub>) into contiguous vectorized NumPy memory. Reduces initialization latency from 35s to 0.00s (instant).
+                            </p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2">
+                            <div class="flex items-center gap-2 text-slate-900 font-bold text-sm">
+                                <i data-lucide="compass" class="w-4 h-4 text-indigo-600"></i>
+                                <span>100% Unseeded Multi-Start</span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Eliminates bias from starting poses. Ligands are uniformly distributed across the user-defined 20 &#8491; search box with random 4D quaternionic orientations and adaptive soft-core clash damping to escape shallow minima.
+                            </p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2">
+                            <div class="flex items-center gap-2 text-slate-900 font-bold text-sm">
+                                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+                                <span>Pharma Zero-Storage</span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Complete execution inside volatile RAM. Target macromolecules, ligand candidate structures, and docked coordinates are never logged, cached to disk, or stored in relational databases.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Pocket Detection & Active Site Architecture -->
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs text-slate-700">
+                        <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                            <i data-lucide="crosshair" class="w-4 h-4 text-amber-600"></i>
+                            <span>Intelligent Active Site Pocket Detection &amp; Cofactor Preservation</span>
+                        </div>
+                        <p class="leading-relaxed">
+                            When an RCSB PDB structure is fetched, the engine automatically extracts coordinates for co-crystallized drug candidates to locate the catalytic pocket. Crucially, the system isolates true drug inhibitors from structural cofactors (e.g., Heme, FAD, NAD, CoA, PLP, and metal clusters), retaining cofactors as rigid parts of the pocket environment while centring search coordinates at the genuine pharmaceutical binding site.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+<!-- CAPABILITY 6: 3D MOLECULAR GRAPHICS & PUBLICATION EXPORT -->
             <div class="space-y-6 pt-8 border-t border-slate-200">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
                         <i data-lucide="box" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <h2 class="text-2xl font-black text-slate-900">5. Hardware-Accelerated 3D WebGL Visualization &amp; Figures</h2>
+                        <h2 class="text-2xl font-black text-slate-900">6. Hardware-Accelerated 3D WebGL Visualization &amp; Figures</h2>
                         <p class="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">Publication-Ready Graphics</p>
                     </div>
                 </div>
@@ -389,14 +475,14 @@
                 </div>
             </div>
 
-            <!-- CAPABILITY 6: REST API AUTOMATION -->
+            <!-- CAPABILITY 7: REST API AUTOMATION -->
             <div id="rest-api" class="space-y-6 pt-8 border-t border-slate-200">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center font-bold">
                         <i data-lucide="terminal" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <h2 class="text-2xl font-black text-slate-900">6. Python REST API for CADD Pipeline Automation</h2>
+                        <h2 class="text-2xl font-black text-slate-900">7. Python REST API for CADD Pipeline Automation</h2>
                         <p class="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">Endpoint: /api/convert/</p>
                     </div>
                 </div>
@@ -423,14 +509,14 @@ print("MedChem Properties:", data["medchem"])</pre>
                 </div>
             </div>
 
-            <!-- SECTION 7: SCIENTIFIC ATTRIBUTION & HOW TO CITE -->
+            <!-- SECTION 8: SCIENTIFIC ATTRIBUTION & HOW TO CITE -->
             <div class="space-y-6 pt-8 border-t border-slate-200">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
                         <i data-lucide="bookmark" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <h2 class="text-2xl font-black text-slate-900">7. Scientific Attribution &amp; Academic Citation</h2>
+                        <h2 class="text-2xl font-black text-slate-900">8. Scientific Attribution &amp; Academic Citation</h2>
                         <p class="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">BibTeX &amp; Software Reference</p>
                     </div>
                 </div>

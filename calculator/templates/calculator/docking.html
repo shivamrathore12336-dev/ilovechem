@@ -179,11 +179,11 @@
             </div>
             
             <div class="flex items-center gap-2 shrink-0">
-                <button type="button" onclick="loadBenchmark('1HSG', 'indinavir')" 
-                    class="px-3 py-1.5 rounded-xl border border-slate-300 hover:border-blue-500 hover:bg-blue-50 text-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs">
-                    <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500"></i>
-                    <span>Quick HIV-1 Benchmark (1HSG)</span>
-                </button>
+                <a href="/about/#molecular-docking" target="_blank"
+                    class="px-3 py-1.5 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50 text-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs">
+                    <i data-lucide="book-open" class="w-3.5 h-3.5 text-blue-600"></i>
+                    <span>Methodology &amp; Physics</span>
+                </a>
                 <button type="button" onclick="document.getElementById('methodology-modal').classList.remove('hidden')" 
                     class="px-3 py-1.5 rounded-xl border border-slate-300 hover:border-slate-400 bg-white text-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs">
                     <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-400"></i>
@@ -219,7 +219,7 @@
                         </label>
                         <div class="flex gap-2">
                             <div class="relative flex-1">
-                                <input type="text" id="pdb-id-input" placeholder="e.g. 1HSG, 6LU7, 3ERT" maxlength="4"
+                                <input type="text" id="pdb-id-input" placeholder="Enter 4-character RCSB PDB ID" maxlength="4"
                                     class="w-full uppercase font-mono px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition" />
                                 <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-mono">PDB</span>
                             </div>
@@ -231,24 +231,7 @@
                         </div>
                     </div>
 
-                    <!-- Popular Benchmark Presets -->
-                    <div class="mb-3.5">
-                        <div class="text-[11px] font-semibold text-slate-500 mb-1">Standard Benchmark Targets:</div>
-                        <div class="flex flex-wrap gap-1.5 text-xs">
-                            <button type="button" onclick="loadBenchmark('1HSG', 'indinavir')" 
-                                class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 font-mono text-[11px] font-semibold transition border border-slate-200">
-                                1HSG (HIV-1 Protease)
-                            </button>
-                            <button type="button" onclick="loadBenchmark('6LU7', 'n3')" 
-                                class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 font-mono text-[11px] font-semibold transition border border-slate-200">
-                                6LU7 (SARS-CoV-2 Mpro)
-                            </button>
-                            <button type="button" onclick="loadBenchmark('3ERT', 'tamoxifen')" 
-                                class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 font-mono text-[11px] font-semibold transition border border-slate-200">
-                                3ERT (Estrogen Receptor)
-                            </button>
-                        </div>
-                    </div>
+
 
                     <!-- File Drop / Raw PDB Upload -->
                     <div>
@@ -306,33 +289,12 @@
                             <label class="text-xs font-semibold text-slate-700">Ligand SMILES or Structure:</label>
                             <span class="text-[11px] text-slate-400 font-mono">RDKit 3D ETKDGv3</span>
                         </div>
-                        <textarea id="ligand-input-text" rows="2" placeholder="e.g. CC(=O)Oc1ccccc1C(=O)O (Aspirin)"
+                        <textarea id="ligand-input-text" rows="2" placeholder="Enter Canonical SMILES or structure coordinates..."
                             class="w-full font-mono text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition custom-scrollbar"
                             oninput="updateLigandStatus()"></textarea>
                     </div>
 
-                    <!-- Sample Ligand Pills -->
-                    <div class="mb-3">
-                        <div class="text-[11px] font-semibold text-slate-500 mb-1">Popular Drug Presets:</div>
-                        <div class="flex flex-wrap gap-1 text-xs">
-                            <button type="button" onclick="setLigandPreset('indinavir')" 
-                                class="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 font-semibold text-[11px] transition border border-slate-200">
-                                Indinavir (HIV-1)
-                            </button>
-                            <button type="button" onclick="setLigandPreset('aspirin')" 
-                                class="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 font-semibold text-[11px] transition border border-slate-200">
-                                Aspirin
-                            </button>
-                            <button type="button" onclick="setLigandPreset('paracetamol')" 
-                                class="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 font-semibold text-[11px] transition border border-slate-200">
-                                Paracetamol
-                            </button>
-                            <button type="button" onclick="setLigandPreset('tamoxifen')" 
-                                class="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 font-semibold text-[11px] transition border border-slate-200">
-                                4-OHT (Tamoxifen)
-                            </button>
-                        </div>
-                    </div>
+
 
                     <!-- File Upload Alternative -->
                     <div>
@@ -540,7 +502,7 @@
                             </div>
                             <h3 class="text-sm font-bold text-slate-200 mb-1">Interactive 3D Viewport Ready</h3>
                             <p class="text-xs text-slate-400 max-w-sm">
-                                Fetch a PDB target (e.g. 1HSG) or load a benchmark preset to visualize macromolecular ribbons and active site residues.
+                                Input a target macromolecule via RCSB PDB ID or file upload to render structural ribbons and configure active site search boundaries.
                             </p>
                         </div>
                     </div>
@@ -640,6 +602,65 @@
 
             </div>
 
+        </div>
+
+        <!-- 4. ENGINE SPECIFICATIONS & SCIENTIFIC METHODOLOGY BANNER -->
+        <div class="mt-8 bg-slate-900 rounded-2xl border border-slate-800 p-6 text-slate-300 shadow-md">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400 flex items-center justify-center font-bold">
+                        <i data-lucide="cpu" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white uppercase tracking-wider">ChemDock Computational Specifications</h3>
+                        <p class="text-xs text-slate-400">Validated empirical free energy scoring &bull; Pure volatile in-memory execution</p>
+                    </div>
+                </div>
+                <a href="/about/#molecular-docking" target="_blank"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0">
+                    <span>Full Methodology in About Section</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 text-xs">
+                <div class="space-y-1">
+                    <div class="font-bold text-slate-200 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                        <span>Scoring Physics</span>
+                    </div>
+                    <p class="text-slate-400 text-[11px] leading-relaxed">
+                        Evaluates van der Waals dispersion (Gauss 1/2), steric repulsion, hydrophobic contact, directional H-bonds, and torsional loss.
+                    </p>
+                </div>
+                <div class="space-y-1">
+                    <div class="font-bold text-slate-200 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                        <span>Search Algorithm</span>
+                    </div>
+                    <p class="text-slate-400 text-[11px] leading-relaxed">
+                        100% blind multi-start search with quaternion rotations, adaptive soft-core clash dampening, and Iterated Local Search (ILS).
+                    </p>
+                </div>
+                <div class="space-y-1">
+                    <div class="font-bold text-slate-200 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        <span>Zero-Disk Policy</span>
+                    </div>
+                    <p class="text-slate-400 text-[11px] leading-relaxed">
+                        100% volatile memory lifecycle. Structures and poses reside in RAM buffers and are never stored to disk or database tables.
+                    </p>
+                </div>
+                <div class="space-y-1">
+                    <div class="font-bold text-slate-200 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                        <span>Academic Deliverables</span>
+                    </div>
+                    <p class="text-slate-400 text-[11px] leading-relaxed">
+                        1-click export of merged Complex (.PDB), AutoDock Multi-Model Poses (.PDBQT), and Publication Summary Table (.CSV).
+                    </p>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -753,38 +774,6 @@
             isDocking: false
         };
 
-        // Presets Library
-        const BENCHMARK_PRESETS = {
-            "1HSG": {
-                name: "HIV-1 Protease",
-                ligandName: "Indinavir",
-                smiles: "CC(C)(C)NC(=O)[C@@H]1C[C@@H]2CCCC[C@@H]2CN1C[C@@H](O)C[C@@H](CC3=CC=CC=C3)C(=O)N[C@@H]4CC5=CC=CC=C5[C@H]4O",
-                center: [16.0, 25.0, 4.0],
-                size: [22.0, 22.0, 22.0]
-            },
-            "6LU7": {
-                name: "SARS-CoV-2 Mpro",
-                ligandName: "N3 Inhibitor",
-                smiles: "CC(C)C[C@H](NC(=O)[C@H](CC1=CC=CC=C1)NC(=O)[C@@H]2CC[C@H](NC(=O)OCC3=CC=CC=C3)O2)C(=O)N[C@@H](CC4CCNC4=O)C(=O)/C=C/C(=O)OCC",
-                center: [-11.0, 12.0, 68.0],
-                size: [24.0, 24.0, 24.0]
-            },
-            "3ERT": {
-                name: "Estrogen Receptor Alpha",
-                ligandName: "4-Hydroxytamoxifen",
-                smiles: "CC/C(=C(\\c1ccc(O)cc1)/c2ccccc2)c3ccc(OCCN(C)C)cc3",
-                center: [30.0, -1.5, 24.5],
-                size: [20.0, 20.0, 20.0]
-            }
-        };
-
-        const DRUG_PRESETS = {
-            "indinavir": "CC(C)(C)NC(=O)[C@@H]1C[C@@H]2CCCC[C@@H]2CN1C[C@@H](O)C[C@@H](CC3=CC=CC=C3)C(=O)N[C@@H]4CC5=CC=CC=C5[C@H]4O",
-            "aspirin": "CC(=O)Oc1ccccc1C(=O)O",
-            "paracetamol": "CC(=O)Nc1ccc(O)cc1",
-            "tamoxifen": "CC/C(=C(\\c1ccc(O)cc1)/c2ccccc2)c3ccc(OCCN(C)C)cc3"
-        };
-
         // Initialize on DOM load
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
@@ -806,7 +795,7 @@
             const pdbId = (pdbIdOverride || pdbInput.value).trim().toUpperCase();
 
             if (!pdbId || pdbId.length !== 4) {
-                alert("Please enter a valid 4-character PDB ID (e.g. 1HSG, 6LU7, 3ERT).");
+                alert("Please enter a valid 4-character RCSB PDB ID.");
                 return;
             }
 
@@ -1196,35 +1185,6 @@
                 listContainer.appendChild(item);
             });
         }
-
-        // Preset Loaders
-        function loadBenchmark(pdbId, drugKey) {
-            const benchmark = BENCHMARK_PRESETS[pdbId];
-            if (!benchmark) return;
-
-            document.getElementById("pdb-id-input").value = pdbId;
-            document.getElementById("ligand-input-text").value = benchmark.smiles;
-            State.ligandFormat = "smiles";
-            updateLigandStatus();
-
-            document.getElementById("grid-center-x").value = benchmark.center[0];
-            document.getElementById("grid-center-y").value = benchmark.center[1];
-            document.getElementById("grid-center-z").value = benchmark.center[2];
-            document.getElementById("grid-size-x").value = benchmark.size[0];
-            document.getElementById("grid-size-y").value = benchmark.size[1];
-            document.getElementById("grid-size-z").value = benchmark.size[2];
-            onGridParamsChanged();
-
-            fetchRCSBStructure(pdbId);
-        }
-
-        function setLigandPreset(drugKey) {
-            const smiles = DRUG_PRESETS[drugKey];
-            if (smiles) {
-                document.getElementById("ligand-input-text").value = smiles;
-                State.ligandFormat = "smiles";
-                updateLigandStatus();
-            }
         }
 
         function updateLigandStatus() {
