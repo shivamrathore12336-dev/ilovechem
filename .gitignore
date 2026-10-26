@@ -36,3 +36,7 @@ ilovechem_claude_*
 # Binaries
 calculator/bin/
 *.exe
+
+benchmark_data/
+benchmark_results_*.json
+

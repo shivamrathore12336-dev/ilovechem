@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .docking_core import ChemDockEngine
+from .interaction_diagram import generate_2d_interaction_svg, generate_pymol_script
 
 
 @ensure_csrf_cookie
@@ -159,24 +160,41 @@ def api_run_docking(request):
         top_pose_pdbqt = dock_results["poses"][0]["pdbqt_block"]
         consolidated_complex_pdb = _merge_receptor_and_pose_to_pdb(receptor_pdb, top_pose_pdbqt)
 
-    hbond_contacts = dock_results.get("hbond_contacts", [])
+    lig_smiles = lig_meta.get("smiles", "") or ligand_input
     poses = dock_results.get("poses", [])
     for idx, p in enumerate(poses):
         p["rmsd_lower_bound"] = p.get("rmsd_lb", 0.0)
         p["rmsd_upper_bound"] = p.get("rmsd_ub", 0.0)
-        if idx == 0:
-            p["contacts"] = hbond_contacts
-            p["num_h_bonds"] = len(hbond_contacts)
-        else:
-            p["contacts"] = []
-            p["num_h_bonds"] = 0
+        p_hb = p.get("hbond_contacts", [])
+        p_hp = p.get("hydrophobic_contacts", [])
+        p_sb = p.get("salt_bridges", [])
+        p["contacts"] = p_hb
+        p["num_h_bonds"] = len(p_hb)
+        # Generate dynamic 2D interaction diagram for each pose
+        p["interaction_diagram_svg"] = generate_2d_interaction_svg(
+            lig_smiles, p_hb, p_hp, p_sb, width=700, height=540, theme="dark"
+        )
+        p["interaction_diagram_svg_white"] = generate_2d_interaction_svg(
+            lig_smiles, p_hb, p_hp, p_sb, width=700, height=540, theme="white"
+        )
+
+    # Deliverables for top pose
+    top_hb = dock_results.get("hbond_contacts", [])
+    top_hp = dock_results.get("hydrophobic_contacts", [])
+    top_sb = dock_results.get("salt_bridges", [])
+    top_svg_dark = generate_2d_interaction_svg(lig_smiles, top_hb, top_hp, top_sb, width=700, height=540, theme="dark")
+    top_svg_white = generate_2d_interaction_svg(lig_smiles, top_hb, top_hp, top_sb, width=700, height=540, theme="white")
+    pymol_script = generate_pymol_script("docked_complex.pdb")
 
     dock_results["num_poses"] = dock_results.get("poses_count", len(poses))
     dock_results["exhaustiveness"] = exhaustiveness
-    dock_results["rotatable_bonds"] = lig_meta.get("num_torsions", 0)
+    dock_results["rotatable_bonds"] = lig_meta.get("rotatable_bonds", 0)
     dock_results["receptor_meta"] = rec_meta
     dock_results["ligand_meta"] = lig_meta
     dock_results["consolidated_complex_pdb"] = consolidated_complex_pdb
+    dock_results["interaction_diagram_svg"] = top_svg_dark
+    dock_results["interaction_diagram_svg_white"] = top_svg_white
+    dock_results["pymol_macro_script"] = pymol_script
 
     return Response(dock_results, status=status.HTTP_200_OK)
 

@@ -456,40 +456,78 @@
 
             </div>
 
-            <!-- RIGHT COLUMN: 3D WEBGL VIEWPORT & DOCKING RESULTS (7 Cols) -->
+            <!-- RIGHT COLUMN: DUAL 3D / 2D INTERACTION VIEWPORT & RESULTS (7 Cols) -->
             <div class="lg:col-span-7 space-y-5">
                 
-                <!-- 3D WEBGL VIEWPORT CARD -->
+                <!-- VIEWPORT CARD: 3D MOLECULAR COMPLEX & 2D INTERACTION MAP -->
                 <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs">
                     
-                    <!-- Viewport Header & Controls -->
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="box" class="w-4 h-4 text-blue-600"></i>
-                            <h2 class="text-sm font-bold text-slate-900">3D Interaction Viewport</h2>
-                            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-bold">3Dmol.js</span>
+                    <!-- Viewport Header: Dual Tabs & Scientific Toolbar -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-3 pb-3 border-b border-slate-100">
+                        <!-- Mode Tabs -->
+                        <div class="flex items-center gap-1.5 p-1 bg-slate-100/90 rounded-xl text-xs font-semibold">
+                            <button type="button" onclick="switchViewportTab('3d')" id="tab-btn-3d"
+                                class="px-3 py-1.5 rounded-lg bg-white text-blue-700 shadow-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+                                <i data-lucide="box" class="w-3.5 h-3.5 text-blue-600"></i>
+                                <span>3D Active Site (PyMOL)</span>
+                            </button>
+                            <button type="button" onclick="switchViewportTab('2d')" id="tab-btn-2d"
+                                class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5 cursor-pointer">
+                                <i data-lucide="compass" class="w-3.5 h-3.5 text-slate-500"></i>
+                                <span>2D Interaction Map</span>
+                                <span id="tab-2d-badge" class="hidden text-[10px] font-mono px-1.5 py-0.2 bg-blue-100 text-blue-700 rounded-full font-bold">0</span>
+                            </button>
                         </div>
                         
-                        <!-- Toolbar Controls -->
-                        <div class="flex items-center gap-1.5 text-xs">
+                        <!-- 3D Toolbar Controls -->
+                        <div id="controls-3d-toolbar" class="flex flex-wrap items-center gap-1.5 text-xs">
+                            <button type="button" onclick="focusPocketIn3D()" id="btn-focus-pocket" title="PyMOL Active Site Focus"
+                                class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold transition flex items-center gap-1 border border-emerald-200 cursor-pointer">
+                                <i data-lucide="target" class="w-3.5 h-3.5 text-emerald-600"></i>
+                                <span>Pocket Focus</span>
+                            </button>
+                            <button type="button" onclick="toggleResidueLabels()" id="btn-toggle-labels" title="Toggle 3D Residue Labels"
+                                class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-semibold transition flex items-center gap-1 border border-blue-200 cursor-pointer">
+                                <i data-lucide="tag" class="w-3.5 h-3.5 text-blue-600"></i>
+                                <span id="labels-btn-text">Labels</span>
+                            </button>
                             <button type="button" onclick="toggleStyleMode()" id="btn-toggle-style" title="Switch Ribbon Style"
-                                class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition flex items-center gap-1">
-                                <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                                class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition flex items-center gap-1 cursor-pointer">
+                                <i data-lucide="layers" class="w-3.5 h-3.5 text-slate-500"></i>
                                 <span id="style-mode-label">Cartoon</span>
                             </button>
                             <button type="button" onclick="toggleGridBoxVisibility()" id="btn-toggle-gridbox" title="Toggle Grid Box"
-                                class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-semibold transition flex items-center gap-1 border border-blue-200">
+                                class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-semibold transition flex items-center gap-1 border border-blue-200 cursor-pointer">
                                 <i data-lucide="grid" class="w-3.5 h-3.5"></i>
                                 <span>Grid Box</span>
                             </button>
                             <button type="button" onclick="toggleHbondsVisibility()" id="btn-toggle-hbonds" title="Toggle H-Bonds"
-                                class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 font-semibold transition flex items-center gap-1 border border-amber-200">
-                                <i data-lucide="link" class="w-3.5 h-3.5"></i>
+                                class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 font-semibold transition flex items-center gap-1 border border-amber-200 cursor-pointer">
+                                <i data-lucide="link" class="w-3.5 h-3.5 text-amber-600"></i>
                                 <span>H-Bonds</span>
                             </button>
                             <button type="button" onclick="resetViewportCamera()" title="Reset Camera View"
-                                class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                                class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer">
                                 <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+
+                        <!-- 2D Toolbar Controls -->
+                        <div id="controls-2d-toolbar" class="hidden flex flex-wrap items-center gap-1.5 text-xs">
+                            <button type="button" onclick="toggleDiagramTheme()" id="btn-toggle-theme" title="Toggle Dark / White Theme"
+                                class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition flex items-center gap-1 cursor-pointer">
+                                <i data-lucide="sun-moon" class="w-3.5 h-3.5 text-slate-600"></i>
+                                <span id="theme-btn-text">Publication White</span>
+                            </button>
+                            <button type="button" onclick="download2DDiagramSVG()" title="Export 2D Vector (.SVG)"
+                                class="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold transition flex items-center gap-1 border border-blue-200 cursor-pointer">
+                                <i data-lucide="download" class="w-3.5 h-3.5 text-blue-600"></i>
+                                <span>Export SVG</span>
+                            </button>
+                            <button type="button" onclick="copyDiagramSVG()" title="Copy Vector SVG to Clipboard"
+                                class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition flex items-center gap-1 cursor-pointer">
+                                <i data-lucide="copy" class="w-3.5 h-3.5 text-slate-500"></i>
+                                <span id="copy-svg-btn-text">Copy SVG</span>
                             </button>
                         </div>
                     </div>
@@ -507,21 +545,40 @@
                         </div>
                     </div>
 
+                    <!-- 2D Interaction Diagram Container -->
+                    <div id="docking-2d-container" class="hidden min-h-[460px] bg-slate-950 rounded-xl border border-slate-800 p-2 relative flex flex-col items-center justify-center overflow-hidden">
+                        <div id="docking-2d-placeholder" class="text-center p-8 text-slate-400">
+                            <div class="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-indigo-400 mb-3 mx-auto shadow-md">
+                                <i data-lucide="git-fork" class="w-8 h-8"></i>
+                            </div>
+                            <h3 class="text-sm font-bold text-slate-200 mb-1">2D Interaction Map Pending</h3>
+                            <p class="text-xs text-slate-400 max-w-sm">
+                                Run a docking calculation to automatically construct a PoseView/Maestro-style 2D interaction map with color-coded amino acid residues and measured H-bonds.
+                            </p>
+                        </div>
+                        <div id="docking-2d-svg-wrapper" class="w-full h-full flex items-center justify-center hidden">
+                            <!-- Populated with SVG -->
+                        </div>
+                    </div>
+
                     <!-- Viewport Legend / Status Footer -->
                     <div class="flex flex-wrap items-center justify-between text-[11px] text-slate-500 mt-2 px-1 gap-2">
-                        <div class="flex items-center gap-3">
+                        <div id="status-3d-legend" class="flex flex-wrap items-center gap-3">
                             <span class="inline-flex items-center gap-1">
                                 <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span> Receptor Ribbon
                             </span>
                             <span class="inline-flex items-center gap-1">
-                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Docked Ligand Pose
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Docked Ligand
                             </span>
                             <span class="inline-flex items-center gap-1">
-                                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Active Site Pocket
+                                <span class="w-2.5 h-2.5 rounded-full bg-slate-300 border border-slate-400"></span> Pocket Sticks (5Å)
                             </span>
                             <span class="inline-flex items-center gap-1">
                                 <span class="w-2.5 h-0.5 bg-yellow-400"></span> H-Bonds
                             </span>
+                        </div>
+                        <div id="status-2d-legend" class="hidden text-xs text-slate-500">
+                            <span class="font-medium text-slate-700">💡 Tip:</span> Click any residue badge in the 2D diagram to zoom & highlight it in 3D.
                         </div>
                         <div class="text-[10px] font-mono text-slate-400">
                             Drag: Rotate • Shift+Drag: Pan • Scroll: Zoom
@@ -539,24 +596,34 @@
                                 <h3 class="text-base font-bold text-slate-900">Ranked Docking Poses</h3>
                             </div>
                             <p class="text-xs text-slate-500 mt-0.5" id="docking-summary-stats">
-                                Calculations completed in 2.4s. Click any pose row to display its 3D conformation.
+                                Calculations completed. Click any pose row to display its 3D conformation.
                             </p>
                         </div>
 
-                        <!-- 1-Click Academic Deliverables -->
+                        <!-- 1-Click Academic & Scientific Deliverables -->
                         <div class="flex flex-wrap items-center gap-1.5">
                             <button type="button" onclick="downloadDockedComplexPDB()" 
-                                class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs" title="Download Receptor + Top Docked Pose as PDB for PyMOL / ChimeraX">
+                                class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer" title="Download Receptor + Top Docked Pose as PDB for PyMOL / ChimeraX">
                                 <i data-lucide="download" class="w-3.5 h-3.5"></i>
                                 <span>Complex (.PDB)</span>
                             </button>
+                            <button type="button" onclick="downloadPyMOLScript()" 
+                                class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Export PyMOL Publication Session Script (.PML)">
+                                <i data-lucide="terminal" class="w-3.5 h-3.5 text-indigo-600"></i>
+                                <span>PyMOL (.PML)</span>
+                            </button>
+                            <button type="button" onclick="download2DDiagramSVG()" 
+                                class="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Download Publication-Ready 2D Interaction Map Vector (.SVG)">
+                                <i data-lucide="image" class="w-3.5 h-3.5 text-amber-600"></i>
+                                <span>2D Map (.SVG)</span>
+                            </button>
                             <button type="button" onclick="downloadLigandPosesPDBQT()" 
-                                class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5" title="Download AutoDock PDBQT multi-model poses">
+                                class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Download AutoDock PDBQT multi-model poses">
                                 <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
                                 <span>Poses (.PDBQT)</span>
                             </button>
                             <button type="button" onclick="downloadScientificReportCSV()" 
-                                class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 rounded-xl text-xs font-bold transition flex items-center gap-1.5" title="Export Thesis & Paper Summary Table (CSV)">
+                                class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Export Thesis & Paper Summary Table (CSV)">
                                 <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-emerald-600"></i>
                                 <span>Report (.CSV)</span>
                             </button>
@@ -573,6 +640,7 @@
                                     <th class="py-2.5 px-3">RMSD l.b.</th>
                                     <th class="py-2.5 px-3">RMSD u.b.</th>
                                     <th class="py-2.5 px-3">H-Bonds</th>
+                                    <th class="py-2.5 px-3">Interactions</th>
                                     <th class="py-2.5 px-3 text-right">Action</th>
                                 </tr>
                             </thead>
@@ -582,18 +650,34 @@
                         </table>
                     </div>
 
-                    <!-- Contact & Hydrogen Bond Inspector -->
-                    <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                                <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500"></i>
-                                Active Pose Hydrogen Bond Interactions:
-                            </span>
-                            <span id="active-pose-tag" class="text-[10px] font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">
-                                Pose #1
-                            </span>
+                    <!-- Contact & Interaction Profiler (PyMOL / Discovery Studio Standard) -->
+                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="activity" class="w-4 h-4 text-blue-600"></i>
+                                <span class="text-xs font-bold text-slate-900">Protein-Ligand Interaction Profiler:</span>
+                                <span id="active-pose-tag" class="text-[10px] font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">
+                                    Pose #1
+                                </span>
+                            </div>
+
+                            <!-- Filter Pills -->
+                            <div class="flex items-center gap-1 text-[11px] font-semibold">
+                                <button type="button" onclick="filterInteractions('all')" id="flt-btn-all"
+                                    class="px-2.5 py-0.5 rounded-md bg-blue-600 text-white font-bold transition cursor-pointer">All</button>
+                                <button type="button" onclick="filterInteractions('hbond')" id="flt-btn-hbond"
+                                    class="px-2.5 py-0.5 rounded-md bg-white hover:bg-slate-200 text-slate-600 transition cursor-pointer">H-Bonds</button>
+                                <button type="button" onclick="filterInteractions('hydrophobic')" id="flt-btn-hydrophobic"
+                                    class="px-2.5 py-0.5 rounded-md bg-white hover:bg-slate-200 text-slate-600 transition cursor-pointer">Hydrophobic</button>
+                                <button type="button" onclick="filterInteractions('salt_bridge')" id="flt-btn-salt_bridge"
+                                    class="px-2.5 py-0.5 rounded-md bg-white hover:bg-slate-200 text-slate-600 transition cursor-pointer">Salt Bridges</button>
+                                <button type="button" onclick="filterInteractions('pocket')" id="flt-btn-pocket"
+                                    class="px-2.5 py-0.5 rounded-md bg-white hover:bg-slate-200 text-slate-600 transition cursor-pointer">Pocket (&lt;5Å)</button>
+                            </div>
                         </div>
-                        <div id="hbonds-detail-list" class="space-y-1.5 text-xs">
+
+                        <!-- Interaction Items List / Table -->
+                        <div id="interactions-container" class="space-y-1.5 text-xs max-h-56 overflow-y-auto custom-scrollbar">
                             <!-- Populated dynamically -->
                         </div>
                     </div>
@@ -604,7 +688,7 @@
 
         </div>
 
-        <!-- 4. ENGINE SPECIFICATIONS & SCIENTIFIC METHODOLOGY BANNER -->
+         & SCIENTIFIC METHODOLOGY BANNER -->
         <div class="mt-8 bg-slate-900 rounded-2xl border border-slate-800 p-6 text-slate-300 shadow-md">
             <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
                 <div class="flex items-center gap-3">
@@ -770,6 +854,11 @@
             activePoseIdx: 0,
             showGridBox: true,
             showHbonds: true,
+            showResidueLabels: true,
+            activeViewportTab: '3d', // '3d' | '2d'
+            diagramTheme: 'dark', // 'dark' | 'white'
+            activeInteractionFilter: 'all', // 'all' | 'hbond' | 'hydrophobic' | 'salt_bridge' | 'pocket'
+            highlightedResidue: null,
             styleMode: "cartoon", // "cartoon" | "line" | "surface"
             isDocking: false
         };
@@ -782,11 +871,84 @@
 
         function init3DViewer() {
             const container = document.getElementById("docking-viewer-container");
-            container.innerHTML = ""; // clear placeholder
-            
+            container.innerHTML = "";
             const config = { backgroundColor: '#020617' };
             State.viewer = $3Dmol.createViewer(container, config);
             State.viewer.render();
+        }
+
+        // Viewport Mode Tabs Switcher
+        function switchViewportTab(tab) {
+            State.activeViewportTab = tab;
+            const tab3d = document.getElementById("tab-btn-3d");
+            const tab2d = document.getElementById("tab-btn-2d");
+            const container3d = document.getElementById("docking-viewer-container");
+            const container2d = document.getElementById("docking-2d-container");
+            const toolbar3d = document.getElementById("controls-3d-toolbar");
+            const toolbar2d = document.getElementById("controls-2d-toolbar");
+            const legend3d = document.getElementById("status-3d-legend");
+            const legend2d = document.getElementById("status-2d-legend");
+
+            if (tab === '3d') {
+                tab3d.className = "px-3 py-1.5 rounded-lg bg-white text-blue-700 shadow-xs font-bold transition flex items-center gap-1.5 cursor-pointer";
+                tab2d.className = "px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5 cursor-pointer";
+                container3d.classList.remove("hidden");
+                container2d.classList.add("hidden");
+                toolbar3d.classList.remove("hidden");
+                toolbar2d.classList.add("hidden");
+                legend3d.classList.remove("hidden");
+                legend2d.classList.add("hidden");
+                if (State.viewer) {
+                    State.viewer.resize();
+                    State.viewer.render();
+                }
+            } else {
+                tab2d.className = "px-3 py-1.5 rounded-lg bg-white text-indigo-700 shadow-xs font-bold transition flex items-center gap-1.5 cursor-pointer";
+                tab3d.className = "px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5 cursor-pointer";
+                container3d.classList.add("hidden");
+                container2d.classList.remove("hidden");
+                toolbar3d.classList.add("hidden");
+                toolbar2d.classList.remove("hidden");
+                legend3d.classList.add("hidden");
+                legend2d.classList.remove("hidden");
+                render2DDiagram(State.activePoseIdx);
+            }
+        }
+
+        function toggleDiagramTheme() {
+            State.diagramTheme = (State.diagramTheme === 'dark') ? 'white' : 'dark';
+            const btnText = document.getElementById("theme-btn-text");
+            const container2d = document.getElementById("docking-2d-container");
+            if (State.diagramTheme === 'white') {
+                btnText.innerText = "Dark Canvas";
+                container2d.classList.remove("bg-slate-950");
+                container2d.classList.add("bg-white");
+            } else {
+                btnText.innerText = "Publication White";
+                container2d.classList.remove("bg-white");
+                container2d.classList.add("bg-slate-950");
+            }
+            render2DDiagram(State.activePoseIdx);
+        }
+
+        function render2DDiagram(poseIdx) {
+            const placeholder = document.getElementById("docking-2d-placeholder");
+            const wrapper = document.getElementById("docking-2d-svg-wrapper");
+            if (!State.dockingResults || !State.dockingResults.poses || State.dockingResults.poses.length === 0) {
+                placeholder.classList.remove("hidden");
+                wrapper.classList.add("hidden");
+                return;
+            }
+            const pose = State.dockingResults.poses[poseIdx] || State.dockingResults.poses[0];
+            const svg = (State.diagramTheme === 'white') 
+                ? (pose.interaction_diagram_svg_white || State.dockingResults.interaction_diagram_svg_white)
+                : (pose.interaction_diagram_svg || State.dockingResults.interaction_diagram_svg);
+
+            if (svg) {
+                placeholder.classList.add("hidden");
+                wrapper.classList.remove("hidden");
+                wrapper.innerHTML = svg;
+            }
         }
 
         // Fetch PDB from RCSB
@@ -802,42 +964,51 @@
             const fetchBtn = document.getElementById("btn-fetch-pdb");
             const originalBtnHtml = fetchBtn.innerHTML;
             fetchBtn.disabled = true;
-            fetchBtn.innerHTML = `<span class="inline-block animate-spin mr-1">⌛</span> Fetching...`;
+            fetchBtn.innerHTML = '<span class="inline-block animate-spin mr-1">⌛</span> Fetching...';
 
             try {
-                const resp = await fetch(`/api/dock/fetch-pdb/${pdbId}/`);
+                const resp = await fetch(`/api/dock/rcsb/${pdbId}/`);
                 const data = await resp.json();
 
-                if (!data.success) {
-                    throw new Error(data.error || "Failed to fetch PDB.");
+                if (!resp.ok || !data.success) {
+                    throw new Error(data.error || "Failed to retrieve crystal structure.");
                 }
 
                 State.receptorPdb = data.pdb_content;
-                pdbInput.value = pdbId;
+                State.receptorMeta = data;
 
-                // Update status badge
+                // Update Status Badge
                 const statusBadge = document.getElementById("receptor-status-badge");
-                statusBadge.className = "px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300";
-                statusBadge.innerText = `PDB: ${pdbId}`;
+                statusBadge.className = "px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-blue-100 text-blue-800 border border-blue-200";
+                statusBadge.innerText = `${data.pdb_id} Loaded`;
 
-                // Handle pocket detection
-                if (data.pocket && data.pocket.found_co_crystallized_ligand) {
-                    const pocketBox = document.getElementById("detected-pocket-box");
-                    pocketBox.classList.remove("hidden");
-                    document.getElementById("pocket-ligand-name").innerText = `Pocket Found: ${data.pocket.co_crystallized_ligand_resname} (${data.pocket.co_crystallized_atoms_count} atoms)`;
-                    document.getElementById("pocket-ligand-coords").innerText = `Centroid: (${data.pocket.centroid_x.toFixed(1)}, ${data.pocket.centroid_y.toFixed(1)}, ${data.pocket.centroid_z.toFixed(1)})`;
-                    
-                    // Auto-fill grid box center
-                    document.getElementById("grid-center-x").value = data.pocket.centroid_x.toFixed(1);
-                    document.getElementById("grid-center-y").value = data.pocket.centroid_y.toFixed(1);
-                    document.getElementById("grid-center-z").value = data.pocket.centroid_z.toFixed(1);
+                // Update Pocket Grid Inputs
+                if (data.pocket) {
+                    document.getElementById("grid-center-x").value = data.pocket.centroid_x.toFixed(2);
+                    document.getElementById("grid-center-y").value = data.pocket.centroid_y.toFixed(2);
+                    document.getElementById("grid-center-z").value = data.pocket.centroid_z.toFixed(2);
+                    document.getElementById("grid-size-x").value = data.pocket.size_x || 20.0;
+                    document.getElementById("grid-size-y").value = data.pocket.size_y || 20.0;
+                    document.getElementById("grid-size-z").value = data.pocket.size_z || 20.0;
+                    onGridParamsChanged();
+
+                    // Co-crystal ligand detection banner
+                    const badge = document.getElementById("detected-pocket-badge");
+                    if (data.pocket.found_co_crystallized_ligand) {
+                        badge.classList.remove("hidden");
+                        badge.innerHTML = `<span>Co-crystal Ligand: <strong>${data.pocket.co_crystallized_ligand_resname}</strong> (${data.pocket.co_crystallized_atoms_count} atoms) &bull; Centroid (${data.pocket.centroid_x}, ${data.pocket.centroid_y}, ${data.pocket.centroid_z})</span>`;
+                    } else {
+                        badge.classList.remove("hidden");
+                        badge.innerHTML = `<span>Receptor Center of Mass: (${data.pocket.centroid_x}, ${data.pocket.centroid_y}, ${data.pocket.centroid_z})</span>`;
+                    }
                 }
 
-                // Render in 3Dmol
+                // Render in 3D
                 renderReceptorIn3D();
+                focusPocketIn3D();
 
             } catch (err) {
-                alert(`Error fetching structure: ${err.message}`);
+                alert(`RCSB Retrieval Error: ${err.message}`);
             } finally {
                 fetchBtn.disabled = false;
                 fetchBtn.innerHTML = originalBtnHtml;
@@ -845,7 +1016,7 @@
             }
         }
 
-        // Render Receptor & Pocket in 3Dmol
+        // Render Receptor & Pocket in 3Dmol (PyMOL / ChimeraX Publication Standard)
         function renderReceptorIn3D() {
             if (!State.viewer || !State.receptorPdb) return;
 
@@ -854,17 +1025,22 @@
             // Load receptor macromolecule
             State.viewer.addModel(State.receptorPdb, "pdb");
 
+            const hasActivePose = (State.dockingResults && State.dockingResults.poses && State.dockingResults.poses.length > 0);
+
             // Style: Ribbon Cartoon
+            // When viewing a docked ligand, use ribbon transparency so binding cavity is visible without visual clutter
+            const ribbonOpacity = hasActivePose ? 0.38 : 0.88;
+
             if (State.styleMode === "cartoon") {
-                State.viewer.setStyle({}, { cartoon: { color: 'spectrum', opacity: 0.85 } });
+                State.viewer.setStyle({}, { cartoon: { color: 'spectrum', opacity: ribbonOpacity } });
             } else if (State.styleMode === "surface") {
-                State.viewer.setStyle({}, { cartoon: { color: 'cyan', opacity: 0.5 } });
-                State.viewer.addSurface($3Dmol.SurfaceType.MS, { opacity: 0.4, color: 'white' });
+                State.viewer.setStyle({}, { cartoon: { color: 'cyan', opacity: 0.4 } });
+                State.viewer.addSurface($3Dmol.SurfaceType.MS, { opacity: 0.3, color: 'white' });
             } else {
                 State.viewer.setStyle({}, { line: { color: 'spectrum' } });
             }
 
-            // Highlight Active Site Pocket Residues (within 6Å of Grid Center)
+            // Highlight Active Site Pocket Residues (within 6.5Å of Grid Center)
             const cx = parseFloat(document.getElementById("grid-center-x").value) || 0.0;
             const cy = parseFloat(document.getElementById("grid-center-y").value) || 0.0;
             const cz = parseFloat(document.getElementById("grid-center-z").value) || 0.0;
@@ -872,20 +1048,36 @@
             State.viewer.setStyle(
                 { within: { distance: 6.5, sel: { center: { x: cx, y: cy, z: cz } } } },
                 { 
-                    cartoon: { color: 'cyan' },
-                    stick: { colorscheme: 'amino', radius: 0.15 } 
+                    cartoon: { color: 'cyan', opacity: 0.6 },
+                    stick: { colorscheme: 'amino', radius: 0.18 } 
                 }
             );
 
             // Draw Grid Box Wireframe
             drawGridBox3D();
 
-            // If a docked pose is active, overlay it
-            if (State.dockingResults && State.dockingResults.poses && State.dockingResults.poses.length > 0) {
+            // If a docked pose is active, overlay it with sticks and contacts
+            if (hasActivePose) {
                 overlayDockedPose(State.activePoseIdx);
             }
 
-            State.viewer.zoomTo();
+            // If a specific residue is highlighted via 2D diagram click or table inspect
+            if (State.highlightedResidue) {
+                const hr = State.highlightedResidue;
+                State.viewer.setStyle(
+                    { resi: hr.resi, chain: hr.chain },
+                    { stick: { color: '#F43F5E', radius: 0.36 } }
+                );
+                State.viewer.addLabel(`${hr.resn} ${hr.resi}:${hr.chain}`, {
+                    resi: hr.resi,
+                    chain: hr.chain,
+                    backgroundColor: 0xF43F5E,
+                    backgroundOpacity: 0.85,
+                    fontColor: 0xffffff,
+                    fontSize: 12
+                });
+            }
+
             State.viewer.render();
         }
 
@@ -904,7 +1096,6 @@
             const hy = sy / 2.0;
             const hz = sz / 2.0;
 
-            // 8 Box Vertices
             const p1 = { x: cx - hx, y: cy - hy, z: cz - hz };
             const p2 = { x: cx + hx, y: cy - hy, z: cz - hz };
             const p3 = { x: cx + hx, y: cy + hy, z: cz - hz };
@@ -914,7 +1105,6 @@
             const p7 = { x: cx + hx, y: cy + hy, z: cz + hz };
             const p8 = { x: cx - hx, y: cy + hy, z: cz + hz };
 
-            // 12 Edges as cylinders
             const edges = [
                 [p1, p2], [p2, p3], [p3, p4], [p4, p1],
                 [p5, p6], [p6, p7], [p7, p8], [p8, p5],
@@ -940,7 +1130,7 @@
             });
         }
 
-        // Overlay Docked Ligand Pose & Hydrogen Bonds
+        // Overlay Docked Ligand Pose & PyMOL Active Site Elements
         function overlayDockedPose(poseIdx) {
             if (!State.dockingResults || !State.dockingResults.poses) return;
             const pose = State.dockingResults.poses[poseIdx];
@@ -951,22 +1141,91 @@
             State.viewer.setStyle({ model: ligModel }, {
                 stick: {
                     colorscheme: 'greenCarbon',
-                    radius: 0.28
+                    radius: 0.30
                 }
             });
 
-            // Draw Hydrogen Bonds as yellow dashed cylinders
-            if (State.showHbonds && pose.contacts && pose.contacts.length > 0) {
-                pose.contacts.forEach(contact => {
-                    State.viewer.addCylinder({
-                        start: { x: contact.receptor_x, y: contact.receptor_y, z: contact.receptor_z },
-                        end: { x: contact.ligand_x, y: contact.ligand_y, z: contact.ligand_z },
-                        radius: 0.08,
-                        color: '#FACC15',
-                        dashed: true
+            // PyMOL Active Site: Render pocket residues as sharp sticks
+            const pocketResidues = pose.pocket_residues || State.dockingResults.pocket_residues || [];
+            pocketResidues.forEach(pr => {
+                State.viewer.setStyle(
+                    { resi: pr.resi, chain: pr.chain },
+                    { stick: { colorscheme: 'amino', radius: 0.20 } }
+                );
+                // Add floating CA labels if enabled
+                if (State.showResidueLabels && pr.ca_coord) {
+                    State.viewer.addLabel(pr.res_label, {
+                        position: { x: pr.ca_coord[0], y: pr.ca_coord[1], z: pr.ca_coord[2] },
+                        backgroundColor: 0x0F172A,
+                        backgroundOpacity: 0.80,
+                        fontColor: 0xF8FAFC,
+                        fontSize: 10
                     });
+                }
+            });
+
+            // Draw Hydrogen Bonds as high-visibility dashed cylinders + distance labels
+            const hbonds = pose.hbond_contacts || pose.contacts || [];
+            if (State.showHbonds && hbonds.length > 0) {
+                hbonds.forEach(contact => {
+                    if (contact.receptor_x !== undefined && contact.ligand_x !== undefined) {
+                        State.viewer.addCylinder({
+                            start: { x: contact.receptor_x, y: contact.receptor_y, z: contact.receptor_z },
+                            end: { x: contact.ligand_x, y: contact.ligand_y, z: contact.ligand_z },
+                            radius: 0.08,
+                            color: '#FACC15',
+                            dashed: true
+                        });
+                        if (State.showResidueLabels) {
+                            const mx = (contact.receptor_x + contact.ligand_x) / 2.0;
+                            const my = (contact.receptor_y + contact.ligand_y) / 2.0;
+                            const mz = (contact.receptor_z + contact.ligand_z) / 2.0;
+                            State.viewer.addLabel(`${contact.distance_angstrom}Å`, {
+                                position: { x: mx, y: my, z: mz },
+                                backgroundColor: 0xEAB308,
+                                backgroundOpacity: 0.85,
+                                fontColor: 0x000000,
+                                fontSize: 9
+                            });
+                        }
+                    }
                 });
             }
+        }
+
+        // Camera & Interaction Focus
+        function focusPocketIn3D() {
+            if (!State.viewer) return;
+            switchViewportTab('3d');
+            if (State.dockingResults && State.dockingResults.poses && State.dockingResults.poses.length > 0) {
+                State.viewer.zoomTo({ resn: 'LIG' }, 1000);
+            } else {
+                const cx = parseFloat(document.getElementById("grid-center-x").value) || 0.0;
+                const cy = parseFloat(document.getElementById("grid-center-y").value) || 0.0;
+                const cz = parseFloat(document.getElementById("grid-center-z").value) || 0.0;
+                State.viewer.zoomTo({ within: { distance: 10.0, sel: { center: { x: cx, y: cy, z: cz } } } }, 1000);
+            }
+        }
+
+        // Bi-directional 2D -> 3D Residue Highlighter
+        function highlightResidueIn3D(resn, resi, chain) {
+            switchViewportTab('3d');
+            State.highlightedResidue = { resn, resi, chain };
+            renderReceptorIn3D();
+            if (State.viewer) {
+                State.viewer.zoomTo({ resi: resi, chain: chain }, 1000);
+            }
+        }
+
+        function toggleResidueLabels() {
+            State.showResidueLabels = !State.showResidueLabels;
+            const btn = document.getElementById("btn-toggle-labels");
+            if (State.showResidueLabels) {
+                btn.className = "px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-semibold transition flex items-center gap-1 border border-blue-200 cursor-pointer";
+            } else {
+                btn.className = "px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500 font-semibold transition flex items-center gap-1 cursor-pointer";
+            }
+            renderReceptorIn3D();
         }
 
         // Execute Inbuilt Molecular Docking
@@ -1047,17 +1306,19 @@
                 }
 
                 progressBar.style.width = "100%";
-                progressText.innerText = "Step 3/3: Clustering poses & analyzing hydrogen bonds...";
+                progressText.innerText = "Step 3/3: Clustering poses & analyzing 2D/3D interactions...";
 
                 const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
                 State.dockingResults = data;
                 State.activePoseIdx = 0;
+                State.highlightedResidue = null;
 
                 // Populate results UI
                 displayDockingResults(data, elapsed);
 
                 // Render in 3D
                 renderReceptorIn3D();
+                focusPocketIn3D();
 
             } catch (err) {
                 alert(`Docking Failed: ${err.message}`);
@@ -1088,6 +1349,14 @@
                 document.getElementById("adv-molwt").innerText = `MW: ${results.ligand_meta.mol_wt} g/mol`;
             }
 
+            // Update 2D Map Tab Badge
+            const tab2dBadge = document.getElementById("tab-2d-badge");
+            const totalInteractions = (results.hbond_contacts || []).length + (results.hydrophobic_contacts || []).length;
+            if (tab2dBadge) {
+                tab2dBadge.classList.remove("hidden");
+                tab2dBadge.innerText = `${totalInteractions} contacts`;
+            }
+
             const tbody = document.getElementById("poses-table-body");
             tbody.innerHTML = "";
 
@@ -1102,6 +1371,8 @@
                 let badgeClass = "bg-emerald-100 text-emerald-800 border-emerald-300";
                 if (aff > -6.0) badgeClass = "bg-amber-100 text-amber-800 border-amber-300";
                 if (aff < -8.5) badgeClass = "bg-indigo-100 text-indigo-800 border-indigo-300";
+
+                const numInteractions = (pose.hbond_contacts || []).length + (pose.hydrophobic_contacts || []).length + (pose.salt_bridges || []).length;
 
                 tr.innerHTML = `
                     <td class="py-2.5 px-3">
@@ -1124,6 +1395,9 @@
                             ${pose.num_h_bonds}
                         </span>
                     </td>
+                    <td class="py-2.5 px-3 text-slate-600 font-semibold">
+                        <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 text-[11px]">${numInteractions} total</span>
+                    </td>
                     <td class="py-2.5 px-3 text-right">
                         <button type="button" class="px-2 py-1 text-[11px] rounded bg-white hover:bg-blue-600 hover:text-white border border-slate-300 text-slate-700 font-bold transition">
                             ${isActive ? 'Active Pose' : 'Show 3D'}
@@ -1133,13 +1407,15 @@
                 tbody.appendChild(tr);
             });
 
-            // Update Hydrogen Bonds list for active pose
-            updateHbondsList(State.activePoseIdx);
+            // Update Interaction Profiler & 2D diagram for active pose
+            updateInteractionsList(State.activePoseIdx);
+            render2DDiagram(State.activePoseIdx);
             lucide.createIcons();
         }
 
         function selectPose(idx) {
             State.activePoseIdx = idx;
+            State.highlightedResidue = null;
             renderReceptorIn3D();
             
             // Re-render table active state
@@ -1153,38 +1429,102 @@
             }
 
             document.getElementById("active-pose-tag").innerText = `Pose #${idx + 1}`;
-            updateHbondsList(idx);
+            updateInteractionsList(idx);
+            render2DDiagram(idx);
         }
 
-        function updateHbondsList(poseIdx) {
-            const listContainer = document.getElementById("hbonds-detail-list");
+        // Filter Interactions in Profiler
+        function filterInteractions(type) {
+            State.activeInteractionFilter = type;
+            const filterBtns = ["all", "hbond", "hydrophobic", "salt_bridge", "pocket"];
+            filterBtns.forEach(f => {
+                const btn = document.getElementById(`flt-btn-${f}`);
+                if (btn) {
+                    if (f === type) {
+                        btn.className = "px-2.5 py-0.5 rounded-md bg-blue-600 text-white font-bold transition cursor-pointer";
+                    } else {
+                        btn.className = "px-2.5 py-0.5 rounded-md bg-white hover:bg-slate-200 text-slate-600 transition cursor-pointer";
+                    }
+                }
+            });
+            updateInteractionsList(State.activePoseIdx);
+        }
+
+        // Render Interaction Items in Profiler
+        function updateInteractionsList(poseIdx) {
+            const listContainer = document.getElementById("interactions-container");
             listContainer.innerHTML = "";
 
             if (!State.dockingResults || !State.dockingResults.poses) return;
             const pose = State.dockingResults.poses[poseIdx];
+            if (!pose) return;
 
-            if (!pose || !pose.contacts || pose.contacts.length === 0) {
-                listContainer.innerHTML = `<div class="text-[11px] text-slate-400 italic">No direct hydrogen bonds detected for this conformation (steric and hydrophobic binding forces predominate).</div>`;
+            const filter = State.activeInteractionFilter;
+            let items = [];
+
+            if (filter === "all") {
+                const hb = (pose.hbond_contacts || []).map(x => ({ ...x, kind: 'Hydrogen Bond', color: 'amber' }));
+                const sb = (pose.salt_bridges || []).map(x => ({ ...x, kind: 'Salt Bridge', color: 'pink' }));
+                const hp = (pose.hydrophobic_contacts || []).map(x => ({ ...x, kind: 'Hydrophobic', color: 'yellow' }));
+                items = [...hb, ...sb, ...hp];
+            } else if (filter === "hbond") {
+                items = (pose.hbond_contacts || []).map(x => ({ ...x, kind: 'Hydrogen Bond', color: 'amber' }));
+            } else if (filter === "hydrophobic") {
+                items = (pose.hydrophobic_contacts || []).map(x => ({ ...x, kind: 'Hydrophobic', color: 'yellow' }));
+            } else if (filter === "salt_bridge") {
+                items = (pose.salt_bridges || []).map(x => ({ ...x, kind: 'Salt Bridge', color: 'pink' }));
+            } else if (filter === "pocket") {
+                const pk = (pose.pocket_residues || State.dockingResults.pocket_residues || []).map(x => ({
+                    resn: x.resn,
+                    resi: x.resi,
+                    chain: x.chain,
+                    receptor_residue: x.res_label,
+                    receptor_atom: 'Pocket CA',
+                    ligand_atom: 'Ligand Surface',
+                    distance_angstrom: x.min_distance,
+                    kind: `${x.property.toUpperCase()} RES`,
+                    color: 'indigo'
+                }));
+                items = pk;
+            }
+
+            if (items.length === 0) {
+                listContainer.innerHTML = `<div class="text-[11px] text-slate-400 italic p-2">No interactions detected for filter '${filter}'.</div>`;
                 return;
             }
 
-            pose.contacts.forEach((contact, idx) => {
-                const item = document.createElement("div");
-                item.className = "flex items-center justify-between p-1.5 rounded-lg bg-white border border-slate-200/80 font-mono text-[11px]";
-                item.innerHTML = `
+            items.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200/90 font-mono text-[11px] hover:border-blue-400 transition";
+                
+                let badgeClass = "bg-amber-100 text-amber-800 border-amber-200";
+                if (item.kind === 'Salt Bridge') badgeClass = "bg-pink-100 text-pink-800 border-pink-200";
+                if (item.kind === 'Hydrophobic') badgeClass = "bg-yellow-100 text-yellow-800 border-yellow-200";
+                if (item.color === 'indigo') badgeClass = "bg-indigo-100 text-indigo-800 border-indigo-200";
+
+                const resn = item.resn || (item.receptor_residue ? item.receptor_residue.split(' ')[0] : 'RES');
+                const resi = item.resi || 0;
+                const chain = item.chain || 'A';
+
+                div.innerHTML = `
                     <div class="flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                        <span class="font-bold text-slate-800">${contact.receptor_atom}</span>
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-bold border ${badgeClass}">${item.kind}</span>
+                        <span class="font-bold text-slate-800">${item.receptor_residue || item.resn}</span>
                         <span class="text-slate-400">&bull;&bull;&bull;</span>
-                        <span class="font-bold text-indigo-700">${contact.ligand_atom}</span>
+                        <span class="font-semibold text-slate-600">${item.receptor_atom || ''} &rarr; ${item.ligand_atom || ''}</span>
                     </div>
-                    <span class="px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 font-bold border border-amber-200">
-                        ${contact.distance_angstrom.toFixed(2)} Å
-                    </span>
+                    <div class="flex items-center gap-2">
+                        <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-bold font-mono">
+                            ${Number(item.distance_angstrom).toFixed(2)} Å
+                        </span>
+                        <button type="button" onclick="highlightResidueIn3D('${resn}', ${resi}, '${chain}')"
+                            class="px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-600 hover:text-white border border-blue-200 text-blue-700 font-bold transition cursor-pointer text-[10px]">
+                            3D Focus
+                        </button>
+                    </div>
                 `;
-                listContainer.appendChild(item);
+                listContainer.appendChild(div);
             });
-        }
         }
 
         function updateLigandStatus() {
@@ -1222,13 +1562,11 @@
         }
 
         function applyDetectedPocket() {
-            // Apply detected centroid from badge
             onGridParamsChanged();
         }
 
         function centerBoxOnReceptor() {
             if (!State.viewer) return;
-            // Center viewer and grid box
             renderReceptorIn3D();
         }
 
@@ -1236,9 +1574,9 @@
             State.showGridBox = !State.showGridBox;
             const btn = document.getElementById("btn-toggle-gridbox");
             if (State.showGridBox) {
-                btn.className = "px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-semibold transition flex items-center gap-1 border border-blue-200";
+                btn.className = "px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-semibold transition flex items-center gap-1 border border-blue-200 cursor-pointer";
             } else {
-                btn.className = "px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500 font-semibold transition flex items-center gap-1";
+                btn.className = "px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500 font-semibold transition flex items-center gap-1 cursor-pointer";
             }
             renderReceptorIn3D();
         }
@@ -1247,9 +1585,9 @@
             State.showHbonds = !State.showHbonds;
             const btn = document.getElementById("btn-toggle-hbonds");
             if (State.showHbonds) {
-                btn.className = "px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 font-semibold transition flex items-center gap-1 border border-amber-200";
+                btn.className = "px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 font-semibold transition flex items-center gap-1 border border-amber-200 cursor-pointer";
             } else {
-                btn.className = "px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500 font-semibold transition flex items-center gap-1";
+                btn.className = "px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500 font-semibold transition flex items-center gap-1 cursor-pointer";
             }
             renderReceptorIn3D();
         }
@@ -1282,6 +1620,7 @@
                 statusBadge.className = "px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300";
                 statusBadge.innerText = "Custom Raw PDB";
                 renderReceptorIn3D();
+                focusPocketIn3D();
             }
         }
 
@@ -1296,6 +1635,7 @@
                 statusBadge.className = "px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300";
                 statusBadge.innerText = file.name;
                 renderReceptorIn3D();
+                focusPocketIn3D();
             };
             reader.readAsText(file);
         }
@@ -1313,8 +1653,72 @@
             reader.readAsText(file);
         }
 
-        // Downloads
+        // Deliverables Downloads
         
+        // Export PyMOL Macro Session Script (.pml)
+        function downloadPyMOLScript() {
+            if (!State.dockingResults) {
+                alert("No docking calculation results available to export.");
+                return;
+            }
+            const script = State.dockingResults.pymol_macro_script || "";
+            if (!script) {
+                alert("PyMOL script generator unavailable for this target.");
+                return;
+            }
+            const pdbId = document.getElementById("pdb-id-input").value.trim().toUpperCase() || "docked";
+            const blob = new Blob([script], { type: "text/plain;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `iLoveChem_${pdbId}_PyMOL_Session.pml`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Export 2D Interaction Diagram Vector (.SVG)
+        function download2DDiagramSVG() {
+            if (!State.dockingResults || !State.dockingResults.poses) {
+                alert("No docking calculation results available to export.");
+                return;
+            }
+            const pose = State.dockingResults.poses[State.activePoseIdx];
+            const svg = (State.diagramTheme === 'white')
+                ? (pose.interaction_diagram_svg_white || State.dockingResults.interaction_diagram_svg_white)
+                : (pose.interaction_diagram_svg || State.dockingResults.interaction_diagram_svg);
+            if (!svg) {
+                alert("2D interaction map SVG unavailable.");
+                return;
+            }
+            const pdbId = document.getElementById("pdb-id-input").value.trim().toUpperCase() || "docked";
+            const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `interaction_map_${pdbId}_pose_${State.activePoseIdx + 1}_${State.diagramTheme}.svg`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Copy 2D Vector SVG to Clipboard
+        function copyDiagramSVG() {
+            if (!State.dockingResults || !State.dockingResults.poses) return;
+            const pose = State.dockingResults.poses[State.activePoseIdx];
+            const svg = (State.diagramTheme === 'white')
+                ? (pose.interaction_diagram_svg_white || State.dockingResults.interaction_diagram_svg_white)
+                : (pose.interaction_diagram_svg || State.dockingResults.interaction_diagram_svg);
+            if (!svg) return;
+            navigator.clipboard.writeText(svg).then(() => {
+                const btnText = document.getElementById("copy-svg-btn-text");
+                btnText.innerText = "Copied!";
+                setTimeout(() => { btnText.innerText = "Copy SVG"; }, 1500);
+            });
+        }
+
         // Export Scientific Report CSV for student thesis/paper
         function downloadScientificReportCSV() {
             if (!State.dockingResults || !State.dockingResults.poses) {
@@ -1322,7 +1726,7 @@
                 return;
             }
             const pdbId = document.getElementById("pdb-id-input").value.trim().toUpperCase() || "CUSTOM_TARGET";
-            const engine = State.dockingResults.engine || "iLoveChem ChemDock v2.0";
+            const engine = State.dockingResults.engine || "iLoveChem ChemDock v3.2";
             const cx = document.getElementById("grid-center-x").value;
             const cy = document.getElementById("grid-center-y").value;
             const cz = document.getElementById("grid-center-z").value;
@@ -1339,7 +1743,7 @@
             csv += "Mode,Affinity_kcal_mol,RMSD_lower_bound_A,RMSD_upper_bound_A,Num_H_Bonds,Key_Interactions\n";
 
             State.dockingResults.poses.forEach(p => {
-                let contactsStr = (p.contacts || []).map(c => `${c.receptor_residue}:${c.receptor_atom}-${c.ligand_atom}(${c.distance_angstrom}A)`).join("; ");
+                let contactsStr = (p.contacts || p.hbond_contacts || []).map(c => `${c.receptor_residue}:${c.receptor_atom}-${c.ligand_atom}(${c.distance_angstrom}A)`).join("; ");
                 csv += `${p.mode},${p.affinity_kcal_mol},${p.rmsd_lower_bound},${p.rmsd_upper_bound},${p.num_h_bonds},"${contactsStr}"\n`;
             });
 

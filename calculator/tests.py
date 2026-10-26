@@ -218,3 +218,53 @@ class MolecularDockingEngineTests(TestCase):
         self.assertIsNotNone(data["best_affinity_kcal_mol"])
         self.assertIn("consolidated_complex_pdb", data)
         self.assertIn("HETATM", data["consolidated_complex_pdb"])
+        self.assertIn("interaction_diagram_svg", data)
+        self.assertIn("<svg", data["interaction_diagram_svg"])
+        self.assertIn("interaction_diagram_svg_white", data)
+        self.assertIn("pymol_macro_script", data)
+        self.assertIn("show cartoon", data["pymol_macro_script"])
+        self.assertIn("pocket_residues", data)
+        self.assertIn("hbond_contacts", data)
+        self.assertIn("interaction_diagram_svg", data["poses"][0])
+
+    def test_2d_interaction_svg_and_pymol_script(self):
+        from .interaction_diagram import generate_2d_interaction_svg, generate_pymol_script
+        hb = [{
+            'receptor_residue': 'ASP 25:A',
+            'resn': 'ASP',
+            'resi': 25,
+            'chain': 'A',
+            'distance_angstrom': 2.74,
+            'ligand_atom_idx': 2
+        }]
+        hp = [{
+            'receptor_residue': 'ILE 50:A',
+            'resn': 'ILE',
+            'resi': 50,
+            'chain': 'A',
+            'distance_angstrom': 3.65,
+            'ligand_atom_idx': 4
+        }]
+        sb = [{
+            'receptor_residue': 'ARG 8:A',
+            'resn': 'ARG',
+            'resi': 8,
+            'chain': 'A',
+            'distance_angstrom': 3.12,
+            'ligand_atom_idx': 1
+        }]
+        svg_dark = generate_2d_interaction_svg('CC(=O)Oc1ccccc1C(=O)O', hb, hp, sb, theme='dark')
+        self.assertIn('<svg', svg_dark)
+        self.assertIn('ASP 25:A', svg_dark)
+        self.assertIn('2.74Å', svg_dark)
+        self.assertIn('ILE 50:A', svg_dark)
+        self.assertIn('± ionic', svg_dark)
+
+        svg_white = generate_2d_interaction_svg('CC(=O)Oc1ccccc1C(=O)O', hb, hp, sb, theme='white')
+        self.assertIn('fill="#FFFFFF"', svg_white)
+
+        pml = generate_pymol_script('docked_complex.pdb')
+        self.assertIn('load docked_complex.pdb', pml)
+        self.assertIn('show cartoon, receptor', pml)
+        self.assertIn('set cartoon_transparency, 0.4', pml)
+        self.assertIn('distance hbonds, ligand, pocket, 3.5', pml)
