@@ -1188,13 +1188,18 @@
                     onGridParamsChanged();
 
                     // Co-crystal ligand detection banner
-                    const badge = document.getElementById("detected-pocket-badge");
-                    if (data.pocket.found_co_crystallized_ligand) {
-                        badge.classList.remove("hidden");
-                        badge.innerHTML = `<span>Co-crystal Ligand: <strong>${data.pocket.co_crystallized_ligand_resname}</strong> (${data.pocket.co_crystallized_atoms_count} atoms) &bull; Centroid (${data.pocket.centroid_x}, ${data.pocket.centroid_y}, ${data.pocket.centroid_z})</span>`;
-                    } else {
-                        badge.classList.remove("hidden");
-                        badge.innerHTML = `<span>Receptor Center of Mass: (${data.pocket.centroid_x}, ${data.pocket.centroid_y}, ${data.pocket.centroid_z})</span>`;
+                    const pocketBox = document.getElementById("detected-pocket-box");
+                    const pocketName = document.getElementById("pocket-ligand-name");
+                    const pocketCoords = document.getElementById("pocket-ligand-coords");
+                    if (pocketBox) {
+                        pocketBox.classList.remove("hidden");
+                        if (data.pocket.found_co_crystallized_ligand) {
+                            if (pocketName) pocketName.innerText = `Co-Crystal Pocket: ${data.pocket.co_crystallized_ligand_resname} (${data.pocket.co_crystallized_atoms_count} atoms)`;
+                            if (pocketCoords) pocketCoords.innerText = `Centroid (${data.pocket.centroid_x.toFixed(2)}, ${data.pocket.centroid_y.toFixed(2)}, ${data.pocket.centroid_z.toFixed(2)}) Å`;
+                        } else {
+                            if (pocketName) pocketName.innerText = `Receptor Center of Mass`;
+                            if (pocketCoords) pocketCoords.innerText = `Coordinates (${data.pocket.centroid_x.toFixed(2)}, ${data.pocket.centroid_y.toFixed(2)}, ${data.pocket.centroid_z.toFixed(2)}) Å`;
+                        }
                     }
                 }
 
