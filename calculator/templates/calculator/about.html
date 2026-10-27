@@ -334,7 +334,7 @@
             </div>
 
             <!-- CAPABILITY 4: ENTERPRISE PHARMA ZERO-STORAGE SECURITY INVARIANT -->
-            <div class="space-y-6 pt-8 border-t border-slate-200">
+            <div id="privacy-security" class="space-y-6 pt-8 border-t border-slate-200">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
                         <i data-lucide="shield-check" class="w-5 h-5"></i>
@@ -354,17 +354,47 @@
                         Most web-based converters stream uploaded files directly to temporary server disk directories (<code class="code-pill">/tmp</code>), retain unmonitored logs, or persist chemical structures in relational databases. For pharmaceutical labs, medicinal chemistry startups, and academic researchers developing novel patent-pending scaffolds, this poses an unacceptable intellectual property hazard.
                     </p>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 text-slate-800">
-                        <div class="p-3 bg-white rounded-xl border border-emerald-200/60 shadow-2xs">
-                            <div class="font-bold text-xs text-slate-900">100% Volatile RAM Execution</div>
-                            <p class="text-[11px] text-slate-600 mt-1">Configured with Django <code class="code-pill">MemoryFileUploadHandler</code>. Files reside strictly in RAM buffers and vanish immediately after conversion.</p>
+                        <div class="p-3.5 bg-white rounded-xl border border-emerald-200/80 shadow-2xs space-y-1">
+                            <div class="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                                <span class="text-emerald-600 font-bold">✓</span>
+                                <span>100% Volatile RAM Execution</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 leading-relaxed">Configured with Django <code class="code-pill">MemoryFileUploadHandler</code>. Chemical files reside strictly in temporary RAM buffers and vanish immediately upon request completion.</p>
                         </div>
-                        <div class="p-3 bg-white rounded-xl border border-emerald-200/60 shadow-2xs">
-                            <div class="font-bold text-xs text-slate-900">Zero Structure Database Logging</div>
-                            <p class="text-[11px] text-slate-600 mt-1">No database tables record user chemical inputs, SMILES strings, or coordinates. Not even hash fingerprints are retained.</p>
+                        <div class="p-3.5 bg-white rounded-xl border border-emerald-200/80 shadow-2xs space-y-1">
+                            <div class="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                                <span class="text-emerald-600 font-bold">✓</span>
+                                <span>Zero Database Structure Logging</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 leading-relaxed">No database tables, caches, or persistent disks record chemical graphs, coordinates, or SMILES strings. Zero metadata or fingerprint retention.</p>
                         </div>
-                        <div class="p-3 bg-white rounded-xl border border-emerald-200/60 shadow-2xs">
-                            <div class="font-bold text-xs text-slate-900">Zero AI Training on User Data</div>
-                            <p class="text-[11px] text-slate-600 mt-1">Your proprietary chemical entities are never harvested or indexed for machine learning training sets.</p>
+                        <div class="p-3.5 bg-white rounded-xl border border-emerald-200/80 shadow-2xs space-y-1">
+                            <div class="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                                <span class="text-emerald-600 font-bold">✓</span>
+                                <span>Zero AI Model Training</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 leading-relaxed">Proprietary chemical scaffolds and drug candidate leads are never collected, logged, or harvested into AI/LLM training corpuses.</p>
+                        </div>
+                        <div class="p-3.5 bg-white rounded-xl border border-emerald-200/80 shadow-2xs space-y-1">
+                            <div class="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                                <span class="text-emerald-600 font-bold">✓</span>
+                                <span>Automated Garbage Collection</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 leading-relaxed">Python and C++ RDKit memory structures are explicitly de-referenced and swept clean from process memory buffers after each computation.</p>
+                        </div>
+                        <div class="p-3.5 bg-white rounded-xl border border-emerald-200/80 shadow-2xs space-y-1">
+                            <div class="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                                <span class="text-emerald-600 font-bold">✓</span>
+                                <span>TLS 1.3 Encrypted In-Flight</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 leading-relaxed">All network communication is strictly enforced with TLS 1.3 / HTTPS encryption, preventing interception or middleman sniffing.</p>
+                        </div>
+                        <div class="p-3.5 bg-white rounded-xl border border-emerald-200/80 shadow-2xs space-y-1">
+                            <div class="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                                <span class="text-emerald-600 font-bold">✓</span>
+                                <span>No Subprocess Binaries</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 leading-relaxed">All docking and descriptor evaluations run in-process through native compiled libraries, avoiding unmonitored disk shell execution.</p>
                         </div>
                     </div>
                 </div>
