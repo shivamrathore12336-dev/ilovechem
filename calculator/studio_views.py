@@ -310,9 +310,10 @@ def sitemap_xml_view(request):
     base = _site_url()
     pages = [
         ("/", "weekly", "1.0"),
-        ("/downloads/", "weekly", "0.9"),
+        ("/docking/", "weekly", "1.0"),
+        ("/properties/", "monthly", "0.8"),
+        ("/downloads/", "weekly", "0.8"),
         ("/about/", "monthly", "0.8"),
-        ("/properties/", "monthly", "0.7"),
     ]
     entries = "\n".join(
         f"  <url>\n    <loc>{base}{path}</loc>\n    <changefreq>{freq}</changefreq>\n    <priority>{prio}</priority>\n  </url>"
@@ -325,6 +326,17 @@ def sitemap_xml_view(request):
         "</urlset>"
     )
     return HttpResponse(xml, content_type="application/xml; charset=utf-8")
+
+
+def og_image_view(request):
+    """Serve the 1200x630 OpenGraph / Twitter sharing banner card."""
+    img_path = os.path.join(settings.BASE_DIR, "calculator", "static", "images", "og-image.png")
+    if os.path.exists(img_path):
+        with open(img_path, "rb") as f:
+            resp = HttpResponse(f.read(), content_type="image/png")
+            resp["Cache-Control"] = "public, max-age=86400"
+            return resp
+    return HttpResponse(status=404)
 
 
 def google_verification_view(request):
