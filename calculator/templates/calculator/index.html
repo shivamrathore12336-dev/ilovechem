@@ -194,6 +194,15 @@
                             <div class="text-xl font-bold font-mono text-cyan-300">{{ properties.qed_score }}</div>
                         </div>
                     </div>
+                    <!-- Veber Bioavailability Rule -->
+                    <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                        <span class="text-slate-400">Veber Oral Bioavailability:</span>
+                        {% if properties.veber_pass %}
+                        <span class="px-2 py-0.5 rounded-full bg-emerald-900/60 text-emerald-300 border border-emerald-700/50 font-bold">Passed (RotB &le; 10, TPSA &le; 140)</span>
+                        {% else %}
+                        <span class="px-2 py-0.5 rounded-full bg-amber-900/60 text-amber-300 border border-amber-700/50 font-bold">Flagged (RotB > 10 or TPSA > 140)</span>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <!-- Properties Grid Cards -->
@@ -249,11 +258,18 @@
                             <i data-lucide="crosshair" class="w-4 h-4"></i>
                             <span>Dock this Molecule in ChemDock Studio</span>
                         </a>
-                        <button onclick="downloadJSON()"
-                            class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 text-xs flex items-center justify-center space-x-2 transition cursor-pointer">
-                            <i data-lucide="download" class="w-4 h-4"></i>
-                            <span>Export Calculated Descriptors (JSON)</span>
-                        </button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="downloadJSON()"
+                                class="py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 text-xs flex items-center justify-center space-x-1.5 transition cursor-pointer" title="Export raw JSON data">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                                <span>Export JSON</span>
+                            </button>
+                            <button onclick="downloadCSV()"
+                                class="py-2.5 bg-emerald-950/50 hover:bg-emerald-900/60 text-emerald-300 font-medium rounded-xl border border-emerald-700/50 text-xs flex items-center justify-center space-x-1.5 transition cursor-pointer" title="Export CSV table for Excel / Prism">
+                                <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-emerald-400"></i>
+                                <span>Export CSV</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -375,6 +391,47 @@
             a.href = url;
             a.download = `chem_properties_${Date.now()}.json`;
             a.click();
+        }
+
+        function downloadCSV() {
+            let data = {};
+            const propsEl = document.getElementById('properties-json-data');
+            if (propsEl) {
+                try {
+                    data = JSON.parse(propsEl.textContent);
+                } catch(e) {
+                    console.error("Failed to parse JSON data:", e);
+                }
+            }
+            const rows = [
+                ["Property", "Value", "Unit / Metric"],
+                ["SMILES", data.smiles || "", ""],
+                ["Molecular Formula", data.formula || "", ""],
+                ["Molecular Weight", data.molecular_weight || "", "g/mol"],
+                ["Exact Mass", data.exact_mass || "", "Da"],
+                ["LogP (Crippen)", data.logp !== undefined ? data.logp : "", "Lipophilicity"],
+                ["TPSA", data.tpsa !== undefined ? data.tpsa : "", "Å²"],
+                ["Rotatable Bonds", data.rotatable_bonds !== undefined ? data.rotatable_bonds : "", "Flexibility"],
+                ["H-Bond Donors", data.h_bond_donors !== undefined ? data.h_bond_donors : "", "Count"],
+                ["H-Bond Acceptors", data.h_bond_acceptors !== undefined ? data.h_bond_acceptors : "", "Count"],
+                ["Heavy Atoms", data.heavy_atoms !== undefined ? data.heavy_atoms : "", "Count"],
+                ["Aromatic Rings", data.aromatic_rings !== undefined ? data.aromatic_rings : "", "Count"],
+                ["Total Rings", data.rings !== undefined ? data.rings : "", "Count"],
+                ["Fraction Csp3", data.fraction_csp3 !== undefined ? data.fraction_csp3 : "", "Saturation index"],
+                ["QED Drug-Likeness", data.qed_score !== undefined ? data.qed_score : "", "0-1 Score"],
+                ["Lipinski Violations", data.lipinski_violations !== undefined ? data.lipinski_violations : 0, "Max 1 for Ro5"],
+                ["Lipinski Status", data.lipinski_pass ? "PASSED" : "FLAGGED", "Rule of 5"],
+                ["Veber Violations", data.veber_violations !== undefined ? data.veber_violations : 0, "Max 0"],
+                ["Veber Status", data.veber_pass ? "PASSED" : "FLAGGED", "Oral Bioavailability"]
+            ];
+            const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.map(x => `"${x}"`).join(",")).join("\n");
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `chem_descriptors_${Date.now()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         window.addEventListener('DOMContentLoaded', () => {

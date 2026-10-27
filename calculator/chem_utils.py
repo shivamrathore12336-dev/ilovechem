@@ -83,6 +83,8 @@ def calculate_properties(smiles: str) -> dict:
                     "qed_score": 0.0,
                     "lipinski_violations": 1 if mw > 500 else 0,
                     "lipinski_pass": mw <= 500,
+                    "veber_violations": 0,
+                    "veber_pass": True,
                 }
         except Exception:
             pass
@@ -126,6 +128,15 @@ def calculate_properties(smiles: str) -> dict:
 
         lipinski_pass = (lipinski_violations <= 1)
 
+        # Veber's Rule for oral bioavailability:
+        # Rotatable Bonds <= 10 and TPSA <= 140 Å²
+        veber_violations = 0
+        if rotatable > 10:
+            veber_violations += 1
+        if tpsa > 140.0:
+            veber_violations += 1
+        veber_pass = (veber_violations == 0)
+
         return {
             "smiles": s,
             "formula": formula,
@@ -143,6 +154,8 @@ def calculate_properties(smiles: str) -> dict:
             "qed_score": qed_val,
             "lipinski_violations": lipinski_violations,
             "lipinski_pass": lipinski_pass,
+            "veber_violations": veber_violations,
+            "veber_pass": veber_pass,
         }
     except Exception:
         return {"error": "Failed to calculate molecular properties."}

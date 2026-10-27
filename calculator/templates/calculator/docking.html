@@ -212,6 +212,39 @@
                         </span>
                     </div>
 
+                    <!-- Quick Benchmark Presets Bar -->
+                    <div class="mb-3.5 p-2.5 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/80 rounded-xl">
+                        <div class="flex items-center justify-between text-[11px] font-bold text-blue-900 mb-1.5">
+                            <span class="flex items-center gap-1.5">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-600"></i>
+                                <span>Quick Benchmark Presets:</span>
+                            </span>
+                            <span class="text-[10px] text-blue-600 font-normal">1-Click Load</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1.5 text-xs">
+                            <button type="button" onclick="loadBenchmarkPreset('1IEP')"
+                                class="px-2 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 text-blue-800 rounded-lg text-left text-[11px] font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Imatinib (Gleevec) with BCR-Abl Tyrosine Kinase">
+                                <span><b>1IEP</b> · Imatinib / Abl</span>
+                                <i data-lucide="arrow-up-right" class="w-3 h-3 text-blue-500"></i>
+                            </button>
+                            <button type="button" onclick="loadBenchmarkPreset('2HU4')"
+                                class="px-2 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 text-blue-800 rounded-lg text-left text-[11px] font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Oseltamivir (Tamiflu) with Influenza Neuraminidase">
+                                <span><b>2HU4</b> · Tamiflu / N1</span>
+                                <i data-lucide="arrow-up-right" class="w-3 h-3 text-blue-500"></i>
+                            </button>
+                            <button type="button" onclick="loadBenchmarkPreset('2ITY')"
+                                class="px-2 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 text-blue-800 rounded-lg text-left text-[11px] font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Gefitinib (Iressa) with EGFR Kinase">
+                                <span><b>2ITY</b> · Gefitinib / EGFR</span>
+                                <i data-lucide="arrow-up-right" class="w-3 h-3 text-blue-500"></i>
+                            </button>
+                            <button type="button" onclick="loadBenchmarkPreset('1CX2')"
+                                class="px-2 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 text-blue-800 rounded-lg text-left text-[11px] font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Aspirin / SC-558 with COX-2">
+                                <span><b>1CX2</b> · Aspirin / COX-2</span>
+                                <i data-lucide="arrow-up-right" class="w-3 h-3 text-blue-500"></i>
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- RCSB PDB ID 1-Click Fetch -->
                     <div class="mb-3">
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">
@@ -1012,6 +1045,53 @@
                 placeholder.classList.add("hidden");
                 wrapper.classList.remove("hidden");
                 wrapper.innerHTML = svg;
+            }
+        }
+
+        // Benchmark Presets Definition
+        const BENCHMARK_PRESETS = {
+            '1IEP': {
+                name: 'Imatinib (Gleevec) & BCR-Abl Kinase',
+                pdbId: '1IEP',
+                smiles: 'CC1=C(C=C(C=C1)NC(=O)C2=CC=C(C=C2)CN3CCN(CC3)C)NC4=NC=CC(=N4)C5=CN=CC=C5'
+            },
+            '2HU4': {
+                name: 'Oseltamivir (Tamiflu) & Influenza Neuraminidase',
+                pdbId: '2HU4',
+                smiles: 'CCC(CC)OC1C=C(CC(C1NC(=O)C)N)C(=O)O'
+            },
+            '2ITY': {
+                name: 'Gefitinib (Iressa) & EGFR Kinase',
+                pdbId: '2ITY',
+                smiles: 'COC1=C(C=C2C(=C1)N=CN=C2NC3=CC(=C(C=C3)F)Cl)OCCCN4CCOCC4'
+            },
+            '1CX2': {
+                name: 'Aspirin & Cyclooxygenase-2 (COX-2)',
+                pdbId: '1CX2',
+                smiles: 'CC(=O)OC1=CC=CC=C1C(=O)O'
+            }
+        };
+
+        function loadBenchmarkPreset(code) {
+            const preset = BENCHMARK_PRESETS[code];
+            if (!preset) return;
+
+            // 1. Set PDB input and fetch
+            const pdbInput = document.getElementById("pdb-id-input");
+            if (pdbInput) {
+                pdbInput.value = preset.pdbId;
+            }
+            fetchRCSBStructure(preset.pdbId);
+
+            // 2. Set Ligand format and value
+            State.ligandFormat = "smiles";
+            const ligandRadio = document.querySelector('input[name="ligand-format"][value="smiles"]');
+            if (ligandRadio) ligandRadio.checked = true;
+
+            const ligandInput = document.getElementById("ligand-input-text");
+            if (ligandInput) {
+                ligandInput.value = preset.smiles;
+                updateLigandStatus();
             }
         }
 

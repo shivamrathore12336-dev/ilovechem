@@ -268,3 +268,19 @@ class MolecularDockingEngineTests(TestCase):
         self.assertIn('show cartoon, receptor', pml)
         self.assertIn('set cartoon_transparency, 0.4', pml)
         self.assertIn('distance hbonds, ligand, pocket, 3.5', pml)
+
+    def test_veber_rules_and_properties_calculation(self):
+        from .chem_utils import calculate_properties
+        # Aspirin: MW 180.16, RotB 3, TPSA 63.6, should pass both Lipinski and Veber
+        res = calculate_properties("CC(=O)Oc1ccccc1C(=O)O")
+        self.assertTrue(res["lipinski_pass"])
+        self.assertEqual(res["lipinski_violations"], 0)
+        self.assertTrue(res["veber_pass"])
+        self.assertEqual(res["veber_violations"], 0)
+
+        # High flexibility test molecule with > 10 rotatable bonds:
+        # e.g., CCCCCCCCCCCC(=O)O (Lauric acid: 10 rotatable bonds)
+        res_flex = calculate_properties("CCCCCCCCCCCCCC(=O)O") # Myristic acid: 12 rotatable bonds
+        self.assertTrue(res_flex["rotatable_bonds"] > 10)
+        self.assertFalse(res_flex["veber_pass"])
+        self.assertGreaterEqual(res_flex["veber_violations"], 1)
