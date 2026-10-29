@@ -97,26 +97,29 @@
         * { box-sizing: border-box; }
         body { 
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background-color: #FAFBFC; 
-            color: #0F172A;
+            background-color: #060913; 
+            color: #F1F5F9;
             -webkit-font-smoothing: antialiased;
             background-image: 
-                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.035) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(79, 70, 229, 0.03) 0px, transparent 50%),
-                radial-gradient(at 50% 100%, rgba(14, 165, 233, 0.025) 0px, transparent 50%);
+                radial-gradient(at 10% 12%, rgba(14, 165, 233, 0.08) 0px, transparent 45%),
+                radial-gradient(at 90% 15%, rgba(99, 102, 241, 0.08) 0px, transparent 45%),
+                radial-gradient(at 50% 85%, rgba(6, 182, 212, 0.05) 0px, transparent 50%),
+                radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 28px 28px;
             background-attachment: fixed;
         }
         .font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 
         .btn-brand-primary {
-            background-color: #2563EB;
+            background: linear-gradient(135deg, #0284C7 0%, #2563EB 50%, #4F46E5 100%);
             color: #FFFFFF;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 2px 8px -2px rgba(37, 99, 235, 0.4), 0 1px 2px -1px rgba(37, 99, 235, 0.2);
+            box-shadow: 0 0 20px -3px rgba(14, 165, 233, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(56, 189, 248, 0.4);
         }
         .btn-brand-primary:hover {
-            background-color: #1D4ED8;
-            box-shadow: 0 6px 16px -2px rgba(37, 99, 235, 0.45);
+            box-shadow: 0 0 30px -2px rgba(14, 165, 233, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border-color: rgba(56, 189, 248, 0.7);
             transform: translateY(-1px);
         }
         .btn-brand-primary:active {
@@ -124,51 +127,56 @@
         }
 
         .btn-brand-success {
-            background-color: #059669;
+            background: linear-gradient(135deg, #059669 0%, #10B981 100%);
             color: #FFFFFF;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 2px 8px -2px rgba(5, 150, 105, 0.35);
+            box-shadow: 0 0 20px -3px rgba(16, 185, 129, 0.45);
+            border: 1px solid rgba(52, 211, 153, 0.4);
         }
         .btn-brand-success:hover {
-            background-color: #047857;
-            box-shadow: 0 6px 16px -2px rgba(5, 150, 105, 0.45);
+            box-shadow: 0 0 30px -2px rgba(16, 185, 129, 0.65);
             transform: translateY(-1px);
         }
 
         .panel-surface {
-            background: #FFFFFF;
-            border: 1px solid rgba(226, 232, 240, 0.85);
-            box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 4px 14px 0 rgba(15, 23, 42, 0.03);
+            background: rgba(11, 16, 30, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(51, 65, 85, 0.65);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
         }
 
         .tool-card {
-            background: #FFFFFF;
-            border: 1px solid rgba(226, 232, 240, 0.9);
-            box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.02), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            background: rgba(11, 16, 30, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.7);
+            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .tool-card:hover {
-            border-color: rgba(59, 130, 246, 0.7);
-            box-shadow: 0 10px 25px -4px rgba(37, 99, 235, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
-            transform: translateY(-2px);
+            border-color: rgba(56, 189, 248, 0.6);
+            background: rgba(15, 23, 42, 0.9);
+            box-shadow: 0 12px 35px -5px rgba(14, 165, 233, 0.2), 0 0 20px -2px rgba(6, 182, 212, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
         }
 
         .drop-active {
-            border-color: #2563EB !important;
-            background-color: rgba(239, 246, 255, 0.6) !important;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12) !important;
+            border-color: #38BDF8 !important;
+            background-color: rgba(14, 165, 233, 0.12) !important;
+            box-shadow: 0 0 35px rgba(56, 189, 248, 0.3) !important;
         }
 
         pre::-webkit-scrollbar { width: 6px; height: 6px; }
-        pre::-webkit-scrollbar-track { background: #0F172A; }
-        pre::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        pre::-webkit-scrollbar-thumb:hover { background: #475569; }
+        pre::-webkit-scrollbar-track { background: #04060C; }
+        pre::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 4px; }
+        pre::-webkit-scrollbar-thumb:hover { background: #334155; }
     </style>
 </head>
 <body class="min-h-full flex flex-col justify-between">
 
     <!-- 1. APP HEADER (iLovePDF Clean Minimalist Style with Mega-Dropdown) -->
-    <header class="bg-white border-b border-slate-200/90 sticky top-0 z-40 shadow-xs">
+    <header class="bg-[#070B16]/90 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-40 shadow-xl">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             
             <!-- Left: Logo & Nav Links -->
@@ -183,38 +191,38 @@
                         </svg>
                     </div>
                     <div class="flex items-baseline space-x-1.5">
-                        <span class="text-2xl font-black tracking-tight text-slate-900">iLove<span class="text-blue-600">Chem</span></span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                        <span class="text-2xl font-black tracking-tight text-white">iLove<span class="text-cyan-400">Chem</span></span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#38bdf8]"></span>
                     </div>
                 </a>
 
                 <!-- Navigation Links (iLovePDF Style) -->
                 <nav class="hidden md:flex items-center space-x-1 text-sm font-semibold text-slate-700">
-                    <button type="button" onclick="selectToolFromGrid('orca', 'ORCA Generator', 'Generate DFT input files with spin parity')" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1 cursor-pointer">
+                    <button type="button" onclick="selectToolFromGrid('orca', 'ORCA Generator', 'Generate DFT input files with spin parity')" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-cyan-400 text-slate-300 transition flex items-center gap-1 cursor-pointer">
                         <span>ORCA</span>
                     </button>
-                    <button type="button" onclick="selectToolFromGrid('gjf', 'Gaussian Builder', 'Convert 2D/3D molecules into .com / .gjf')" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1 cursor-pointer">
+                    <button type="button" onclick="selectToolFromGrid('gjf', 'Gaussian Builder', 'Convert 2D/3D molecules into .com / .gjf')" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-cyan-400 text-slate-300 transition flex items-center gap-1 cursor-pointer">
                         <span>Gaussian</span>
                     </button>
-                    <button type="button" onclick="selectToolFromGrid('pdbqt', 'AutoDock PDBQT', 'Prepare ligands & receptors for Vina docking')" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1 cursor-pointer">
+                    <button type="button" onclick="selectToolFromGrid('pdbqt', 'AutoDock PDBQT', 'Prepare ligands & receptors for Vina docking')" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-cyan-400 text-slate-300 transition flex items-center gap-1 cursor-pointer">
                         <span>AutoDock PDBQT</span>
                     </button>
-                    <button type="button" onclick="selectToolFromGrid('cdxml', 'ChemDraw Unpacker', 'Extract schemes & SuperAtoms into 3D files')" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1 cursor-pointer">
+                    <button type="button" onclick="selectToolFromGrid('cdxml', 'ChemDraw Unpacker', 'Extract schemes & SuperAtoms into 3D files')" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-cyan-400 text-slate-300 transition flex items-center gap-1 cursor-pointer">
                         <span>ChemDraw</span>
                     </button>
-                    <a href="/properties/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
+                    <a href="/properties/" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-cyan-400 text-slate-300 transition flex items-center gap-1.5 cursor-pointer">
                         <i data-lucide="sliders" class="w-4 h-4 text-slate-500"></i>
                         <span>Properties</span>
                     </a>
-                    <a href="/docking/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
+                    <a href="/docking/" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-cyan-400 text-slate-300 transition flex items-center gap-1.5 cursor-pointer">
                         <i data-lucide="crosshair" class="w-4 h-4 text-blue-600"></i>
                         <span>Docking</span>
                         <span class="px-1.5 py-0.5 text-[9px] uppercase font-mono tracking-wider font-extrabold bg-blue-600 text-white rounded-md">New</span>
                     </a>
-                    <a href="/downloads/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1 cursor-pointer">
+                    <a href="/downloads/" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-cyan-400 text-slate-300 transition flex items-center gap-1 cursor-pointer">
                         <span>Downloads</span>
                     </a>
-                    <a href="/about/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1 cursor-pointer">
+                    <a href="/about/" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-cyan-400 text-slate-300 transition flex items-center gap-1 cursor-pointer">
                         <span>About</span>
                     </a>
                 </nav>
@@ -235,12 +243,12 @@
                 <!-- THREE-DOTS MENU TRIGGER & EXPANDABLE PLATFORM HUB (Far Right) -->
                 <div class="relative">
                     <button type="button" id="mega-menu-btn" onclick="toggleMegaDropdown()" aria-label="All Chemistry Tools, About & Security"
-                        class="p-2 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-slate-100 border border-slate-200 transition flex items-center justify-center cursor-pointer shadow-2xs group" title="All Chemistry Tools, About & Security">
+                        class="p-2 rounded-xl text-slate-300 hover:text-cyan-400 hover:bg-slate-800 border border-slate-700/80 transition flex items-center justify-center cursor-pointer shadow-2xs group" title="All Chemistry Tools, About & Security">
                         <i data-lucide="more-vertical" class="w-5 h-5 text-slate-600 group-hover:text-blue-600 transition-colors"></i>
                     </button>
 
                     <!-- MEGA DROPDOWN POPUP (Aligned right-0 with Tools, About, and Security) -->
-                    <div id="mega-dropdown" class="hidden absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2.5 z-50 transition-all duration-150 text-left space-y-1">
+                    <div id="mega-dropdown" class="hidden absolute right-0 top-full mt-2 w-80 bg-[#0B101E]/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-slate-800 p-2.5 z-50 transition-all duration-150 text-left space-y-1 text-slate-200">
                         
                         <!-- 1. Highlighted Clickable Link: About & Capabilities -->
                         <a href="/about/" class="flex items-center gap-3 p-3 rounded-xl bg-blue-50 hover:bg-blue-100/80 text-blue-900 font-bold transition group border border-blue-200/60 shadow-2xs">
@@ -375,45 +383,45 @@
         </div>
     </div>
 
-    <!-- 2. HERO SECTION (Benchling / BioRender Clean Scientific Style) -->
-    <section class="pt-10 pb-6 sm:pt-14 sm:pb-8 text-center px-4 max-w-4xl mx-auto space-y-4">
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-slate-200/90 shadow-2xs text-xs font-semibold text-slate-700">
+    <!-- 2. HERO SECTION (Deep Quantum Dark Standard) -->
+    <section class="pt-12 pb-8 sm:pt-16 sm:pb-10 text-center px-4 max-w-4xl mx-auto space-y-5">
+        <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.18)] text-xs font-semibold text-cyan-300">
             <span class="flex h-2 w-2 relative">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-400 shadow-[0_0_8px_#38bdf8]"></span>
             </span>
-            <span>Universal CADD &amp; DFT File Studio</span>
-            <span class="text-slate-300">•</span>
-            <span class="text-blue-600 font-mono text-[11px] font-bold">100% In-Memory RAM</span>
+            <span class="tracking-wide">Deep Quantum Chemistry Workstation</span>
+            <span class="text-slate-600">•</span>
+            <span class="text-cyan-400 font-mono text-[11px] font-bold">100% Volatile RAM</span>
         </div>
 
-        <h1 class="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-            Every format you need for <span class="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 bg-clip-text text-transparent">Computational Chemistry</span> in one place
+        <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+            Every format you need for <span class="bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent">Computational Chemistry</span> in one place
         </h1>
         
-        <p class="text-slate-600 text-sm sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            High-fidelity, in-memory file transformation, quantum spin multiplicity verification, and structure preparation for ORCA, Gaussian, AutoDock, PyMOL, and Crystallography.
+        <p class="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+            High-fidelity in-memory file transformation, quantum spin multiplicity verification, and structure preparation for ORCA, Gaussian, AutoDock, PyMOL, and Crystallography.
         </p>
 
         <div class="pt-2 flex flex-wrap items-center justify-center gap-3">
-            <a href="/docking/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-500/25 hover:shadow-lg hover:scale-[1.02] transition-all">
+            <a href="/docking/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 text-white font-bold text-xs sm:text-sm shadow-[0_0_25px_rgba(6,182,212,0.35)] hover:shadow-[0_0_35px_rgba(6,182,212,0.55)] hover:scale-[1.02] transition-all">
                 <i data-lucide="crosshair" class="w-4 h-4"></i>
-                <span>Open Inbuilt ChemDock Studio</span>
-                <span class="bg-white/20 text-white px-2 py-0.5 rounded-md text-[10px] font-mono uppercase tracking-wider font-extrabold">Live 3D WebGL</span>
+                <span>Open ChemDock 3D Studio</span>
+                <span class="bg-white/20 text-white px-2 py-0.5 rounded-md text-[10px] font-mono uppercase tracking-wider font-extrabold">WebGL</span>
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </a>
-            <button type="button" onclick="selectPresetShortcut('imatinib')" class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm border border-slate-200/90 shadow-2xs hover:border-blue-400 transition-all cursor-pointer">
-                <i data-lucide="flask-conical" class="w-4 h-4 text-blue-600"></i>
-                <span>Load Sample: Imatinib</span>
+            <button type="button" onclick="selectPresetShortcut('imatinib')" class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 font-bold text-xs sm:text-sm border border-slate-700/80 shadow-sm hover:border-cyan-500/50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] transition-all cursor-pointer">
+                <i data-lucide="flask-conical" class="w-4 h-4 text-cyan-400"></i>
+                <span>Load Preset: Imatinib</span>
             </button>
         </div>
 
         <!-- Capability Trust Tags -->
-        <div class="pt-3 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-500 font-medium">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-slate-700 border border-slate-200/70 shadow-2xs"><i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500"></i> 15+ Formats In-Memory</span>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-slate-700 border border-slate-200/70 shadow-2xs"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i> Zero Disk Storage</span>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-slate-700 border border-slate-200/70 shadow-2xs"><i data-lucide="orbit" class="w-3.5 h-3.5 text-blue-600"></i> Quantum Spin Parity</span>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-slate-700 border border-slate-200/70 shadow-2xs"><i data-lucide="sliders" class="w-3.5 h-3.5 text-indigo-600"></i> Lipinski Ro5 Radar</span>
+        <div class="pt-3 flex flex-wrap items-center justify-center gap-2 text-xs font-medium">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/80 text-slate-300 border border-slate-800 shadow-sm"><i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i> 15+ Formats In-Memory</span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/80 text-slate-300 border border-slate-800 shadow-sm"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Zero Disk Storage</span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/80 text-slate-300 border border-slate-800 shadow-sm"><i data-lucide="orbit" class="w-3.5 h-3.5 text-cyan-400"></i> Quantum Spin Parity</span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/80 text-slate-300 border border-slate-800 shadow-sm"><i data-lucide="sliders" class="w-3.5 h-3.5 text-indigo-400"></i> Lipinski Ro5 Radar</span>
         </div>
     </section>
 
@@ -421,10 +429,10 @@
     <section id="tools-grid" class="max-w-6xl mx-auto px-4 sm:px-6 mb-12">
         <div class="flex items-center justify-between mb-4 px-1">
             <div>
-                <h2 class="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">Integrated Chemistry Engines</h2>
-                <div class="text-sm font-bold text-slate-800">Select an Instrument or Drop a File Anywhere</div>
+                <h2 class="text-xs font-mono font-bold uppercase tracking-wider text-cyan-400/90">Integrated Chemistry Engines</h2>
+                <div class="text-sm font-bold text-slate-200">Select an Instrument or Drop a File Anywhere</div>
             </div>
-            <span class="text-xs font-mono text-slate-500 bg-white px-2.5 py-1 rounded-lg border border-slate-200/80 shadow-2xs">12 Active Solvers</span>
+            <span class="text-xs font-mono text-cyan-400 bg-slate-900/90 px-2.5 py-1 rounded-lg border border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.15)]">12 Solvers Active</span>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             
@@ -433,17 +441,17 @@
                 class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-blue-50/80 text-blue-600 border border-blue-100/60 flex items-center justify-center font-bold group-hover:bg-blue-600 group-hover:text-white transition-all shadow-2xs">
+                        <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/25 flex items-center justify-center font-bold group-hover:bg-cyan-500 group-hover:text-black group-hover:shadow-[0_0_15px_#38bdf8] transition-all shadow-sm">
                             <i data-lucide="atom" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Quantum DFT</span>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-cyan-400/80 bg-slate-900/90 px-2 py-0.5 rounded border border-slate-800">Quantum DFT</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">ORCA Generator</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Build DFT .inp with automatic spin parity, def2-SVP, and %pal cores.</p>
+                        <h3 class="font-bold text-slate-100 group-hover:text-cyan-400 text-sm tracking-tight transition-colors">ORCA Generator</h3>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">Build DFT .inp with automatic spin parity, def2-SVP, and %pal cores.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-cyan-400">
                     <span>Use ORCA</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                 </div>
@@ -454,17 +462,17 @@
                 class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-indigo-50/80 text-indigo-600 border border-indigo-100/60 flex items-center justify-center font-bold group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-2xs">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/25 flex items-center justify-center font-bold group-hover:bg-indigo-500 group-hover:text-white group-hover:shadow-[0_0_15px_#818cf8] transition-all shadow-sm">
                             <i data-lucide="cpu" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Quantum DFT</span>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-indigo-400/80 bg-slate-900/90 px-2 py-0.5 rounded border border-slate-800">Quantum DFT</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">Gaussian Builder</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Generate .com / .gjf route cards, memory directives, and coordinates.</p>
+                        <h3 class="font-bold text-slate-100 group-hover:text-cyan-400 text-sm tracking-tight transition-colors">Gaussian Builder</h3>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">Generate .com / .gjf route cards, memory directives, and coordinates.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-cyan-400">
                     <span>Use Gaussian</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                 </div>
@@ -475,17 +483,17 @@
                 class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-emerald-50/80 text-emerald-600 border border-emerald-100/60 flex items-center justify-center font-bold group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-2xs">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 flex items-center justify-center font-bold group-hover:bg-emerald-500 group-hover:text-black group-hover:shadow-[0_0_15px_#34d399] transition-all shadow-sm">
                             <i data-lucide="dna" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Docking CADD</span>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-emerald-400/80 bg-slate-900/90 px-2 py-0.5 rounded border border-slate-800">Docking CADD</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">AutoDock PDBQT</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Assign polar hydrogens, Gasteiger charges, and rotatable torsion bonds.</p>
+                        <h3 class="font-bold text-slate-100 group-hover:text-cyan-400 text-sm tracking-tight transition-colors">AutoDock PDBQT</h3>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">Assign polar hydrogens, Gasteiger charges, and rotatable torsion bonds.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-cyan-400">
                     <span>Prep PDBQT</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                 </div>
@@ -496,17 +504,17 @@
                 class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-cyan-50/80 text-cyan-600 border border-cyan-100/60 flex items-center justify-center font-bold group-hover:bg-cyan-600 group-hover:text-white transition-all shadow-2xs">
+                        <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/25 flex items-center justify-center font-bold group-hover:bg-sky-500 group-hover:text-black group-hover:shadow-[0_0_15px_#38bdf8] transition-all shadow-sm">
                             <i data-lucide="file-code" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">ChemDraw 2D/3D</span>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-sky-400/80 bg-slate-900/90 px-2 py-0.5 rounded border border-slate-800">ChemDraw 2D/3D</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">ChemDraw Unpacker</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Extract multi-molecule schemes, chemical drawings, and SuperAtoms.</p>
+                        <h3 class="font-bold text-slate-100 group-hover:text-cyan-400 text-sm tracking-tight transition-colors">ChemDraw Unpacker</h3>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">Extract multi-molecule schemes, chemical drawings, and SuperAtoms.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-cyan-400">
                     <span>Unpack CDXML</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                 </div>
@@ -517,17 +525,17 @@
                 class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-purple-50/80 text-purple-600 border border-purple-100/60 flex items-center justify-center font-bold group-hover:bg-purple-600 group-hover:text-white transition-all shadow-2xs">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/25 flex items-center justify-center font-bold group-hover:bg-purple-500 group-hover:text-white group-hover:shadow-[0_0_15px_#c084fc] transition-all shadow-sm">
                             <i data-lucide="library" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Screening</span>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-purple-400/80 bg-slate-900/90 px-2 py-0.5 rounded border border-slate-800">Screening</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">SDF Batch Splitter</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Decompose multi-compound screening libraries into individual structures.</p>
+                        <h3 class="font-bold text-slate-100 group-hover:text-cyan-400 text-sm tracking-tight transition-colors">SDF Batch Splitter</h3>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">Decompose multi-compound screening libraries into individual structures.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-cyan-400">
                     <span>Split Library</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                 </div>
@@ -538,17 +546,17 @@
                 class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-amber-50/80 text-amber-600 border border-amber-100/60 flex items-center justify-center font-bold group-hover:bg-amber-600 group-hover:text-white transition-all shadow-2xs">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/25 flex items-center justify-center font-bold group-hover:bg-amber-500 group-hover:text-black group-hover:shadow-[0_0_15px_#fbbf24] transition-all shadow-sm">
                             <i data-lucide="gem" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Solid-State</span>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-amber-400/80 bg-slate-900/90 px-2 py-0.5 rounded border border-slate-800">Solid-State</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">CIF Crystallography</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Convert crystal unit cells with fractional coordinates into Cartesian XYZ.</p>
+                        <h3 class="font-bold text-slate-100 group-hover:text-cyan-400 text-sm tracking-tight transition-colors">CIF Crystallography</h3>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">Convert crystal unit cells with fractional coordinates into Cartesian XYZ.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-cyan-400">
                     <span>Convert Crystal</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                 </div>
@@ -559,17 +567,17 @@
                 class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-rose-50/80 text-rose-600 border border-rose-100/60 flex items-center justify-center font-bold group-hover:bg-rose-600 group-hover:text-white transition-all shadow-2xs">
+                        <div class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/25 flex items-center justify-center font-bold group-hover:bg-rose-500 group-hover:text-white group-hover:shadow-[0_0_15px_#fb7185] transition-all shadow-sm">
                             <i data-lucide="flask-conical" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Curation</span>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-rose-400/80 bg-slate-900/90 px-2 py-0.5 rounded border border-slate-800">Curation</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">Salt Stripper</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Remove spectator counter-ions while preserving organometallic bonds.</p>
+                        <h3 class="font-bold text-slate-100 group-hover:text-cyan-400 text-sm tracking-tight transition-colors">Salt Stripper</h3>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">Remove spectator counter-ions while preserving organometallic bonds.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-cyan-400">
                     <span>Strip Salts</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                 </div>
@@ -580,17 +588,17 @@
                 class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-blue-50/80 text-blue-600 border border-blue-100/60 flex items-center justify-center font-bold group-hover:bg-blue-600 group-hover:text-white transition-all shadow-2xs">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/25 flex items-center justify-center font-bold group-hover:bg-blue-500 group-hover:text-white group-hover:shadow-[0_0_15px_#60a5fa] transition-all shadow-sm">
                             <i data-lucide="eye" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">WebGL 3D</span>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-blue-400/80 bg-slate-900/90 px-2 py-0.5 rounded border border-slate-800">WebGL 3D</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">3D Inspector</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Interactive 3D WebGL inspection, stereochemistry, and formula audit.</p>
+                        <h3 class="font-bold text-slate-100 group-hover:text-cyan-400 text-sm tracking-tight transition-colors">3D Inspector</h3>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">Interactive 3D WebGL inspection, stereochemistry, and formula audit.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-cyan-400">
                     <span>Inspect 3D</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                 </div>
@@ -601,17 +609,17 @@
                 class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-violet-50/80 text-violet-600 border border-violet-100/60 flex items-center justify-center font-bold group-hover:bg-violet-600 group-hover:text-white transition-all shadow-2xs">
+                        <div class="w-10 h-10 rounded-xl bg-violet-500/10 text-violet-400 border border-violet-500/25 flex items-center justify-center font-bold group-hover:bg-violet-500 group-hover:text-white group-hover:shadow-[0_0_15px_#a78bfa] transition-all shadow-sm">
                             <i data-lucide="activity" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">MedChem</span>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-violet-400/80 bg-slate-900/90 px-2 py-0.5 rounded border border-slate-800">MedChem</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">Drug Properties</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Calculate MW, LogP, TPSA, and Lipinski Ro5 compliance in real-time.</p>
+                        <h3 class="font-bold text-slate-100 group-hover:text-cyan-400 text-sm tracking-tight transition-colors">Drug Properties</h3>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">Calculate MW, LogP, TPSA, and Lipinski Ro5 compliance in real-time.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-cyan-400">
                     <span>Calculate Ro5</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                 </div>
@@ -622,17 +630,17 @@
                 class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-teal-50/80 text-teal-600 border border-teal-100/60 flex items-center justify-center font-bold group-hover:bg-teal-600 group-hover:text-white transition-all shadow-2xs">
+                        <div class="w-10 h-10 rounded-xl bg-teal-500/10 text-teal-400 border border-teal-500/25 flex items-center justify-center font-bold group-hover:bg-teal-500 group-hover:text-black group-hover:shadow-[0_0_15px_#2dd4bf] transition-all shadow-sm">
                             <i data-lucide="layers" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Materials</span>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-teal-400/80 bg-slate-900/90 px-2 py-0.5 rounded border border-slate-800">Materials</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">Q-Chem / VASP</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Prepare density functional theory and periodic boundary POSCAR files.</p>
+                        <h3 class="font-bold text-slate-100 group-hover:text-cyan-400 text-sm tracking-tight transition-colors">Q-Chem / VASP</h3>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">Prepare density functional theory and periodic boundary POSCAR files.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-cyan-400">
                     <span>Use Q-Chem</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                 </div>
@@ -643,17 +651,17 @@
                 class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-orange-50/80 text-orange-600 border border-orange-100/60 flex items-center justify-center font-bold group-hover:bg-orange-600 group-hover:text-white transition-all shadow-2xs">
+                        <div class="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-400 border border-orange-500/25 flex items-center justify-center font-bold group-hover:bg-orange-500 group-hover:text-black group-hover:shadow-[0_0_15px_#fb923c] transition-all shadow-sm">
                             <i data-lucide="maximize-2" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Synthesis</span>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-orange-400/80 bg-slate-900/90 px-2 py-0.5 rounded border border-slate-800">Synthesis</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">SuperAtom Expander</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Expand protecting groups (Boc, Ts, Ph, Cy) into explicit 3D atoms.</p>
+                        <h3 class="font-bold text-slate-100 group-hover:text-cyan-400 text-sm tracking-tight transition-colors">SuperAtom Expander</h3>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">Expand protecting groups (Boc, Ts, Ph, Cy) into explicit 3D atoms.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-cyan-400">
                     <span>Expand Atoms</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                 </div>
@@ -664,17 +672,17 @@
                 class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-blue-50/80 text-blue-600 border border-blue-100/60 flex items-center justify-center font-bold group-hover:bg-blue-600 group-hover:text-white transition-all shadow-2xs">
+                        <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/25 flex items-center justify-center font-bold group-hover:bg-cyan-500 group-hover:text-black group-hover:shadow-[0_0_15px_#38bdf8] transition-all shadow-sm">
                             <i data-lucide="refresh-cw" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100 font-bold">Universal</span>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/30 font-bold">Universal</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">Any-to-Any Converter</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Direct bidirectional conversion between all 15+ formats with quantum parity.</p>
+                        <h3 class="font-bold text-slate-100 group-hover:text-cyan-400 text-sm tracking-tight transition-colors">Any-to-Any Converter</h3>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">Direct bidirectional conversion between all 15+ formats with quantum parity.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-cyan-400">
                     <span>All Formats</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                 </div>
@@ -725,20 +733,20 @@
             </div>
 
             <!-- STEP 1: DROPZONE (iLovePDF Signature Large Upload Button) -->
-            <div id="upload-stage" class="panel-surface rounded-2xl p-10 sm:p-14 text-center border-2 border-dashed border-slate-300 hover:border-blue-500 transition-all duration-200 bg-white shadow-sm">
+            <div id="upload-stage" class="panel-surface rounded-3xl p-10 sm:p-14 text-center border-2 border-dashed border-slate-800 hover:border-cyan-500/70 transition-all duration-300 shadow-[0_0_40px_rgba(0,0,0,0.6)]">
                 
                 <input type="file" id="file-selector" class="hidden" accept=".cdxml,.cdx,.pdb,.pdbqt,.mol,.sdf,.mol2,.cif,.xyz,.log,.out,.gjf,.com,.inp,.smi,.txt,*" />
 
                 <div class="flex flex-col items-center space-y-4 max-w-md mx-auto">
-                    <div class="w-20 h-20 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
+                    <div class="w-20 h-20 rounded-2xl bg-cyan-500/10 border border-cyan-500/25 flex items-center justify-center text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.25)]">
                         <i data-lucide="upload-cloud" class="w-10 h-10 stroke-[2]"></i>
                     </div>
 
                     <div class="space-y-1">
-                        <div class="text-lg font-bold text-slate-900">
+                        <div class="text-lg font-bold text-slate-100">
                             Select chemistry file or drop here
                         </div>
-                        <div class="text-xs text-slate-500">
+                        <div class="text-xs text-slate-400">
                             PDB, PDBQT, SDF, CIF, ChemDraw CDXML, Gaussian/ORCA logs, or SMILES
                         </div>
                     </div>
@@ -801,7 +809,7 @@
             <div id="action-stage" class="hidden panel-surface rounded-2xl p-6 sm:p-8 space-y-6">
                 
                 <!-- Smart Sanitization Notification -->
-                <div id="detection-banner" class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div id="detection-banner" class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                     <div class="flex items-center space-x-3">
                         <div class="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold shrink-0">
                             <i data-lucide="check-circle" class="w-5 h-5"></i>
@@ -815,7 +823,7 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" onclick="cancelUpload()" class="text-xs text-slate-500 hover:text-rose-600 font-semibold underline self-start sm:self-center">
+                    <button type="button" onclick="cancelUpload()" class="text-xs text-slate-400 hover:text-rose-600 font-semibold underline self-start sm:self-center">
                         Pick Different File
                     </button>
                 </div>
@@ -957,7 +965,7 @@
                         <i data-lucide="check" class="w-6 h-6 stroke-[3]"></i>
                     </div>
                     <h3 class="text-2xl font-extrabold text-slate-900" id="result-title">Conversion Complete</h3>
-                    <p id="result-summary" class="text-xs text-slate-500 font-mono">Formula: C9H8O4 • 21 Atoms • Geometry Minimized</p>
+                    <p id="result-summary" class="text-xs text-slate-400 font-mono">Formula: C9H8O4 • 21 Atoms • Geometry Minimized</p>
 
                     <!-- Scientific Badges Container -->
                     <div id="audit-badges-container" class="flex flex-wrap items-center justify-center gap-1.5 pt-2">
@@ -1125,7 +1133,7 @@
                             <span>Essential Computational Chemistry Software & Downloads</span>
                             <span class="hidden md:inline-flex px-2 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono font-bold">10 Free Tools</span>
                         </div>
-                        <div class="text-xs text-slate-500 mt-0.5">
+                        <div class="text-xs text-slate-400 mt-0.5">
                             AutoDock Vina, PyMOL, ORCA, ChimeraX, Avogadro 2, and GROMACS official direct links.
                         </div>
                     </div>
@@ -1296,7 +1304,7 @@
                     </div>
                     <div>
                         <h3 class="font-black text-slate-900 text-lg">About iLoveChem &amp; Platform Capabilities</h3>
-                        <p class="text-xs text-slate-500 font-mono">Designed &amp; Developed by Shivam Rathore</p>
+                        <p class="text-xs text-slate-400 font-mono">Designed &amp; Developed by Shivam Rathore</p>
                     </div>
                 </div>
                 <button type="button" onclick="document.getElementById('about-modal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer">
@@ -1321,7 +1329,7 @@
                     <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider font-mono text-slate-500">Core Scientific Capabilities</h4>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                        <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
                             <div class="font-bold text-slate-900 flex items-center gap-1.5">
                                 <span class="w-2 h-2 rounded-full bg-blue-600"></span>
                                 <span>15+ Chemical File Formats</span>
@@ -1331,7 +1339,7 @@
                             </p>
                         </div>
 
-                        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                        <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
                             <div class="font-bold text-slate-900 flex items-center gap-1.5">
                                 <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
                                 <span>Valence &amp; Spin Multiplicity Guard</span>
@@ -1341,7 +1349,7 @@
                             </p>
                         </div>
 
-                        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                        <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
                             <div class="font-bold text-slate-900 flex items-center gap-1.5">
                                 <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
                                 <span>Real-Time MedChem Ro5 Radar</span>
@@ -1351,7 +1359,7 @@
                             </p>
                         </div>
 
-                        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                        <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
                             <div class="font-bold text-slate-900 flex items-center gap-1.5">
                                 <span class="w-2 h-2 rounded-full bg-teal-600"></span>
                                 <span>Reaction Scheme ZIP Unbundler</span>
@@ -1450,7 +1458,7 @@
                         <i data-lucide="flask-conical" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-bold text-slate-900">Benchmark Test Case Catalog</h3>
+                        <h3 class="text-lg font-bold text-slate-100">Benchmark Test Case Catalog</h3>
                         <p class="text-[11px] text-slate-500 font-mono">19 Real-World Computational Chemistry Failure Modes</p>
                     </div>
                 </div>

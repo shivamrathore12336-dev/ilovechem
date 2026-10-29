@@ -71,13 +71,15 @@
         * { box-sizing: border-box; }
         body { 
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background-color: #FAFBFC; 
-            color: #0F172A;
+            background-color: #060913; 
+            color: #F1F5F9;
             -webkit-font-smoothing: antialiased;
             background-image: 
-                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.035) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(79, 70, 229, 0.03) 0px, transparent 50%),
-                radial-gradient(at 50% 100%, rgba(14, 165, 233, 0.025) 0px, transparent 50%);
+                radial-gradient(at 10% 12%, rgba(14, 165, 233, 0.08) 0px, transparent 45%),
+                radial-gradient(at 90% 15%, rgba(99, 102, 241, 0.08) 0px, transparent 45%),
+                radial-gradient(at 50% 85%, rgba(6, 182, 212, 0.05) 0px, transparent 50%),
+                radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 28px 28px;
             background-attachment: fixed;
         }
         .font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
@@ -87,25 +89,25 @@
             height: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: #F1F5F9;
+            background: #04060C;
             border-radius: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #CBD5E1;
+            background: #1E293B;
             border-radius: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94A3B8;
+            background: #334155;
         }
         .viewer-box {
             position: relative;
             width: 100%;
             height: 520px;
-            background: radial-gradient(circle at center, #0F172A 0%, #020617 100%);
+            background: radial-gradient(circle at center, #0B101E 0%, #030509 100%);
             border-radius: 1.25rem;
             overflow: hidden;
-            box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.3);
-            border: 1px solid rgba(30, 41, 59, 0.6);
+            box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.7), 0 0 30px -5px rgba(6, 182, 212, 0.15);
+            border: 1px solid rgba(51, 65, 85, 0.7);
         }
         @keyframes pulse-ring {
             0% { transform: scale(0.97); opacity: 0.8; }
@@ -116,17 +118,22 @@
             animation: pulse-ring 3s infinite ease-in-out;
         }
         .dock-card {
-            background: #FFFFFF;
-            border: 1px solid rgba(226, 232, 240, 0.85);
-            box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 2px 8px -2px rgba(15, 23, 42, 0.03);
-            transition: all 0.2s ease;
+            background: rgba(11, 16, 30, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(51, 65, 85, 0.7);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
+            transition: all 0.25s ease;
+        }
+        .dock-card:hover {
+            border-color: rgba(56, 189, 248, 0.5);
         }
     </style>
 </head>
 <body class="min-h-full flex flex-col justify-between">
 
     <!-- 1. APP HEADER -->
-    <header class="bg-white/95 backdrop-blur-md border-b border-slate-200/90 sticky top-0 z-40 shadow-xs">
+    <header class="bg-[#070B16]/90 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-40 shadow-xl">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             
             <!-- Left: Logo & Nav Links -->
@@ -141,31 +148,31 @@
                         </svg>
                     </div>
                     <div class="flex items-baseline space-x-1.5">
-                        <span class="text-2xl font-black tracking-tight text-slate-900">iLove<span class="text-blue-600">Chem</span></span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                        <span class="text-2xl font-black tracking-tight text-white">iLove<span class="text-cyan-400">Chem</span></span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#38bdf8]"></span>
                     </div>
                 </a>
 
                 <!-- Navigation Links -->
                 <nav class="hidden md:flex items-center space-x-1 text-sm font-semibold text-slate-700">
-                    <a href="/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
+                    <a href="/" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-cyan-400 text-slate-300 transition flex items-center gap-1.5 cursor-pointer">
                         <i data-lucide="flask-conical" class="w-4 h-4 text-slate-500"></i>
                         <span>Converter Studio</span>
                     </a>
-                    <a href="/properties/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
+                    <a href="/properties/" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-cyan-400 text-slate-300 transition flex items-center gap-1.5 cursor-pointer">
                         <i data-lucide="sliders" class="w-4 h-4 text-slate-500"></i>
                         <span>Properties</span>
                     </a>
-                    <a href="/docking/" class="px-3 py-2 rounded-lg bg-blue-50 text-blue-600 font-bold transition flex items-center gap-1.5 shadow-2xs">
+                    <a href="/docking/" class="px-3 py-2 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-bold transition flex items-center gap-1.5 shadow-[0_0_12px_rgba(6,182,212,0.25)]">
                         <i data-lucide="crosshair" class="w-4 h-4 text-blue-600"></i>
                         <span>Molecular Docking</span>
                         <span class="px-1.5 py-0.5 text-[9px] uppercase font-mono tracking-wider font-extrabold bg-blue-600 text-white rounded-md">New</span>
                     </a>
-                    <a href="/downloads/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
+                    <a href="/downloads/" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-cyan-400 text-slate-300 transition flex items-center gap-1.5 cursor-pointer">
                         <i data-lucide="download" class="w-4 h-4 text-slate-500"></i>
                         <span>Downloads</span>
                     </a>
-                    <a href="/about/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
+                    <a href="/about/" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-cyan-400 text-slate-300 transition flex items-center gap-1.5 cursor-pointer">
                         <i data-lucide="info" class="w-4 h-4 text-slate-500"></i>
                         <span>About</span>
                     </a>
@@ -187,21 +194,21 @@
         </div>
     </header>
 
-    <!-- 2. HERO / BADGE STRIP (Benchling / BioRender Clean Scientific Style) -->
-    <div class="border-b border-slate-200/80 bg-white py-5 shadow-2xs">
+    <!-- 2. HERO / BADGE STRIP (Deep Quantum Dark Standard) -->
+    <div class="border-b border-slate-800/80 bg-[#070B16]/80 backdrop-blur-md py-5 shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <div class="flex flex-wrap items-center gap-2 mb-1.5">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/80 shadow-2xs">
-                        <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-slate-900 text-cyan-300 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_6px_#38bdf8]"></span>
                         ChemDock In-Browser Engine 2.0
                     </span>
-                    <span class="text-xs text-slate-500 font-mono">AutoDock Vina Calibration · 100% Volatile RAM</span>
+                    <span class="text-xs text-slate-400 font-mono">AutoDock Vina Calibration · 100% Volatile RAM</span>
                 </div>
-                <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
                     Inbuilt Molecular Docking Studio
                 </h1>
-                <p class="text-xs sm:text-sm text-slate-600 mt-1 max-w-3xl leading-relaxed">
+                <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-3xl leading-relaxed">
                     Empirical free energy scoring (&Delta;G in kcal/mol), Monte Carlo simulated annealing, 
                     real-time active-site pocket detection, and automated 3D hydrogen bond contact profiling.
                 </p>
@@ -209,12 +216,12 @@
             
             <div class="flex items-center gap-2 shrink-0">
                 <a href="/about/#molecular-docking" target="_blank"
-                    class="px-3.5 py-2 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50 text-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
-                    <i data-lucide="book-open" class="w-3.5 h-3.5 text-blue-600"></i>
+                    class="px-3.5 py-2 rounded-xl border border-slate-700/80 bg-slate-900/80 hover:border-cyan-500/50 hover:bg-slate-800 text-slate-200 text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer">
+                    <i data-lucide="book-open" class="w-3.5 h-3.5 text-cyan-400"></i>
                     <span>Methodology &amp; Physics</span>
                 </a>
                 <button type="button" onclick="document.getElementById('methodology-modal').classList.remove('hidden')" 
-                    class="px-3.5 py-2 rounded-xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
+                    class="px-3.5 py-2 rounded-xl border border-slate-700/80 bg-slate-900/80 hover:border-slate-600 text-slate-300 text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer">
                     <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-400"></i>
                     <span>Scoring Algorithm</span>
                 </button>
@@ -230,11 +237,11 @@
             <div class="lg:col-span-5 space-y-5">
                 
                 <!-- CARD 1: TARGET RECEPTOR (PDB) -->
-                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+                <div class="dock-card rounded-2xl p-5 shadow-lg">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-2">
                             <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-black">1</span>
-                            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Target Macromolecule</h2>
+                            <h2 class="text-sm font-bold text-slate-100 uppercase tracking-wider">Target Macromolecule</h2>
                         </div>
                         <span id="receptor-status-badge" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-slate-100 text-slate-500">
                             No Receptor
@@ -242,8 +249,8 @@
                     </div>
 
                     <!-- Quick Benchmark Presets Bar -->
-                    <div class="mb-3.5 p-2.5 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/80 rounded-xl">
-                        <div class="flex items-center justify-between text-[11px] font-bold text-blue-900 mb-1.5">
+                    <div class="mb-3.5 p-2.5 bg-slate-900/90 border border-cyan-500/20 shadow-inner rounded-xl">
+                        <div class="flex items-center justify-between text-[11px] font-bold text-cyan-300 mb-1.5">
                             <span class="flex items-center gap-1.5">
                                 <i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-600"></i>
                                 <span>Quick Benchmark Presets:</span>
@@ -252,22 +259,22 @@
                         </div>
                         <div class="grid grid-cols-2 gap-1.5 text-xs">
                             <button type="button" onclick="loadBenchmarkPreset('1IEP')"
-                                class="px-2 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 text-blue-800 rounded-lg text-left text-[11px] font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Imatinib (Gleevec) with BCR-Abl Tyrosine Kinase">
+                                class="px-2 py-1 bg-[#060913] hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/40 text-slate-200 rounded-lg text-left text-[11px] font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Imatinib (Gleevec) with BCR-Abl Tyrosine Kinase">
                                 <span><b>1IEP</b> · Imatinib / Abl</span>
                                 <i data-lucide="arrow-up-right" class="w-3 h-3 text-blue-500"></i>
                             </button>
                             <button type="button" onclick="loadBenchmarkPreset('2HU4')"
-                                class="px-2 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 text-blue-800 rounded-lg text-left text-[11px] font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Oseltamivir (Tamiflu) with Influenza Neuraminidase">
+                                class="px-2 py-1 bg-[#060913] hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/40 text-slate-200 rounded-lg text-left text-[11px] font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Oseltamivir (Tamiflu) with Influenza Neuraminidase">
                                 <span><b>2HU4</b> · Tamiflu / N1</span>
                                 <i data-lucide="arrow-up-right" class="w-3 h-3 text-blue-500"></i>
                             </button>
                             <button type="button" onclick="loadBenchmarkPreset('2ITY')"
-                                class="px-2 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 text-blue-800 rounded-lg text-left text-[11px] font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Gefitinib (Iressa) with EGFR Kinase">
+                                class="px-2 py-1 bg-[#060913] hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/40 text-slate-200 rounded-lg text-left text-[11px] font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Gefitinib (Iressa) with EGFR Kinase">
                                 <span><b>2ITY</b> · Gefitinib / EGFR</span>
                                 <i data-lucide="arrow-up-right" class="w-3 h-3 text-blue-500"></i>
                             </button>
                             <button type="button" onclick="loadBenchmarkPreset('1CX2')"
-                                class="px-2 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 text-blue-800 rounded-lg text-left text-[11px] font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Aspirin / SC-558 with COX-2">
+                                class="px-2 py-1 bg-[#060913] hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/40 text-slate-200 rounded-lg text-left text-[11px] font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Aspirin / SC-558 with COX-2">
                                 <span><b>1CX2</b> · Aspirin / COX-2</span>
                                 <i data-lucide="arrow-up-right" class="w-3 h-3 text-blue-500"></i>
                             </button>
@@ -276,13 +283,13 @@
 
                     <!-- RCSB PDB ID 1-Click Fetch -->
                     <div class="mb-3">
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5">
                             Fetch from RCSB Protein Data Bank
                         </label>
                         <div class="flex gap-2">
                             <div class="relative flex-1">
                                 <input type="text" id="pdb-id-input" placeholder="Enter 4-character RCSB PDB ID" maxlength="4"
-                                    class="w-full uppercase font-mono px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition" />
+                                    class="w-full uppercase font-mono px-3.5 py-2 text-sm bg-[#04060C] border border-slate-800 rounded-xl text-cyan-300 focus:bg-slate-950 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition" />
                                 <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-mono">PDB</span>
                             </div>
                             <button type="button" id="btn-fetch-pdb" onclick="fetchRCSBStructure()"
@@ -334,11 +341,11 @@
                 </div>
 
                 <!-- CARD 2: SMALL MOLECULE LIGAND -->
-                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+                <div class="dock-card rounded-2xl p-5 shadow-lg">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-2">
                             <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-black">2</span>
-                            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Ligand Small Molecule</h2>
+                            <h2 class="text-sm font-bold text-slate-100 uppercase tracking-wider">Ligand Small Molecule</h2>
                         </div>
                         <span id="ligand-status-badge" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-slate-100 text-slate-500">
                             No Ligand
@@ -352,7 +359,7 @@
                             <span class="text-[11px] text-slate-400 font-mono">RDKit 3D ETKDGv3</span>
                         </div>
                         <textarea id="ligand-input-text" rows="2" placeholder="Enter Canonical SMILES or structure coordinates..."
-                            class="w-full font-mono text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition custom-scrollbar"
+                            class="w-full font-mono text-xs p-2.5 bg-[#04060C] border border-slate-800 rounded-xl text-cyan-300 focus:bg-slate-950 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition custom-scrollbar"
                             oninput="updateLigandStatus()"></textarea>
                     </div>
 
@@ -370,11 +377,11 @@
                 </div>
 
                 <!-- CARD 3: SEARCH SPACE GRID BOX -->
-                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+                <div class="dock-card rounded-2xl p-5 shadow-lg">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-2">
                             <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-black">3</span>
-                            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Search Space (Grid Box)</h2>
+                            <h2 class="text-sm font-bold text-slate-100 uppercase tracking-wider">Search Space (Grid Box)</h2>
                         </div>
                         <span class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-blue-50 text-blue-700 border border-blue-200">
                             Interactive 3D Bounding Box
@@ -442,11 +449,11 @@
                 </div>
 
                 <!-- CARD 4: ENGINE CONFIGURATION & LAUNCH BUTTON -->
-                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+                <div class="dock-card rounded-2xl p-5 shadow-lg">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-2">
                             <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-black">4</span>
-                            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Search Thoroughness</h2>
+                            <h2 class="text-sm font-bold text-slate-100 uppercase tracking-wider">Search Thoroughness</h2>
                         </div>
                     </div>
 
@@ -505,7 +512,7 @@
                     </button>
 
                     <!-- Execution Status / Progress -->
-                    <div id="docking-progress-banner" class="hidden mt-3 p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs">
+                    <div id="docking-progress-banner" class="hidden mt-3 p-3 rounded-xl bg-blue-50 border border-blue-200 text-cyan-300 text-xs">
                         <div class="flex items-center gap-2 mb-1.5">
                             <div class="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                             <span class="font-bold" id="docking-progress-text">Preparing 3D structures &amp; torsion trees...</span>

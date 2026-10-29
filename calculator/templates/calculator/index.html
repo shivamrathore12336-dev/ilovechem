@@ -58,14 +58,16 @@
         <style>
         * { box-sizing: border-box; }
         body { 
-            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; 
-            background-color: #FAFBFC; 
-            color: #0F172A;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background-color: #060913; 
+            color: #F1F5F9;
             -webkit-font-smoothing: antialiased;
             background-image: 
-                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.035) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(79, 70, 229, 0.03) 0px, transparent 50%),
-                radial-gradient(at 50% 100%, rgba(14, 165, 233, 0.025) 0px, transparent 50%);
+                radial-gradient(at 10% 12%, rgba(14, 165, 233, 0.08) 0px, transparent 45%),
+                radial-gradient(at 90% 15%, rgba(99, 102, 241, 0.08) 0px, transparent 45%),
+                radial-gradient(at 50% 85%, rgba(6, 182, 212, 0.05) 0px, transparent 50%),
+                radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 28px 28px;
             background-attachment: fixed;
         }
         .font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
@@ -73,15 +75,24 @@
             width: 100%;
             height: 480px;
             position: relative;
-            background: radial-gradient(circle at center, #0F172A 0%, #020617 100%);
+            background: radial-gradient(circle at center, #0B101E 0%, #030509 100%);
             border-radius: 1rem;
+            border: 1px solid rgba(51, 65, 85, 0.7);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+        }
+        .calc-card {
+            background: rgba(11, 16, 30, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(51, 65, 85, 0.7);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
         }
     </style>
 </head>
 <body class="min-h-full flex flex-col justify-between bg-slate-50 text-slate-800 font-sans">
 
     <!-- 1. UNIFIED APP HEADER -->
-    <header class="bg-white/95 backdrop-blur-md border-b border-slate-200/90 sticky top-0 z-40 shadow-xs">
+    <header class="bg-[#070B16]/90 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-40 shadow-xl">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             
             <!-- Left: Logo & Nav Links -->
@@ -96,31 +107,31 @@
                         </svg>
                     </div>
                     <div class="flex items-baseline space-x-1.5">
-                        <span class="text-2xl font-black tracking-tight text-slate-900">iLove<span class="text-blue-600">Chem</span></span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                        <span class="text-2xl font-black tracking-tight text-white">iLove<span class="text-cyan-400">Chem</span></span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#38bdf8]"></span>
                     </div>
                 </a>
 
                 <!-- Standardized Global Navigation -->
                 <nav class="hidden md:flex items-center space-x-1 text-sm font-semibold text-slate-700">
-                    <a href="/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
+                    <a href="/" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-cyan-400 text-slate-300 transition flex items-center gap-1.5 cursor-pointer">
                         <i data-lucide="flask-conical" class="w-4 h-4 text-slate-500"></i>
                         <span>Converter Studio</span>
                     </a>
-                    <a href="/properties/" class="px-3 py-2 rounded-lg bg-blue-50 text-blue-600 font-bold transition flex items-center gap-1.5 shadow-2xs">
+                    <a href="/properties/" class="px-3 py-2 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-bold transition flex items-center gap-1.5 shadow-[0_0_12px_rgba(6,182,212,0.25)]">
                         <i data-lucide="sliders" class="w-4 h-4 text-blue-600"></i>
                         <span>Properties</span>
                     </a>
-                    <a href="/docking/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
+                    <a href="/docking/" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-cyan-400 text-slate-300 transition flex items-center gap-1.5 cursor-pointer">
                         <i data-lucide="crosshair" class="w-4 h-4 text-slate-500"></i>
                         <span>Molecular Docking</span>
                         <span class="px-1.5 py-0.5 text-[9px] uppercase font-mono tracking-wider font-extrabold bg-blue-600 text-white rounded-md">New</span>
                     </a>
-                    <a href="/downloads/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
+                    <a href="/downloads/" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-cyan-400 text-slate-300 transition flex items-center gap-1.5 cursor-pointer">
                         <i data-lucide="download" class="w-4 h-4 text-slate-500"></i>
                         <span>Downloads</span>
                     </a>
-                    <a href="/about/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
+                    <a href="/about/" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-cyan-400 text-slate-300 transition flex items-center gap-1.5 cursor-pointer">
                         <i data-lucide="info" class="w-4 h-4 text-slate-500"></i>
                         <span>About</span>
                     </a>
@@ -153,10 +164,10 @@
         {% endif %}
 
         <!-- Input Section -->
-        <section class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 shadow-xs">
+        <section class="calc-card rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4">
             <div class="mb-4">
-                <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Molecular Properties & Drug-Likeness Calculator</h1>
-                <p class="text-xs sm:text-sm text-slate-500 mt-1">Compute physicochemical descriptors, Lipinski Rule of 5, Veber bioavailability filters, and 3D conformers in volatile RAM.</p>
+                <h1 class="text-xl sm:text-2xl font-black text-white tracking-tight">Molecular Properties & Drug-Likeness Calculator</h1>
+                <p class="text-xs sm:text-sm text-slate-400 mt-1">Compute physicochemical descriptors, Lipinski Rule of 5, Veber bioavailability filters, and 3D conformers in volatile RAM.</p>
             </div>
             
             <form method="POST" action="/properties/" class="space-y-4">
@@ -169,10 +180,10 @@
                         <input type="text" name="smiles" id="smiles-input"
                             value="{{ input_smiles|default:'CC(=O)OC1=CC=CC=C1C(=O)O' }}"
                             placeholder="Enter SMILES notation (e.g. Aspirin, Caffeine, Penicillin)..."
-                            class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 font-mono text-sm transition shadow-2xs">
+                            class="w-full pl-11 pr-4 py-3 bg-[#04060C] border border-slate-800 rounded-xl text-cyan-300 placeholder-slate-500 focus:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 font-mono text-sm transition shadow-inner">
                     </div>
                     <button type="submit"
-                        class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-xs flex items-center justify-center space-x-2 transition cursor-pointer">
+                        class="px-6 py-3 bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(6,182,212,0.35)] flex items-center justify-center space-x-2 transition cursor-pointer">
                         <i data-lucide="cpu" class="w-4 h-4"></i>
                         <span>Calculate Properties</span>
                     </button>
@@ -184,17 +195,17 @@
                         <i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-600"></i> Fast Presets:
                     </span>
                     <button type="button" onclick="setSmiles('CC(=O)OC1=CC=CC=C1C(=O)O')" 
-                        class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Aspirin</button>
+                        class="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-slate-800 hover:text-cyan-300 text-slate-300 border border-slate-800 hover:border-cyan-500/40 transition font-medium cursor-pointer">Aspirin</button>
                     <button type="button" onclick="setSmiles('CN1C=NC2=C1C(=O)N(C(=O)N2C)C')" 
-                        class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Caffeine</button>
+                        class="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-slate-800 hover:text-cyan-300 text-slate-300 border border-slate-800 hover:border-cyan-500/40 transition font-medium cursor-pointer">Caffeine</button>
                     <button type="button" onclick="setSmiles('CC(C)CC1=CC=C(C=C1)C(C)C(=O)O')" 
-                        class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Ibuprofen</button>
+                        class="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-slate-800 hover:text-cyan-300 text-slate-300 border border-slate-800 hover:border-cyan-500/40 transition font-medium cursor-pointer">Ibuprofen</button>
                     <button type="button" onclick="setSmiles('CC12CCC3C(C1CCC2O)CCC4=CC(=O)CCC34C')" 
-                        class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Testosterone</button>
+                        class="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-slate-800 hover:text-cyan-300 text-slate-300 border border-slate-800 hover:border-cyan-500/40 transition font-medium cursor-pointer">Testosterone</button>
                     <button type="button" onclick="setSmiles('CN(C)CCOC(C1=CC=CC=C1)C2=CC=CC=C2')" 
-                        class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Diphenhydramine</button>
+                        class="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-slate-800 hover:text-cyan-300 text-slate-300 border border-slate-800 hover:border-cyan-500/40 transition font-medium cursor-pointer">Diphenhydramine</button>
                     <button type="button" onclick="setSmiles('C1=CC=C(C=C1)C2=CC(=NO2)C3=CC=CC=C3')" 
-                        class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Isoxazole</button>
+                        class="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-slate-800 hover:text-cyan-300 text-slate-300 border border-slate-800 hover:border-cyan-500/40 transition font-medium cursor-pointer">Isoxazole</button>
                 </div>
             </form>
         </section>
@@ -206,16 +217,16 @@
 
             <!-- Left Panel: 3D Molecular Graphics & 2D Topology (7 Cols) -->
             <div class="lg:col-span-7 space-y-5">
-                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
-                    <div class="px-5 py-3 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 bg-slate-50/70">
+                <div class="calc-card rounded-2xl overflow-hidden shadow-xl">
+                    <div class="px-5 py-3 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 bg-slate-950/80">
                         <div class="flex items-center space-x-2">
                             <i data-lucide="box" class="w-4 h-4 text-blue-600"></i>
                             <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wider">3D Conformer (MMFF Optimized)</h2>
                         </div>
                         <div class="flex items-center space-x-1.5">
-                            <button type="button" onclick="toggleStyle('stick')" class="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200 transition cursor-pointer">Sticks</button>
-                            <button type="button" onclick="toggleStyle('sphere')" class="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200 transition cursor-pointer">Spacefill</button>
-                            <button type="button" onclick="toggleStyle('ball_and_stick')" class="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200 transition cursor-pointer">Ball & Stick</button>
+                            <button type="button" onclick="toggleStyle('stick')" class="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 text-xs font-medium border border-slate-800 transition cursor-pointer">Sticks</button>
+                            <button type="button" onclick="toggleStyle('sphere')" class="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 text-xs font-medium border border-slate-800 transition cursor-pointer">Spacefill</button>
+                            <button type="button" onclick="toggleStyle('ball_and_stick')" class="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 text-xs font-medium border border-slate-800 transition cursor-pointer">Ball & Stick</button>
                             <button type="button" onclick="reset3DView()" class="px-2 py-1 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-semibold border border-blue-200 transition cursor-pointer flex items-center gap-1">
                                 <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
                                 <span>Reset</span>
@@ -225,17 +236,17 @@
                     
                     <div id="3d-container" class="mol-canvas"></div>
 
-                    <div class="px-5 py-2.5 border-t border-slate-200 bg-slate-50 text-xs text-slate-500 flex items-center justify-between">
+                    <div class="px-5 py-2.5 border-t border-slate-800 bg-slate-50 text-xs text-slate-500 flex items-center justify-between">
                         <span>Drag to rotate • Scroll to zoom • Right-click to pan</span>
                         <span class="text-blue-600 font-mono font-semibold">ETKDGv3 MMFF Conformer</span>
                     </div>
                 </div>
 
                 <!-- 2D Structure & Topology -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
+                <div class="calc-card rounded-2xl p-5 shadow-xl grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
                     <div>
                         <h3 class="text-xs uppercase tracking-wider text-slate-500 font-bold mb-2">2D Skeletal Structure</h3>
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center justify-center min-h-[180px]">
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-800 flex items-center justify-center min-h-[180px]">
                             {% if img_2d %}
                             <img src="{{ img_2d }}" alt="2D Chemical Representation" class="rounded-lg max-h-44 object-contain">
                             {% else %}
@@ -296,7 +307,7 @@
                         </div>
                     </div>
                     <!-- Veber Bioavailability Rule -->
-                    <div class="mt-3.5 pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs">
+                    <div class="mt-3.5 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
                         <span class="text-slate-600 font-medium">Veber Oral Bioavailability:</span>
                         {% if properties.veber_pass %}
                         <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold">Passed (RotB &le; 10, TPSA &le; 140)</span>
@@ -308,22 +319,22 @@
 
                 <!-- Properties Grid Cards -->
                 <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
+                    <div class="bg-white border border-slate-800 rounded-xl p-3.5 shadow-2xs">
                         <div class="text-xs font-semibold text-slate-500">Molecular Weight</div>
                         <div class="text-lg font-bold font-mono text-slate-900 mt-1">{{ properties.molecular_weight }} <span class="text-xs text-slate-400 font-normal">g/mol</span></div>
                         <div class="text-[11px] text-slate-400 mt-0.5 font-mono">Exact: {{ properties.exact_mass }}</div>
                     </div>
-                    <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
+                    <div class="bg-white border border-slate-800 rounded-xl p-3.5 shadow-2xs">
                         <div class="text-xs font-semibold text-slate-500">LogP (Lipophilicity)</div>
                         <div class="text-lg font-bold font-mono text-indigo-600 mt-1">{{ properties.logp }}</div>
                         <div class="text-[11px] text-slate-400 mt-0.5">Target: &lt; 5.0</div>
                     </div>
-                    <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
+                    <div class="bg-white border border-slate-800 rounded-xl p-3.5 shadow-2xs">
                         <div class="text-xs font-semibold text-slate-500">TPSA</div>
                         <div class="text-lg font-bold font-mono text-blue-600 mt-1">{{ properties.tpsa }} <span class="text-xs text-slate-400 font-normal">Å²</span></div>
                         <div class="text-[11px] text-slate-400 mt-0.5">Polar surface area</div>
                     </div>
-                    <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
+                    <div class="bg-white border border-slate-800 rounded-xl p-3.5 shadow-2xs">
                         <div class="text-xs font-semibold text-slate-500">Rotatable Bonds</div>
                         <div class="text-lg font-bold font-mono text-purple-600 mt-1">{{ properties.rotatable_bonds }}</div>
                         <div class="text-[11px] text-slate-400 mt-0.5">Flexibility metric</div>
@@ -331,7 +342,7 @@
                 </div>
 
                 <!-- Detailed Molecular Descriptors -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
+                <div class="bg-white border border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
                     <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center space-x-2">
                         <i data-lucide="sliders" class="w-4 h-4 text-blue-600"></i>
                         <span>Hydrogen Bonding & Atoms</span>
@@ -361,7 +372,7 @@
                         </a>
                         <div class="grid grid-cols-2 gap-2">
                             <button type="button" onclick="downloadJSON()"
-                                class="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl border border-slate-200 text-xs flex items-center justify-center space-x-1.5 transition cursor-pointer" title="Export raw JSON data">
+                                class="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl border border-slate-800 text-xs flex items-center justify-center space-x-1.5 transition cursor-pointer" title="Export raw JSON data">
                                 <i data-lucide="download" class="w-3.5 h-3.5"></i>
                                 <span>Export JSON</span>
                             </button>
@@ -380,14 +391,14 @@
 
         <!-- Recent Search History / Quick Access -->
         {% if recent_queries %}
-        <section class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
+        <section class="bg-white border border-slate-800 rounded-2xl p-5 shadow-xs">
             <h3 class="text-xs uppercase tracking-wider text-slate-500 font-bold mb-3 flex items-center gap-2">
                 <i data-lucide="history" class="w-4 h-4 text-blue-600"></i> Recent Calculations
             </h3>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5">
                 {% for q in recent_queries %}
                 <button type="button" onclick="setSmiles('{{ q.smiles|escapejs }}')"
-                    class="p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50/70 border border-slate-200 text-left transition group cursor-pointer">
+                    class="p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50/70 border border-slate-800 text-left transition group cursor-pointer">
                     <div class="text-xs font-mono font-bold text-slate-900 group-hover:text-blue-600 truncate">{{ q.formula|default:'Molecule' }}</div>
                     <div class="text-[11px] text-slate-500 truncate mt-0.5">MW: {{ q.molecular_weight|default:'--' }}</div>
                 </button>
