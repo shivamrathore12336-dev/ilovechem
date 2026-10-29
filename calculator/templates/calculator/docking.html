@@ -331,6 +331,27 @@
                             Apply Center
                         </button>
                     </div>
+
+                    <!-- Receptor Telemetry Metadata Strip (When Loaded) -->
+                    <div id="receptor-meta-strip" class="hidden mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200/90 text-xs shadow-2xs">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200/70 text-[11px] font-bold text-slate-800">
+                            <span class="flex items-center gap-1.5 text-blue-600">
+                                <i data-lucide="dna" class="w-3.5 h-3.5"></i>
+                                <span id="receptor-title-label">Target Loaded</span>
+                            </span>
+                            <span id="receptor-res-label" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-mono text-[10px] font-bold border border-emerald-200">Crystal Structure</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-[11px]">
+                            <div>
+                                <span class="text-slate-400 block text-[10px] uppercase font-mono">Method</span>
+                                <span id="receptor-method-label" class="font-semibold text-slate-700">X-Ray Diffraction</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block text-[10px] uppercase font-mono">Chains & Atoms</span>
+                                <span id="receptor-chains-label" class="font-semibold text-slate-700 font-mono">Polymer Chain</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- CARD 2: SMALL MOLECULE LIGAND -->
@@ -1226,6 +1247,23 @@
                             if (pocketCoords) pocketCoords.innerText = `Coordinates (${data.pocket.centroid_x.toFixed(2)}, ${data.pocket.centroid_y.toFixed(2)}, ${data.pocket.centroid_z.toFixed(2)}) Å`;
                         }
                     }
+
+                    // Update Receptor Telemetry Metadata Strip
+                    const metaStrip = document.getElementById("receptor-meta-strip");
+                    if (metaStrip) {
+                        metaStrip.classList.remove("hidden");
+                        const titleEl = document.getElementById("receptor-title-label");
+                        const resEl = document.getElementById("receptor-res-label");
+                        const methodEl = document.getElementById("receptor-method-label");
+                        const chainsEl = document.getElementById("receptor-chains-label");
+                        if (titleEl) titleEl.innerText = `${data.pdb_id} ${data.title ? '· ' + data.title.substring(0, 28) + '...' : ''}`;
+                        if (resEl) resEl.innerText = data.resolution ? `${data.resolution} Å` : "Crystal Structure";
+                        if (methodEl) methodEl.innerText = data.experimental_method || "X-ray Diffraction";
+                        if (chainsEl) {
+                            const atomsCount = State.receptorPdb ? (State.receptorPdb.match(/\nATOM  /g) || []).length : 0;
+                            chainsEl.innerText = atomsCount > 0 ? `${atomsCount.toLocaleString()} atoms` : "Polymer chain";
+                        }
+                    }
                 }
 
                 // Render in 3D
@@ -1856,6 +1894,21 @@
                 const statusBadge = document.getElementById("receptor-status-badge");
                 statusBadge.className = "px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300";
                 statusBadge.innerText = "Custom Raw PDB";
+                const metaStrip = document.getElementById("receptor-meta-strip");
+                if (metaStrip) {
+                    metaStrip.classList.remove("hidden");
+                    const titleEl = document.getElementById("receptor-title-label");
+                    const resEl = document.getElementById("receptor-res-label");
+                    const methodEl = document.getElementById("receptor-method-label");
+                    const chainsEl = document.getElementById("receptor-chains-label");
+                    if (titleEl) titleEl.innerText = "Custom Raw PDB Text";
+                    if (resEl) resEl.innerText = "Pasted Text";
+                    if (methodEl) methodEl.innerText = "Direct Input";
+                    if (chainsEl) {
+                        const count = (val.match(/\nATOM  /g) || []).length;
+                        chainsEl.innerText = count > 0 ? `${count.toLocaleString()} atoms` : "PDB coordinates";
+                    }
+                }
                 renderReceptorIn3D();
                 focusPocketIn3D();
             }
@@ -1871,6 +1924,21 @@
                 const statusBadge = document.getElementById("receptor-status-badge");
                 statusBadge.className = "px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300";
                 statusBadge.innerText = file.name;
+                const metaStrip = document.getElementById("receptor-meta-strip");
+                if (metaStrip) {
+                    metaStrip.classList.remove("hidden");
+                    const titleEl = document.getElementById("receptor-title-label");
+                    const resEl = document.getElementById("receptor-res-label");
+                    const methodEl = document.getElementById("receptor-method-label");
+                    const chainsEl = document.getElementById("receptor-chains-label");
+                    if (titleEl) titleEl.innerText = file.name;
+                    if (resEl) resEl.innerText = `${(file.size / 1024).toFixed(1)} KB`;
+                    if (methodEl) methodEl.innerText = "Local Upload";
+                    if (chainsEl) {
+                        const count = (State.receptorPdb.match(/\nATOM  /g) || []).length;
+                        chainsEl.innerText = count > 0 ? `${count.toLocaleString()} atoms` : "Macromolecule";
+                    }
+                }
                 renderReceptorIn3D();
                 focusPocketIn3D();
             };

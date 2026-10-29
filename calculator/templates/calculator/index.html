@@ -306,27 +306,39 @@
                     </div>
                 </div>
 
-                <!-- Properties Grid Cards -->
+                <!-- Properties Grid Cards with Benchmark Metrics -->
                 <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-                        <div class="text-xs font-semibold text-slate-500">Molecular Weight</div>
-                        <div class="text-lg font-bold font-mono text-slate-900 mt-1">{{ properties.molecular_weight }} <span class="text-xs text-slate-400 font-normal">g/mol</span></div>
-                        <div class="text-[11px] text-slate-400 mt-0.5 font-mono">Exact: {{ properties.exact_mass }}</div>
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs hover:border-blue-300 transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-500">Molecular Weight</span>
+                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-bold">&lt; 500 Da</span>
+                        </div>
+                        <div class="text-xl font-bold font-mono text-slate-900 mt-1.5">{{ properties.molecular_weight }} <span class="text-xs text-slate-400 font-normal">g/mol</span></div>
+                        <div class="text-[11px] text-slate-400 mt-1 font-mono">Exact: {{ properties.exact_mass }}</div>
                     </div>
-                    <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-                        <div class="text-xs font-semibold text-slate-500">LogP (Lipophilicity)</div>
-                        <div class="text-lg font-bold font-mono text-indigo-600 mt-1">{{ properties.logp }}</div>
-                        <div class="text-[11px] text-slate-400 mt-0.5">Target: &lt; 5.0</div>
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs hover:border-blue-300 transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-500">LogP (Lipophilicity)</span>
+                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 font-bold">&lt; 5.0</span>
+                        </div>
+                        <div class="text-xl font-bold font-mono text-indigo-600 mt-1.5">{{ properties.logp }}</div>
+                        <div class="text-[11px] text-slate-400 mt-1">Octanol/Water Partition</div>
                     </div>
-                    <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-                        <div class="text-xs font-semibold text-slate-500">TPSA</div>
-                        <div class="text-lg font-bold font-mono text-blue-600 mt-1">{{ properties.tpsa }} <span class="text-xs text-slate-400 font-normal">Å²</span></div>
-                        <div class="text-[11px] text-slate-400 mt-0.5">Polar surface area</div>
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs hover:border-blue-300 transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-500">Polar Area (TPSA)</span>
+                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-bold">&lt; 140 Å²</span>
+                        </div>
+                        <div class="text-xl font-bold font-mono text-blue-600 mt-1.5">{{ properties.tpsa }} <span class="text-xs text-slate-400 font-normal">Å²</span></div>
+                        <div class="text-[11px] text-slate-400 mt-1">Oral Permeability Target</div>
                     </div>
-                    <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-                        <div class="text-xs font-semibold text-slate-500">Rotatable Bonds</div>
-                        <div class="text-lg font-bold font-mono text-purple-600 mt-1">{{ properties.rotatable_bonds }}</div>
-                        <div class="text-[11px] text-slate-400 mt-0.5">Flexibility metric</div>
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs hover:border-blue-300 transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-500">Rotatable Bonds</span>
+                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 font-bold">&le; 10</span>
+                        </div>
+                        <div class="text-xl font-bold font-mono text-purple-600 mt-1.5">{{ properties.rotatable_bonds }}</div>
+                        <div class="text-[11px] text-slate-400 mt-1">Conformational Flexibility</div>
                     </div>
                 </div>
 
