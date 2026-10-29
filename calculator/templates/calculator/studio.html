@@ -96,52 +96,73 @@
     <style>
         * { box-sizing: border-box; }
         body { 
-            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; 
-            background-color: #FAFAFC; 
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background-color: #FAFBFC; 
             color: #0F172A;
             -webkit-font-smoothing: antialiased;
-            background-image: radial-gradient(rgba(148, 163, 184, 0.18) 1px, transparent 1px);
-            background-size: 28px 28px;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.035) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(79, 70, 229, 0.03) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(14, 165, 233, 0.025) 0px, transparent 50%);
+            background-attachment: fixed;
         }
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 
         .btn-brand-primary {
             background-color: #2563EB;
             color: #FFFFFF;
-            transition: all 0.15s ease;
-            box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.25);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 2px 8px -2px rgba(37, 99, 235, 0.4), 0 1px 2px -1px rgba(37, 99, 235, 0.2);
         }
         .btn-brand-primary:hover {
             background-color: #1D4ED8;
-            box-shadow: 0 6px 20px 0 rgba(37, 99, 235, 0.35);
+            box-shadow: 0 6px 16px -2px rgba(37, 99, 235, 0.45);
+            transform: translateY(-1px);
+        }
+        .btn-brand-primary:active {
+            transform: translateY(0);
         }
 
         .btn-brand-success {
             background-color: #059669;
             color: #FFFFFF;
-            transition: all 0.15s ease;
-            box-shadow: 0 4px 14px 0 rgba(5, 150, 105, 0.25);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 2px 8px -2px rgba(5, 150, 105, 0.35);
         }
         .btn-brand-success:hover {
             background-color: #047857;
-            box-shadow: 0 6px 20px 0 rgba(5, 150, 105, 0.35);
+            box-shadow: 0 6px 16px -2px rgba(5, 150, 105, 0.45);
+            transform: translateY(-1px);
         }
 
         .panel-surface {
             background: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 4px 14px 0 rgba(15, 23, 42, 0.03);
+        }
+
+        .tool-card {
+            background: #FFFFFF;
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.02), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .tool-card:hover {
+            border-color: rgba(59, 130, 246, 0.7);
+            box-shadow: 0 10px 25px -4px rgba(37, 99, 235, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+            transform: translateY(-2px);
         }
 
         .drop-active {
             border-color: #2563EB !important;
-            background-color: #F0F7FF !important;
+            background-color: rgba(239, 246, 255, 0.6) !important;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12) !important;
         }
 
         pre::-webkit-scrollbar { width: 6px; height: 6px; }
-        pre::-webkit-scrollbar-track { background: #0B0F19; }
-        pre::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 4px; }
-        pre::-webkit-scrollbar-thumb:hover { background: #334155; }
+        pre::-webkit-scrollbar-track { background: #0F172A; }
+        pre::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        pre::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
 <body class="min-h-full flex flex-col justify-between">
@@ -354,38 +375,72 @@
         </div>
     </div>
 
-    <!-- 2. HERO SECTION (iLovePDF Clean Style) -->
-    <section class="pt-10 pb-6 sm:pt-14 sm:pb-8 text-center px-4 max-w-4xl mx-auto space-y-3">
+    <!-- 2. HERO SECTION (Benchling / BioRender Clean Scientific Style) -->
+    <section class="pt-10 pb-6 sm:pt-14 sm:pb-8 text-center px-4 max-w-4xl mx-auto space-y-4">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-slate-200/90 shadow-2xs text-xs font-semibold text-slate-700">
+            <span class="flex h-2 w-2 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+            </span>
+            <span>Universal CADD &amp; DFT File Studio</span>
+            <span class="text-slate-300">•</span>
+            <span class="text-blue-600 font-mono text-[11px] font-bold">100% In-Memory RAM</span>
+        </div>
+
         <h1 class="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-            Every tool you need for <span class="text-blue-600">Computational Chemistry</span> in one place
+            Every format you need for <span class="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 bg-clip-text text-transparent">Computational Chemistry</span> in one place
         </h1>
+        
         <p class="text-slate-600 text-sm sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            100% free, secure, and in-memory tools to convert, sanitize, and prepare molecules for ORCA, Gaussian, AutoDock, PyMOL, and Crystallography in seconds.
+            High-fidelity, in-memory file transformation, quantum spin multiplicity verification, and structure preparation for ORCA, Gaussian, AutoDock, PyMOL, and Crystallography.
         </p>
-        <div class="pt-2 flex justify-center">
-            <a href="/docking/" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-500/25 hover:shadow-lg hover:scale-105 transition-all">
+
+        <div class="pt-2 flex flex-wrap items-center justify-center gap-3">
+            <a href="/docking/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-500/25 hover:shadow-lg hover:scale-[1.02] transition-all">
                 <i data-lucide="crosshair" class="w-4 h-4"></i>
-                <span>Try Inbuilt Molecular Docking Studio</span>
-                <span class="bg-white/20 text-white px-2 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider font-extrabold">Live 3D WebGL</span>
+                <span>Open Inbuilt ChemDock Studio</span>
+                <span class="bg-white/20 text-white px-2 py-0.5 rounded-md text-[10px] font-mono uppercase tracking-wider font-extrabold">Live 3D WebGL</span>
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </a>
+            <button type="button" onclick="selectPresetShortcut('imatinib')" class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm border border-slate-200/90 shadow-2xs hover:border-blue-400 transition-all cursor-pointer">
+                <i data-lucide="flask-conical" class="w-4 h-4 text-blue-600"></i>
+                <span>Load Sample: Imatinib</span>
+            </button>
+        </div>
+
+        <!-- Capability Trust Tags -->
+        <div class="pt-3 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-500 font-medium">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-slate-700 border border-slate-200/70 shadow-2xs"><i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500"></i> 15+ Formats In-Memory</span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-slate-700 border border-slate-200/70 shadow-2xs"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i> Zero Disk Storage</span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-slate-700 border border-slate-200/70 shadow-2xs"><i data-lucide="orbit" class="w-3.5 h-3.5 text-blue-600"></i> Quantum Spin Parity</span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-slate-700 border border-slate-200/70 shadow-2xs"><i data-lucide="sliders" class="w-3.5 h-3.5 text-indigo-600"></i> Lipinski Ro5 Radar</span>
         </div>
     </section>
 
     <!-- 3. THE SIGNATURE iLoveChem TOOLS GRID (12 Clean Minimalist Cards - Exact iLovePDF Paradigm) -->
     <section id="tools-grid" class="max-w-6xl mx-auto px-4 sm:px-6 mb-12">
+        <div class="flex items-center justify-between mb-4 px-1">
+            <div>
+                <h2 class="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">Integrated Chemistry Engines</h2>
+                <div class="text-sm font-bold text-slate-800">Select an Instrument or Drop a File Anywhere</div>
+            </div>
+            <span class="text-xs font-mono text-slate-500 bg-white px-2.5 py-1 rounded-lg border border-slate-200/80 shadow-2xs">12 Active Solvers</span>
+        </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             
             <!-- Card 1: ORCA Generator -->
             <div onclick="selectToolFromGrid('orca', 'ORCA Input Generator', 'Build DFT .inp with automatic spin parity and %pal cores')"
-                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
-                    <div class="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
-                        <i data-lucide="atom" class="w-6 h-6"></i>
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50/80 text-blue-600 border border-blue-100/60 flex items-center justify-center font-bold group-hover:bg-blue-600 group-hover:text-white transition-all shadow-2xs">
+                            <i data-lucide="atom" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Quantum DFT</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">ORCA Generator</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Build DFT .inp with automatic spin parity, def2-SVP, and %pal cores.</p>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">ORCA Generator</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Build DFT .inp with automatic spin parity, def2-SVP, and %pal cores.</p>
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
@@ -396,14 +451,17 @@
 
             <!-- Card 2: Gaussian Builder -->
             <div onclick="selectToolFromGrid('gjf', 'Gaussian Input Builder', 'Generate .com / .gjf keywords, charges, and coordinates')"
-                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
-                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
-                        <i data-lucide="cpu" class="w-6 h-6"></i>
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-50/80 text-indigo-600 border border-indigo-100/60 flex items-center justify-center font-bold group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-2xs">
+                            <i data-lucide="cpu" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Quantum DFT</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">Gaussian Builder</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Generate .com / .gjf route cards, memory directives, and coordinates.</p>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">Gaussian Builder</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Generate .com / .gjf route cards, memory directives, and coordinates.</p>
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
@@ -414,32 +472,38 @@
 
             <!-- Card 3: AutoDock PDBQT Prep -->
             <div onclick="selectToolFromGrid('pdbqt', 'AutoDock PDBQT Prep', 'Prepare ligands & receptors for Vina with Gasteiger charges')"
-                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
-                        <i data-lucide="dna" class="w-6 h-6"></i>
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50/80 text-emerald-600 border border-emerald-100/60 flex items-center justify-center font-bold group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-2xs">
+                            <i data-lucide="dna" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Docking CADD</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">AutoDock PDBQT</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Prepare ligands & proteins for AutoDock Vina with explicit hydrogens.</p>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">AutoDock PDBQT</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Assign polar hydrogens, Gasteiger charges, and rotatable torsion bonds.</p>
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
-                    <span>Docking Prep</span>
+                    <span>Prep PDBQT</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                 </div>
             </div>
 
             <!-- Card 4: ChemDraw CDXML Unpacker -->
-            <div onclick="selectToolFromGrid('cdxml', 'ChemDraw CDXML Unpacker', 'Extract schemes, arrows, and multi-molecules into 3D files')"
-                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+            <div onclick="selectToolFromGrid('cdxml', 'ChemDraw CDXML Unpacker', 'Extract schemes & SuperAtoms into 3D files')"
+                class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
-                    <div class="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
-                        <i data-lucide="file-code" class="w-6 h-6"></i>
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-cyan-50/80 text-cyan-600 border border-cyan-100/60 flex items-center justify-center font-bold group-hover:bg-cyan-600 group-hover:text-white transition-all shadow-2xs">
+                            <i data-lucide="file-code" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">ChemDraw 2D/3D</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">ChemDraw Unpacker</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Unpack multi-molecule reaction schemes & text annotations into 3D.</p>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">ChemDraw Unpacker</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Extract multi-molecule schemes, chemical drawings, and SuperAtoms.</p>
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
@@ -449,15 +513,18 @@
             </div>
 
             <!-- Card 5: SDF Batch Splitter -->
-            <div onclick="selectToolFromGrid('sdf', 'SDF Batch Splitter', 'Decompose multi-molecule compound libraries into single files')"
-                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+            <div onclick="selectToolFromGrid('sdf', 'SDF Batch Splitter', 'Decompose multi-compound screening libraries into clean ZIP bundles')"
+                class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
-                    <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
-                        <i data-lucide="layers" class="w-6 h-6"></i>
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-purple-50/80 text-purple-600 border border-purple-100/60 flex items-center justify-center font-bold group-hover:bg-purple-600 group-hover:text-white transition-all shadow-2xs">
+                            <i data-lucide="library" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Screening</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">SDF Batch Splitter</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Decompose multi-compound screening libraries into clean ZIP bundles.</p>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">SDF Batch Splitter</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Decompose multi-compound screening libraries into individual structures.</p>
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
@@ -468,14 +535,17 @@
 
             <!-- Card 6: CIF Crystallography -->
             <div onclick="selectToolFromGrid('xyz', 'CIF Crystallography', 'Convert unit cells and asymmetric crystal files to Cartesian XYZ')"
-                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
-                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
-                        <i data-lucide="gem" class="w-6 h-6"></i>
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-amber-50/80 text-amber-600 border border-amber-100/60 flex items-center justify-center font-bold group-hover:bg-amber-600 group-hover:text-white transition-all shadow-2xs">
+                            <i data-lucide="gem" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Solid-State</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">CIF Crystallography</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Convert crystal unit cells with fractional coordinates into XYZ.</p>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">CIF Crystallography</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Convert crystal unit cells with fractional coordinates into Cartesian XYZ.</p>
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
@@ -486,14 +556,17 @@
 
             <!-- Card 7: Salt & Solvent Stripper -->
             <div onclick="selectToolFromGrid('orca', 'Salt & Solvent Stripper', 'Isolate active parent drugs from counter-ions with coordination lock')"
-                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
-                    <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
-                        <i data-lucide="flask-conical" class="w-6 h-6"></i>
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-rose-50/80 text-rose-600 border border-rose-100/60 flex items-center justify-center font-bold group-hover:bg-rose-600 group-hover:text-white transition-all shadow-2xs">
+                            <i data-lucide="flask-conical" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Curation</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">Salt & Solvent Stripper</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Remove spectator counter-ions while preserving organometallic bonds.</p>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">Salt Stripper</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Remove spectator counter-ions while preserving organometallic bonds.</p>
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
@@ -504,14 +577,17 @@
 
             <!-- Card 8: 3D Molecular Inspector -->
             <div onclick="selectToolFromGrid('xyz', '3D Molecular Inspector', 'Interactive WebGL 3D inspection and valence verification')"
-                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+                class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
-                    <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
-                        <i data-lucide="eye" class="w-6 h-6"></i>
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50/80 text-blue-600 border border-blue-100/60 flex items-center justify-center font-bold group-hover:bg-blue-600 group-hover:text-white transition-all shadow-2xs">
+                            <i data-lucide="eye" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">WebGL 3D</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">3D Inspector</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Interactive 3D WebGL inspection, stereochemistry, and formula audit.</p>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">3D Inspector</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Interactive 3D WebGL inspection, stereochemistry, and formula audit.</p>
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
@@ -520,34 +596,40 @@
                 </div>
             </div>
 
-            <!-- Card 9: Lipinski & Drug Properties -->
-            <div onclick="selectToolFromGrid('mol2', 'Lipinski & Drug Properties', 'Compute MW, LogP, HBD, HBA, TPSA and Lipinski Rule of 5')"
-                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+            <!-- Card 9: Drug Properties & Ro5 -->
+            <div onclick="selectToolFromGrid('mol2', 'Lipinski & Drug Properties', 'Calculate MW, LogP, TPSA, and Lipinski Ro5 compliance')"
+                class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
-                    <div class="w-12 h-12 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
-                        <i data-lucide="pill" class="w-6 h-6"></i>
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-violet-50/80 text-violet-600 border border-violet-100/60 flex items-center justify-center font-bold group-hover:bg-violet-600 group-hover:text-white transition-all shadow-2xs">
+                            <i data-lucide="activity" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">MedChem</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">Drug Properties</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Calculate MW, LogP, TPSA, and Lipinski Rule of 5 drug-likeness filters.</p>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">Drug Properties</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Calculate MW, LogP, TPSA, and Lipinski Ro5 compliance in real-time.</p>
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
-                    <span>Calculate Filters</span>
+                    <span>Calculate Ro5</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                 </div>
             </div>
 
             <!-- Card 10: Q-Chem / VASP Builder -->
-            <div onclick="selectToolFromGrid('qchem', 'Q-Chem & VASP Builder', 'Prepare solid-state and quantum chemistry inputs')"
-                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+            <div onclick="selectToolFromGrid('qchem', 'Q-Chem & VASP Builder', 'Prepare density functional theory and periodic boundary files')"
+                class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
-                    <div class="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
-                        <i data-lucide="sparkles" class="w-6 h-6"></i>
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-teal-50/80 text-teal-600 border border-teal-100/60 flex items-center justify-center font-bold group-hover:bg-teal-600 group-hover:text-white transition-all shadow-2xs">
+                            <i data-lucide="layers" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Materials</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">Q-Chem / VASP</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Prepare density functional theory and periodic crystal lattice inputs.</p>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">Q-Chem / VASP</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Prepare density functional theory and periodic boundary POSCAR files.</p>
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
@@ -557,37 +639,43 @@
             </div>
 
             <!-- Card 11: SuperAtom Expander -->
-            <div onclick="selectToolFromGrid('xyz', 'SuperAtom Expander', 'Expand Boc, Ts, Ph, Cbz abbreviations into explicit atoms')"
-                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+            <div onclick="selectToolFromGrid('xyz', 'SuperAtom Expander', 'Expand protecting groups (Boc, Ts, Ph, Cy) into explicit atoms')"
+                class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
-                    <div class="w-12 h-12 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
-                        <i data-lucide="tag" class="w-6 h-6"></i>
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-orange-50/80 text-orange-600 border border-orange-100/60 flex items-center justify-center font-bold group-hover:bg-orange-600 group-hover:text-white transition-all shadow-2xs">
+                            <i data-lucide="maximize-2" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Synthesis</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">SuperAtom Expander</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Expand protecting groups (Boc, Ts, Ph, Cbz) into full atom graphs.</p>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">SuperAtom Expander</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Expand protecting groups (Boc, Ts, Ph, Cy) into explicit 3D atoms.</p>
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
-                    <span>Expand Groups</span>
+                    <span>Expand Atoms</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                 </div>
             </div>
 
             <!-- Card 12: Universal Any-to-Any -->
-            <div onclick="selectToolFromGrid('orca', 'Universal Converter', 'Convert between 20+ computational chemistry file formats')"
-                class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between">
+            <div onclick="selectToolFromGrid('orca', 'Universal Converter', 'Convert between PDB, SDF, CIF, XYZ, ORCA, Gaussian with spin parity')"
+                class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
-                    <div class="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold group-hover:scale-105 transition">
-                        <i data-lucide="repeat" class="w-6 h-6"></i>
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50/80 text-blue-600 border border-blue-100/60 flex items-center justify-center font-bold group-hover:bg-blue-600 group-hover:text-white transition-all shadow-2xs">
+                            <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100 font-bold">Universal</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-base">Universal Any-to-Any</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Convert between PDB, SDF, CIF, XYZ, ORCA, Gaussian with 1 click.</p>
+                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">Any-to-Any Converter</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">Direct bidirectional conversion between all 15+ formats with quantum parity.</p>
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
-                    <span>Universal Studio</span>
+                    <span>All Formats</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                 </div>
             </div>
