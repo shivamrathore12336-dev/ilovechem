@@ -3,7 +3,10 @@ import re
 import io
 import zipfile
 import tempfile
-import xml.etree.ElementTree as ET
+try:
+    import defusedxml.ElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
 from typing import List, Dict, Any, Tuple, Optional
 from rdkit import Chem
 from rdkit.Chem import AllChem
@@ -53,8 +56,8 @@ def sanitize_and_extract_all_fragments(raw_text: str) -> Tuple[List[Dict[str, An
     - Auto-computes formula, molecular weight, and 2D topology for each
     Returns: (list_of_molecules_data, inspection_summary)
     """
-    if len(raw_text) > 50 * 1024 * 1024:
-        raise ValueError("CDXML file exceeds maximum allowed size (50 MB).")
+    if len(raw_text) > 25 * 1024 * 1024:
+        raise ValueError("CDXML file exceeds maximum allowed size (25 MB).")
     # Security Guard: Defuse XXE / Entity injection attacks (handles multiline bracketed DOCTYPE)
     clean_xml = re.sub(r'<!DOCTYPE\s+[^\[>]*(\[[^\]]*\])?\s*>', '', raw_text, flags=re.DOTALL | re.IGNORECASE)
     clean_xml = re.sub(r'<!ENTITY[^>]*>', '', clean_xml, flags=re.IGNORECASE)

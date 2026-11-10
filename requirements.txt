@@ -7,3 +7,4 @@ rdkit>=2023.9.1
 gunicorn>=22.0.0
 numpy
 scipy
+defusedxml>=0.7.1

@@ -2,6 +2,7 @@ import os
 import json
 import urllib.request
 import ssl
+import functools
 from typing import Dict, Any
 
 from django.shortcuts import render
@@ -23,6 +24,19 @@ def docking_studio_view(request):
     return render(request, "calculator/docking.html")
 
 
+@functools.lru_cache(maxsize=64)
+def _fetch_rcsb_cached(clean_id: str) -> str:
+    """In-memory LRU cache for RCSB PDB structures. Prevents redundant remote downloads and caps buffer to 25 MB."""
+    rcsb_url = f"https://files.rcsb.org/download/{clean_id}.pdb"
+    ctx = ssl.create_default_context()
+    req = urllib.request.Request(rcsb_url, headers={'User-Agent': 'iLoveChem-Docking-Engine/1.0'})
+    with urllib.request.urlopen(req, context=ctx, timeout=15) as resp:
+        if resp.status != 200:
+            raise FileNotFoundError(f"PDB ID '{clean_id}' not found on RCSB Protein Data Bank.")
+        raw_bytes = resp.read(26214400)  # Bounded to 25 MB maximum to avoid memory bloat
+        return raw_bytes.decode('utf-8', errors='ignore')
+
+
 @api_view(['GET'])
 def api_fetch_rcsb_pdb(request, pdb_id: str):
     """
@@ -36,18 +50,13 @@ def api_fetch_rcsb_pdb(request, pdb_id: str):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    rcsb_url = f"https://files.rcsb.org/download/{clean_id}.pdb"
-    ctx = ssl.create_default_context()
-
     try:
-        req = urllib.request.Request(rcsb_url, headers={'User-Agent': 'iLoveChem-Docking-Engine/1.0'})
-        with urllib.request.urlopen(req, context=ctx, timeout=15) as resp:
-            if resp.status != 200:
-                return Response(
-                    {"success": False, "error": f"PDB ID '{clean_id}' not found on RCSB Protein Data Bank."},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            pdb_content = resp.read().decode('utf-8', errors='ignore')
+        pdb_content = _fetch_rcsb_cached(clean_id)
+    except FileNotFoundError:
+        return Response(
+            {"success": False, "error": f"PDB ID '{clean_id}' not found on RCSB Protein Data Bank."},
+            status=status.HTTP_404_NOT_FOUND
+        )
     except Exception as e:
         return Response(
             {"success": False, "error": f"Failed to retrieve PDB '{clean_id}' from RCSB: {str(e)}"},

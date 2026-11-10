@@ -147,9 +147,19 @@ FILE_UPLOAD_HANDLERS = [
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
 ]
 
-# Support large PDB macromolecules, NMR ensembles, and quantum logs (up to 50 MB in RAM)
-DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
-FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
+# Support large PDB macromolecules, NMR ensembles, and quantum logs (up to 25 MB in RAM to prevent OOM)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 26214400  # 25 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 26214400  # 25 MB
+
+# Django REST Framework Rate Limiting (Protects CPU-heavy calculations from DoS/flooding)
+REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '60/minute',  # 60 requests per minute per IP address
+    }
+}
 
 # Security hardening. Production values are explicitly enabled in render.yaml;
 # defaults preserve local HTTP development.

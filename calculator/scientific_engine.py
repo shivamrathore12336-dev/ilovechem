@@ -905,6 +905,22 @@ class ZeroCoordinateGuard:
 
         is_collapsed = (zeros_count >= 2) or (float(np.sum(var_xyz)) < 1e-5)
         if not is_collapsed:
+            # Check for individual overlapping pairs (< 0.35 A) to prevent Lennard-Jones 1/r^12 singularity
+            has_micro_clash = False
+            atom_count = len(mol.atoms)
+            for i in range(atom_count):
+                for j in range(i + 1, atom_count):
+                    d = np.linalg.norm(coords[i] - coords[j])
+                    if d < 0.35:
+                        has_micro_clash = True
+                        cur_v = mol.atoms[j].OBAtom.GetVector()
+                        mol.atoms[j].OBAtom.SetVector(cur_v.GetX() + 0.12, cur_v.GetY() + 0.12, cur_v.GetZ() + 0.08)
+            if has_micro_clash:
+                warnings.append(
+                    "Atomic Collision Jitter: Detected atoms sharing nearly identical 3D positions (< 0.35 Å). "
+                    "Displaced overlapping coordinates to prevent mathematical singularities in force fields."
+                )
+                return mol, True, warnings
             return mol, False, warnings
 
         fixed_rd = False
