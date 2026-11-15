@@ -6,7 +6,7 @@ PoseView / Maestro / LigPlot / PyMOL / ChimeraX Standard
 
 import math
 import re
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem.Draw import rdMolDraw2D

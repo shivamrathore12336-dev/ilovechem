@@ -682,6 +682,7 @@ class ChemDockEngine:
         salt_bridges = []
         seen_hb = set()
         seen_hp = set()
+        seen_sb = set()
 
         HETERO = {'O', 'N', 'OA', 'NA', 'SA', 'S', 'HD'}
         HYDRO_RES = {'LEU', 'ILE', 'VAL', 'PHE', 'TRP', 'MET', 'PRO', 'ALA', 'TYR'}
@@ -789,30 +790,33 @@ class ChemDockEngine:
                     elif r_name in BASIC_RES and r_aname in {'NZ', 'NE', 'NH1', 'NH2'} and l_type in {'OA', 'O'}:
                         is_salt = True
                     if is_salt:
-                        sb_key = (res_key, l_idx)
-                        salt_bridges.append({
-                            'interaction_type': 'Salt Bridge',
-                            'category': 'salt_bridge',
-                            'receptor_residue': f"{r_name} {r_num}:{r_chain}",
-                            'resn': r_name,
-                            'resi': r_num,
-                            'chain': r_chain,
-                            'receptor_atom': r_aname,
-                            'ligand_atom_index': l_idx,
-                            'ligand_atom': la['atom_name'],
+                        sb_key = (res_key, r_aname, l_idx)
+                        if sb_key not in seen_sb:
+                            seen_sb.add(sb_key)
+                            salt_bridges.append({
+                                'interaction_type': 'Salt Bridge',
+                                'category': 'salt_bridge',
+                                'receptor_residue': f"{r_name} {r_num}:{r_chain}",
+                                'resn': r_name,
+                                'resi': r_num,
+                                'chain': r_chain,
+                                'receptor_atom': r_aname,
+                                'ligand_atom_index': l_idx,
+                                'ligand_atom': la['atom_name'],
                                 'ligand_atom_name': la['atom_name'],
-                            'distance_angstrom': round(float(dist), 2),
-                            'receptor_x': round(float(r_coord[0]), 3),
-                            'receptor_y': round(float(r_coord[1]), 3),
-                            'receptor_z': round(float(r_coord[2]), 3),
-                            'ligand_x': round(float(l_coord[0]), 3),
-                            'ligand_y': round(float(l_coord[1]), 3),
-                            'ligand_z': round(float(l_coord[2]), 3)
-                        })
+                                'distance_angstrom': round(float(dist), 2),
+                                'receptor_x': round(float(r_coord[0]), 3),
+                                'receptor_y': round(float(r_coord[1]), 3),
+                                'receptor_z': round(float(r_coord[2]), 3),
+                                'ligand_x': round(float(l_coord[0]), 3),
+                                'ligand_y': round(float(l_coord[1]), 3),
+                                'ligand_z': round(float(l_coord[2]), 3)
+                            })
 
         pocket_residues = sorted(list(pocket_dict.values()), key=lambda x: x['min_distance'])
         hbonds = sorted(hbonds, key=lambda x: x['distance_angstrom'])
         hydrophobics = sorted(hydrophobics, key=lambda x: x['distance_angstrom'])
+        salt_bridges = sorted(salt_bridges, key=lambda x: x['distance_angstrom'])
         all_interactions = hbonds + salt_bridges + hydrophobics
 
         return {

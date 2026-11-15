@@ -26,7 +26,7 @@ def _fetch_rcsb_cached(clean_id: str) -> str:
     rcsb_url = f"https://files.rcsb.org/download/{clean_id}.pdb"
     ctx = ssl.create_default_context()
     req = urllib.request.Request(rcsb_url, headers={'User-Agent': 'iLoveChem-Docking-Engine/1.0'})
-    with urllib.request.urlopen(req, context=ctx, timeout=15) as resp:
+    with urllib.request.urlopen(req, context=ctx, timeout=15) as resp:  # nosec: B310
         if resp.status != 200:
             raise FileNotFoundError(f"PDB ID '{clean_id}' not found on RCSB Protein Data Bank.")
         raw_bytes = resp.read(26214400)  # Bounded to 25 MB maximum to avoid memory bloat
@@ -216,14 +216,16 @@ def _merge_receptor_and_pose_to_pdb(receptor_pdb: str, pose_pdbqt: str) -> str:
 
     atom_idx = 1000
     for line in pose_pdbqt.splitlines():
-        if line.startswith("ATOM") or line.startswith("HETATM"):
+        if (line.startswith("ATOM") or line.startswith("HETATM")) and len(line) >= 54:
             atom_idx += 1
             # Format as HETATM LIG X 900
             name = line[12:16].strip()
             x = line[30:38]
             y = line[38:46]
             z = line[46:54]
-            element = line[77:79].strip() or name[:1]
+            element = line[77:79].strip() if len(line) >= 79 else ""
+            if not element:
+                element = name[:1]
             pdb_line = f"HETATM{atom_idx:5d} {name:<4s} LIG Z 900    {x}{y}{z}  1.00 20.00          {element:>2s}"
             out_lines.append(pdb_line)
 

@@ -2,7 +2,6 @@ import os
 import re
 import io
 import zipfile
-import tempfile
 try:
     import defusedxml.ElementTree as ET
 except ImportError:
@@ -62,7 +61,7 @@ def sanitize_and_extract_all_fragments(raw_text: str) -> Tuple[List[Dict[str, An
     clean_xml = re.sub(r'<!DOCTYPE\s+[^\[>]*(\[[^\]]*\])?\s*>', '', raw_text, flags=re.DOTALL | re.IGNORECASE)
     clean_xml = re.sub(r'<!ENTITY[^>]*>', '', clean_xml, flags=re.IGNORECASE)
     clean_xml = re.sub(r'<!DOCTYPE[^>]*>', '', clean_xml, flags=re.IGNORECASE)
-    root = ET.fromstring(clean_xml)  # nosec B314 - ET is defusedxml (see import)
+    root = ET.fromstring(clean_xml)  # nosec: B314
 
     stats = {
         "text_labels_filtered": 0,
@@ -88,7 +87,6 @@ def sanitize_and_extract_all_fragments(raw_text: str) -> Tuple[List[Dict[str, An
             if not nid: continue
             
             # Inspect if node has superatom text label (e.g. <s font="1">Ph</s>)
-            node_type = n.get('NodeType', '')
             superatom_label = None
             text_el = n.find('.//s')
             if text_el is not None and text_el.text:

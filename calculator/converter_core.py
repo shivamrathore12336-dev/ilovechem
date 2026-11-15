@@ -8,7 +8,6 @@ if "BABEL_DATADIR" not in os.environ:
 import re
 import io
 from typing import Dict, Any, Tuple, Optional, List
-import numpy as np
 
 from openbabel import openbabel as ob
 from openbabel import pybel
@@ -18,11 +17,10 @@ from ase.atoms import Atoms
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from .format_registry import COMPLETE_TARGET_FORMATS
+from .format_registry import COMPLETE_TARGET_FORMATS  # noqa: F401 (re-exported for studio_views)
 from .phase1_engine import (
     sanitize_and_extract_all_fragments,
-    build_3d_mol_from_fragment,
-    create_zip_archive_of_all_fragments
+    build_3d_mol_from_fragment
 )
 from .scientific_engine import (
     SpinChargeParityValidator,
@@ -38,7 +36,6 @@ from .scientific_engine import (
     GromacsGroEngine,
     ZeroCoordinateGuard,
     PDBBondPerceptionEngine,
-    BatchSdfProcessor,
     GhostAtomNormalizer,
     UnixEolNormalizer,
     MesoCompoundDetector
@@ -164,7 +161,7 @@ def parse_and_extract_atoms(
                     meta_info["num_atoms"] = len(py_mol.atoms)
                     py_mol = _apply_integrity_audit(py_mol, meta_info, strip_salts=strip_salts)
                     return py_mol, meta_info
-        except Exception as e:
+        except Exception:
             meta_info["warnings"].append("ChemDraw parsing failed; check the input structure and file syntax.")
 
     # 1b. InChI Native Support via RDKit
@@ -184,7 +181,7 @@ def parse_and_extract_atoms(
                 meta_info["num_atoms"] = len(py_mol.atoms)
                 py_mol = _apply_integrity_audit(py_mol, meta_info, strip_salts=strip_salts)
                 return py_mol, meta_info
-        except Exception as e:
+        except Exception:
             meta_info["warnings"].append("InChI parsing failed; check the identifier syntax.")
 
     # 1c. ORCA Input (.inp) Geometry & Coordinate Extractor
@@ -249,7 +246,7 @@ def parse_and_extract_atoms(
             try:
                 parser = cclib.io.ccopen(io.StringIO(content_str))
                 data = parser.parse()
-            except Exception as cclib_err:
+            except Exception:
                 meta_info["warnings"].append("The primary log parser could not read this file; trying the rescue parser.")
 
             if data is not None and hasattr(data, 'atomcoords') and len(data.atomcoords) > 0:
@@ -290,7 +287,7 @@ def parse_and_extract_atoms(
                 )
                 py_mol = _apply_integrity_audit(py_mol, meta_info, strip_salts=strip_salts)
                 return py_mol, meta_info
-        except Exception as e:
+        except Exception:
             meta_info["warnings"].append("Quantum chemistry log parsing failed; check the log format.")
 
     # 3a. AutoDock PDBQT Ligand Support
@@ -303,7 +300,7 @@ def parse_and_extract_atoms(
             meta_info["num_atoms"] = len(mol.atoms)
             mol = _apply_integrity_audit(mol, meta_info, strip_salts=strip_salts)
             return mol, meta_info
-        except Exception as e:
+        except Exception:
             meta_info["warnings"].append("PDBQT parsing failed; check the input file syntax.")
 
     # 3b. PDB / Macromolecules Sanitization (Issues 16 & 17 + Loophole 4)
@@ -323,7 +320,7 @@ def parse_and_extract_atoms(
             meta_info["num_atoms"] = len(mol.atoms)
             mol = _apply_integrity_audit(mol, meta_info, strip_salts=strip_salts)
             return mol, meta_info
-        except Exception as e:
+        except Exception:
             meta_info["warnings"].append("PDB parsing failed; check the input file syntax.")
 
     # 4. Materials & Crystals via ASE (Issues 12, 13, 14)
@@ -363,7 +360,7 @@ def parse_and_extract_atoms(
             meta_info["num_atoms"] = len(atoms)
             py_mol = _apply_integrity_audit(py_mol, meta_info, strip_salts=strip_salts)
             return py_mol, meta_info
-        except Exception as e:
+        except Exception:
             meta_info["warnings"].append("Crystal parsing failed; check the cell parameters and coordinates.")
 
     # 5. Standard OpenBabel Formats with Heavy Metal UFF Detection (Issue 20 & Loophole 6)

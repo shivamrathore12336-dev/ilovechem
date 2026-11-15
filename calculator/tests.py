@@ -280,7 +280,38 @@ class MolecularDockingEngineTests(TestCase):
 
         # High flexibility test molecule with > 10 rotatable bonds:
         # e.g., CCCCCCCCCCCC(=O)O (Lauric acid: 10 rotatable bonds)
-        res_flex = calculate_properties("CCCCCCCCCCCCCC(=O)O") # Myristic acid: 12 rotatable bonds
+        res_flex = calculate_properties("CCCCCCCCCCCCCC(=O)O")  # Myristic acid: 12 rotatable bonds
         self.assertTrue(res_flex["rotatable_bonds"] > 10)
         self.assertFalse(res_flex["veber_pass"])
         self.assertGreaterEqual(res_flex["veber_violations"], 1)
+
+    def test_centroid_sniffer_z_dimension_independence(self):
+        from .docking_core import DockingEngine
+        anisotropic_pdb = (
+            "ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00 20.00           N\n"
+            "HETATM    2  C1  LIG A 100       0.000   0.000   0.000  1.00 15.00           C\n"
+            "HETATM    3  C2  LIG A 100       1.000   1.000   3.000  1.00 15.00           C\n"
+            "HETATM    4  C3  LIG A 100       1.500   1.500   6.000  1.00 15.00           C\n"
+            "HETATM    5  C4  LIG A 100       2.000   2.000   9.000  1.00 15.00           C\n"
+            "HETATM    6  C5  LIG A 100       2.000   2.000  14.000  1.00 15.00           C\n"
+            "HETATM    7  C6  LIG A 100       2.000   2.000  18.000  1.00 15.00           C\n"
+            "END\n"
+        )
+        info = DockingEngine.detect_co_crystallized_ligand_and_centroid(anisotropic_pdb)
+        self.assertTrue(info["has_co_crystal_ligand"])
+        # span_y = 2.0 + 8.0 = 10.0 -> max(18.0, min(30.0, 10.0)) = 18.0
+        self.assertEqual(info["size_y"], 18.0)
+        # span_z = 18.0 + 8.0 = 26.0 -> max(18.0, min(30.0, 26.0)) = 26.0
+        self.assertEqual(info["size_z"], 26.0)
+
+    def test_merge_receptor_and_pose_short_line_safety(self):
+        from .docking_views import _merge_receptor_and_pose_to_pdb
+        receptor = "ATOM      1  CA  ALA A   1       1.000   1.000   1.000  1.00 20.00           C\nEND\n"
+        malformed_pose = (
+            "ATOM      1\n"  # Short line (< 54 chars)
+            "ATOM      2  C1  LIG     1      10.000  10.000  10.000  1.00 20.00    +0.000 C\n"
+        )
+        merged = _merge_receptor_and_pose_to_pdb(receptor, malformed_pose)
+        self.assertIn("HETATM 1001", merged)
+        self.assertIn("LIG Z 900", merged)
+        self.assertIn("END", merged)
