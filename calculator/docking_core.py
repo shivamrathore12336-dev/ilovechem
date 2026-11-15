@@ -318,7 +318,7 @@ class ChemDockEngine:
             span_z = float(np.ptp(arr[:, 2])) + 8.0
             size_x = max(18.0, min(30.0, round(span_x, 1)))
             size_y = max(18.0, min(30.0, round(span_y, 1)))
-            size_z = max(18.0, min(30.0, round(span_y, 1)))
+            size_z = max(18.0, min(30.0, round(span_z, 1)))
 
             return {
                 "has_co_crystal_ligand": True,

@@ -10,7 +10,6 @@ Implements Phases 2 through 5 of the Universal Chemistry Conversion Standard:
 import os
 import re
 import io
-import math
 import zipfile
 from typing import List, Dict, Any, Tuple, Optional
 import numpy as np

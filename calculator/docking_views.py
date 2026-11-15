@@ -1,12 +1,8 @@
-import os
-import json
 import urllib.request
 import ssl
 import functools
-from typing import Dict, Any
 
 from django.shortcuts import render
-from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework.decorators import api_view
 from rest_framework.response import Response

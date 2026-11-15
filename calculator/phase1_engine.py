@@ -62,7 +62,7 @@ def sanitize_and_extract_all_fragments(raw_text: str) -> Tuple[List[Dict[str, An
     clean_xml = re.sub(r'<!DOCTYPE\s+[^\[>]*(\[[^\]]*\])?\s*>', '', raw_text, flags=re.DOTALL | re.IGNORECASE)
     clean_xml = re.sub(r'<!ENTITY[^>]*>', '', clean_xml, flags=re.IGNORECASE)
     clean_xml = re.sub(r'<!DOCTYPE[^>]*>', '', clean_xml, flags=re.IGNORECASE)
-    root = ET.fromstring(clean_xml)
+    root = ET.fromstring(clean_xml)  # nosec B314 - ET is defusedxml (see import)
 
     stats = {
         "text_labels_filtered": 0,

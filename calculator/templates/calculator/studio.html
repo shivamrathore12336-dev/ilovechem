@@ -2175,7 +2175,7 @@
                 }
                 badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">✓ Parity Validated</span>`;
                 if (meta.electronic_state) {
-                    badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-bold">⚡ ${meta.electronic_state}</span>`;
+                    badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-bold">⚡ ${escapeHtml(meta.electronic_state)}</span>`;
                 }
 
                 // Handle Scientific Warnings / Actions
