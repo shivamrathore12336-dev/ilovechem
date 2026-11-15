@@ -143,15 +143,14 @@
 
         .tool-card {
             background: #FFFFFF;
-            border: 1px solid rgba(226, 232, 240, 0.85);
-            box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.02), 0 2px 8px -2px rgba(15, 23, 42, 0.03), inset 0 1px 0 0 #FFFFFF;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.03);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
             position: relative;
         }
         .tool-card:hover {
-            border-color: rgba(37, 99, 235, 0.6);
-            box-shadow: 0 12px 28px -4px rgba(37, 99, 235, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.04), inset 0 1px 0 0 #FFFFFF;
-            transform: translateY(-2px);
+            border-color: #2563EB;
+            box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
         }
 
         .drop-active {
@@ -386,18 +385,15 @@
 
     <!-- 2. HERO SECTION (Benchling / BioRender Clean Scientific Style) -->
     <section class="pt-10 pb-6 sm:pt-14 sm:pb-8 text-center px-4 max-w-4xl mx-auto space-y-4">
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-slate-200/90 shadow-2xs text-xs font-semibold text-slate-700">
-            <span class="flex h-2 w-2 relative">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
-            </span>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
             <span>Universal CADD &amp; DFT File Studio</span>
             <span class="text-slate-300">•</span>
-            <span class="text-blue-600 font-mono text-[11px] font-bold">100% In-Memory RAM</span>
+            <span class="text-slate-600 font-mono text-[11px]">Volatile RAM Architecture</span>
         </div>
 
         <h1 class="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-            Every format you need for <span class="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 bg-clip-text text-transparent">Computational Chemistry</span> in one place
+            Every format you need for <span class="text-blue-600">Computational Chemistry</span> in one place
         </h1>
         
         <p class="text-slate-600 text-sm sm:text-lg max-w-2xl mx-auto leading-relaxed">
@@ -405,7 +401,7 @@
         </p>
 
         <div class="pt-2 flex flex-wrap items-center justify-center gap-3">
-            <a href="/docking/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-500/25 hover:shadow-lg hover:scale-[1.02] transition-all">
+            <a href="/docking/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-xs transition">
                 <i data-lucide="crosshair" class="w-4 h-4"></i>
                 <span>Open Inbuilt ChemDock Studio</span>
                 <span class="bg-white/20 text-white px-2 py-0.5 rounded-md text-[10px] font-mono uppercase tracking-wider font-extrabold">Live 3D WebGL</span>
@@ -418,11 +414,12 @@
         </div>
 
         <!-- Capability Trust Tags -->
-        <div class="pt-3 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-500 font-medium">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-slate-700 border border-slate-200/70 shadow-2xs"><i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500"></i> 15+ Formats In-Memory</span>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-slate-700 border border-slate-200/70 shadow-2xs"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i> Zero Disk Storage</span>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-slate-700 border border-slate-200/70 shadow-2xs"><i data-lucide="orbit" class="w-3.5 h-3.5 text-blue-600"></i> Quantum Spin Parity</span>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-slate-700 border border-slate-200/70 shadow-2xs"><i data-lucide="sliders" class="w-3.5 h-3.5 text-indigo-600"></i> Lipinski Ro5 Radar</span>
+        <div class="pt-2 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-500 font-medium">
+            <span class="inline-flex items-center gap-1.5"><i data-lucide="layers" class="w-3.5 h-3.5 text-slate-500"></i> 15+ CADD &amp; DFT Formats</span>
+            <span class="text-slate-300">•</span>
+            <span class="inline-flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i> Zero-Disk Volatile Execution</span>
+            <span class="text-slate-300">•</span>
+            <span class="inline-flex items-center gap-1.5"><i data-lucide="activity" class="w-3.5 h-3.5 text-blue-600"></i> Spin Multiplicity &amp; Parity Check</span>
         </div>
     </section>
 
@@ -780,12 +777,8 @@
                 <input type="file" id="file-selector" class="hidden" accept=".cdxml,.cdx,.pdb,.pdbqt,.mol,.sdf,.mol2,.cif,.xyz,.log,.out,.gjf,.com,.inp,.smi,.txt,*" />
 
                 <div class="flex flex-col items-center space-y-4 max-w-md mx-auto">
-                    <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-blue-50 to-indigo-50 border border-blue-200/80 flex items-center justify-center text-blue-600 shadow-sm relative group">
-                        <i data-lucide="upload-cloud" class="w-10 h-10 stroke-[2] group-hover:scale-105 transition-transform"></i>
-                        <span class="absolute -top-1 -right-1 flex h-3 w-3">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-600"></span>
-                        </span>
+                    <div class="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shadow-2xs">
+                        <i data-lucide="upload-cloud" class="w-8 h-8 stroke-[1.75]"></i>
                     </div>
 
                     <div class="space-y-1.5">
@@ -910,7 +903,7 @@
                     <div class="pt-2 flex items-center justify-between text-[11px] text-blue-900 border-t border-blue-200/80">
                         <span>Need all chemical structures in this scheme?</span>
                         <button type="button" onclick="setModeAndConvert('all_zip')" class="font-bold underline hover:text-blue-950 flex items-center gap-1">
-                            <span>📦 Export All Molecules as ZIP Archive</span>
+                            <i data-lucide="archive" class="w-3.5 h-3.5 text-blue-700"></i><span>Export All Molecules as ZIP Archive</span>
                         </button>
                     </div>
                 </div>
@@ -1579,27 +1572,27 @@
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <button type="button" onclick="selectPresetAndClose('gaussian_log', 'xyz')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">🔄 Gaussian Log ➔ Stationary Point</div>
+                            <div class="font-bold text-slate-800">Gaussian Log ➔ Stationary Point</div>
                             <div class="text-[10px] text-slate-500">Reverse-tail scan extracts final converged step</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('crashed_log', 'xyz')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">🚨 Crashed Log ➔ Lowest-Energy Rescue</div>
+                            <div class="font-bold text-slate-800">Crashed Log ➔ Lowest-Energy Rescue</div>
                             <div class="text-[10px] text-slate-500">Recovers lowest SCF intermediate from aborted job</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('giant_log', 'xyz')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">🚀 Giant Logs ➔ Tail-Stream Parser</div>
+                            <div class="font-bold text-slate-800">Giant Logs ➔ Tail-Stream Parser</div>
                             <div class="text-[10px] text-slate-500">Sub-second tail seek with zero browser freezing</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('ghost_atoms', 'gjf')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">👻 Ghost Atoms (Bq) ➔ BSSE Preservation</div>
+                            <div class="font-bold text-slate-800">Ghost Atoms (Bq) ➔ BSSE Preservation</div>
                             <div class="text-[10px] text-slate-500">Preserves Bq dummy centers without crashes</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('radical_tempo', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">⚡ Radical TEMPO ➔ Auto-Doublet (2S+1)</div>
+                            <div class="font-bold text-slate-800">Radical TEMPO ➔ Auto-Doublet (2S+1)</div>
                             <div class="text-[10px] text-slate-500">Odd electrons (87 e⁻) ➔ automatic Mult = 2</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('acetate_anion', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">🔋 Acetate Anion (COO⁻) ➔ Charge -1</div>
+                            <div class="font-bold text-slate-800">Acetate Anion (COO⁻) ➔ Charge -1</div>
                             <div class="text-[10px] text-slate-500">Charge -1 with even electrons ➔ Singlet</div>
                         </button>
                     </div>
@@ -1613,19 +1606,19 @@
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <button type="button" onclick="selectPresetAndClose('cif_missing_h', 'xyz')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">💎 CIF Crystal ➔ Auto-Protonate Missing H</div>
+                            <div class="font-bold text-slate-800">CIF Crystal ➔ Auto-Protonate Missing H</div>
                             <div class="text-[10px] text-slate-500">Fractional-to-Cartesian with auto valence H</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('split_crystal', 'xyz')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">🧩 Split Crystal Molecule ➔ Unwrapper</div>
+                            <div class="font-bold text-slate-800">Split Crystal Molecule ➔ Unwrapper</div>
                             <div class="text-[10px] text-slate-500">Reassembles covalent bond split across [0,1] cell</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('benzene_vasp', 'poscar')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">📦 Molecule ➔ VASP (15Å Vacuum Box)</div>
+                            <div class="font-bold text-slate-800">Molecule ➔ VASP (15Å Vacuum Box)</div>
                             <div class="text-[10px] text-slate-500">Cubic supercell prevents periodic self-interaction</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('gromacs_box', 'gro')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">📦 GROMACS (.gro) ➔ 1.0nm Clearance</div>
+                            <div class="font-bold text-slate-800">GROMACS (.gro) ➔ 1.0nm Clearance</div>
                             <div class="text-[10px] text-slate-500">Bounding box with minimum 1.0nm simulation buffer</div>
                         </button>
                     </div>
@@ -1639,27 +1632,27 @@
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <button type="button" onclick="selectPresetAndClose('pdb_complex', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">🧬 PDB Complex ➔ Strip Waters & Isolate</div>
+                            <div class="font-bold text-slate-800">PDB Complex ➔ Strip Waters & Isolate</div>
                             <div class="text-[10px] text-slate-500">Filters waters (HOH) and extracts pure ligand</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('ferrocene', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">🔬 Ferrocene (Fe) ➔ UFF Metal Guard</div>
+                            <div class="font-bold text-slate-800">Ferrocene (Fe) ➔ UFF Metal Guard</div>
                             <div class="text-[10px] text-slate-500">Universal Force Field prevents organometallic distortion</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('cisplatin_metal', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">🔬 Cisplatin (Pt) ➔ UFF Metal Guard</div>
+                            <div class="font-bold text-slate-800">Cisplatin (Pt) ➔ UFF Metal Guard</div>
                             <div class="text-[10px] text-slate-500">Preserves square-planar Pt coordination geometry</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('salt_complex', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">🧂 Salt Complex ➔ Strip Counter-Ions</div>
+                            <div class="font-bold text-slate-800">Salt Complex ➔ Strip Counter-Ions</div>
                             <div class="text-[10px] text-slate-500">Strips Cl⁻ from Aniline·HCl to prevent DFT crash</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('collapsed_zero', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">🛡️ (0,0,0) Coords ➔ Silent Failure Guard</div>
+                            <div class="font-bold text-slate-800">Zero-Coordinate Guard ➔ Origin Collapse Filter</div>
                             <div class="text-[10px] text-slate-500">Detects collapsed coordinates and recovers 3D</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('disguised_xyz', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">⚠️ Disguised Extension ➔ Sniffer Recovery</div>
+                            <div class="font-bold text-slate-800">Disguised Extension ➔ Sniffer Recovery</div>
                             <div class="text-[10px] text-slate-500">Parses true XYZ content despite fake .pdb extension</div>
                         </button>
                     </div>
@@ -2153,7 +2146,7 @@
                 actionStage.classList.add('hidden');
                 resultStage.classList.remove('hidden');
                 updateStepPills(3);
-                showToast("File converted and scientific parity verified! 🔬✨", "success", 3000);
+                showToast("File converted and scientific parity verified", "success", 3000);
 
                 const meta = res.metadata || {};
                 const badgesContainer = document.getElementById('audit-badges-container');
@@ -2162,20 +2155,20 @@
                 // Scientific Audit Badges
                 if (meta.salt_detected) {
                     if (meta.salts_stripped) {
-                        badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-teal-50 text-teal-700 border border-teal-200 text-[10px] font-bold">🧂 Counter-Ions Stripped (${escapeHtml((meta.detected_salts || []).join(', '))})</span>`;
+                        badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-teal-50 text-teal-800 border border-teal-200 text-[10px] font-mono font-bold">Counter-Ions Stripped (${escapeHtml((meta.detected_salts || []).join(', '))})</span>`;
                     } else {
-                        badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold">🧂 Salt Complex Retained (${escapeHtml((meta.detected_salts || []).join(', '))})</span>`;
+                        badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-mono font-bold">Salt Complex Retained (${escapeHtml((meta.detected_salts || []).join(', '))})</span>`;
                     }
                 }
                 if (['poscar', 'cif', 'pwi'].includes(targetFormat)) {
-                    badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-sky-50 text-sky-700 border border-sky-200 text-[10px] font-bold">📦 15Å Vacuum Wrapped</span>`;
+                    badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-sky-50 text-sky-800 border border-sky-200 text-[10px] font-mono font-bold">15 Å Vacuum Box</span>`;
                 }
                 if (meta.has_metals) {
-                    badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-bold">🔬 Heavy Metal Guard (${escapeHtml((meta.metal_symbols || []).join(','))})</span>`;
+                    badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-purple-50 text-purple-800 border border-purple-200 text-[10px] font-mono font-bold">Metal UFF Guard (${escapeHtml((meta.metal_symbols || []).join(','))})</span>`;
                 }
-                badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">✓ Parity Validated</span>`;
+                badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-mono font-bold">Parity Validated</span>`;
                 if (meta.electronic_state) {
-                    badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-bold">⚡ ${escapeHtml(meta.electronic_state)}</span>`;
+                    badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-800 border border-indigo-200 text-[10px] font-mono font-bold">Spin Parity: ${escapeHtml(meta.electronic_state)}</span>`;
                 }
 
                 // Handle Scientific Warnings / Actions
@@ -2349,7 +2342,7 @@
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
-                    showToast("Publication 3D Figure Exported! 📸", "success", 2500);
+                    showToast("Publication 3D figure exported", "success", 2500);
                 } else {
                     showToast("Could not capture 3D canvas", "error");
                 }
@@ -2369,7 +2362,7 @@
             navigator.clipboard.writeText(text).then(() => {
                 const label = document.getElementById('copy-bibtex-text');
                 if (label) label.textContent = "Copied! ✓";
-                showToast("BibTeX Citation Copied! 📋", "success", 2500);
+                showToast("BibTeX citation copied to clipboard", "success", 2500);
                 setTimeout(() => {
                     if (label) label.textContent = "Copy BibTeX";
                 }, 2000);
@@ -2385,7 +2378,7 @@
                 shareUrl += '?target=' + encodeURIComponent(target);
             }
             navigator.clipboard.writeText(shareUrl).then(() => {
-                showToast("Shareable link copied to clipboard! 🔗", "success", 3000);
+                showToast("Shareable link copied to clipboard", "success", 3000);
             }).catch(() => {
                 prompt("Copy this shareable link:", shareUrl);
             });
@@ -2428,7 +2421,7 @@
                 a.href = url;
                 a.download = finalOutputName;
                 a.click();
-                showToast("Downloading ZIP archive... 📦", "success", 2500);
+                showToast("Downloading ZIP archive...", "success", 2500);
             } else if (finalOutputText) {
                 const blob = new Blob([finalOutputText], { type: 'text/plain;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
@@ -2436,7 +2429,7 @@
                 a.href = url;
                 a.download = finalOutputName;
                 a.click();
-                showToast(`Downloaded ${finalOutputName}! 📥`, "success", 2500);
+                showToast(`Downloaded ${finalOutputName}`, "success", 2500);
             }
         }
 
@@ -2453,7 +2446,7 @@
             if (!finalOutputText) return;
             navigator.clipboard.writeText(finalOutputText);
             document.getElementById('copy-btn-label').textContent = "Copied to Clipboard!";
-            showToast("Copied converted file to clipboard! 📋", "success", 2500);
+            showToast("Copied converted file to clipboard", "success", 2500);
             setTimeout(() => { document.getElementById('copy-btn-label').textContent = "Copy File Text"; }, 2000);
         }
 
