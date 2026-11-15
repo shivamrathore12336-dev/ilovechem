@@ -2274,6 +2274,18 @@
             }
         }
 
+        // WebGL Responsive Auto-Resize Observer (Prevents aspect ratio distortion on desktop resize & mobile rotation)
+        let studioResizeTimer = null;
+        window.addEventListener('resize', () => {
+            clearTimeout(studioResizeTimer);
+            studioResizeTimer = setTimeout(() => {
+                if (stage3DViewer) {
+                    stage3DViewer.resize();
+                    stage3DViewer.render();
+                }
+            }, 120);
+        });
+
         function apply3DStyle(style) {
             if (!stage3DViewer) return;
             current3DStyle = style;

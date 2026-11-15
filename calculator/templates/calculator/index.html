@@ -536,6 +536,18 @@
             }
         }
 
+        // WebGL Responsive Auto-Resize Observer (Prevents aspect ratio distortion on desktop resize & mobile rotation)
+        let indexResizeTimer = null;
+        window.addEventListener('resize', () => {
+            clearTimeout(indexResizeTimer);
+            indexResizeTimer = setTimeout(() => {
+                if (viewer) {
+                    viewer.resize();
+                    viewer.render();
+                }
+            }, 120);
+        });
+
         function downloadJSON() {
             let data = {};
             const propsEl = document.getElementById('properties-json-data');

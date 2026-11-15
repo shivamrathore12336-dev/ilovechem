@@ -236,7 +236,7 @@
                             <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-black">1</span>
                             <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Target Macromolecule</h2>
                         </div>
-                        <span id="receptor-status-badge" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-slate-100 text-slate-500">
+                        <span id="receptor-status-badge" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-slate-100 text-slate-500 max-w-[150px] sm:max-w-[200px] truncate inline-block align-middle" title="Target Status">
                             No Receptor
                         </span>
                     </div>
@@ -361,7 +361,7 @@
                             <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-black">2</span>
                             <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Ligand Small Molecule</h2>
                         </div>
-                        <span id="ligand-status-badge" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-slate-100 text-slate-500">
+                        <span id="ligand-status-badge" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-slate-100 text-slate-500 max-w-[150px] sm:max-w-[200px] truncate inline-block align-middle" title="Ligand Status">
                             No Ligand
                         </span>
                     </div>
@@ -981,6 +981,29 @@
         });
 
         
+        // Escape HTML to prevent DOM-based XSS attacks from parsed external PDB files
+        function escapeHtml(str) {
+            if (str == null) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // WebGL Responsive Auto-Resize Observer (Prevents aspect ratio distortion on desktop resize & mobile rotation)
+        let dockingResizeTimer = null;
+        window.addEventListener('resize', () => {
+            clearTimeout(dockingResizeTimer);
+            dockingResizeTimer = setTimeout(() => {
+                if (State.viewer) {
+                    State.viewer.resize();
+                    State.viewer.render();
+                }
+            }, 120);
+        });
+
         // Thermodynamic Inhibition Constant (Ki / Kd) Estimation
         // dG = R * T * ln(Ki)  ==>  Ki = exp(dG / (R * T)) where R*T = 0.592483 kcal/mol at 298.15K
         function calculateKi(dG) {
@@ -1777,27 +1800,40 @@
                 if (item.kind === 'Hydrophobic') badgeClass = "bg-yellow-100 text-yellow-800 border-yellow-200";
                 if (item.color === 'indigo') badgeClass = "bg-indigo-100 text-indigo-800 border-indigo-200";
 
-                const resn = item.resn || (item.receptor_residue ? item.receptor_residue.split(' ')[0] : 'RES');
-                const resi = item.resi || 0;
-                const chain = item.chain || 'A';
+                const rawResn = item.resn || (item.receptor_residue ? item.receptor_residue.split(' ')[0] : 'RES');
+                const cleanResn = String(rawResn).replace(/[^a-zA-Z0-9_\-]/g, '');
+                const resi = parseInt(item.resi, 10) || 0;
+                const cleanChain = String(item.chain || 'A').replace(/[^a-zA-Z0-9]/g, '');
+
+                const safeLabel = escapeHtml(item.receptor_residue || item.resn || '');
+                const safeRecAtom = escapeHtml(item.receptor_atom || '');
+                const safeLigAtom = escapeHtml(item.ligand_atom || '');
+                const safeKind = escapeHtml(item.kind || '');
+                const safeDist = Number(item.distance_angstrom || 0).toFixed(2);
 
                 div.innerHTML = `
                     <div class="flex items-center gap-2">
-                        <span class="px-1.5 py-0.5 rounded text-[10px] font-bold border ${badgeClass}">${item.kind}</span>
-                        <span class="font-bold text-slate-800">${item.receptor_residue || item.resn}</span>
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-bold border ${badgeClass}">${safeKind}</span>
+                        <span class="font-bold text-slate-800">${safeLabel}</span>
                         <span class="text-slate-400">&bull;&bull;&bull;</span>
-                        <span class="font-semibold text-slate-600">${item.receptor_atom || ''} &rarr; ${item.ligand_atom || ''}</span>
+                        <span class="font-semibold text-slate-600">${safeRecAtom} &rarr; ${safeLigAtom}</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-bold font-mono">
-                            ${Number(item.distance_angstrom).toFixed(2)} Å
+                            ${safeDist} Å
                         </span>
-                        <button type="button" onclick="highlightResidueIn3D('${resn}', ${resi}, '${chain}')"
-                            class="px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-600 hover:text-white border border-blue-200 text-blue-700 font-bold transition cursor-pointer text-[10px]">
+                        <button type="button" class="focus-res-btn px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-600 hover:text-white border border-blue-200 text-blue-700 font-bold transition cursor-pointer text-[10px]">
                             3D Focus
                         </button>
                     </div>
                 `;
+
+                const btn = div.querySelector('.focus-res-btn');
+                if (btn) {
+                    btn.addEventListener('click', () => {
+                        highlightResidueIn3D(cleanResn, resi, cleanChain);
+                    });
+                }
                 listContainer.appendChild(div);
             });
         }
