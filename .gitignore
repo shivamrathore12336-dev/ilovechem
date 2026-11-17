@@ -40,3 +40,12 @@ calculator/bin/
 benchmark_data/
 benchmark_results_*.json
 
+# Scratch dev and audit scripts
+/deep_scientific_audit.py
+/extreme_stress_test.py
+/internet_stress_test_10x.py
+/run_*.py
+/senior_scientist_audit.py
+/test_*.py
+/verify_*.py
+
