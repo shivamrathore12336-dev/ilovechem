@@ -20,7 +20,7 @@ def docking_studio_view(request):
     return render(request, "calculator/docking.html")
 
 
-@functools.lru_cache(maxsize=64)
+@functools.lru_cache(maxsize=8)
 def _fetch_rcsb_cached(clean_id: str) -> str:
     """In-memory LRU cache for RCSB PDB structures. Prevents redundant remote downloads and caps buffer to 25 MB."""
     rcsb_url = f"https://files.rcsb.org/download/{clean_id}.pdb"
@@ -53,9 +53,9 @@ def api_fetch_rcsb_pdb(request, pdb_id: str):
             {"success": False, "error": f"PDB ID '{clean_id}' not found on RCSB Protein Data Bank."},
             status=status.HTTP_404_NOT_FOUND
         )
-    except Exception as e:
+    except Exception:
         return Response(
-            {"success": False, "error": f"Failed to retrieve PDB '{clean_id}' from RCSB: {str(e)}"},
+            {"success": False, "error": "An internal error occurred while fetching the PDB structure."},
             status=status.HTTP_502_BAD_GATEWAY
         )
 

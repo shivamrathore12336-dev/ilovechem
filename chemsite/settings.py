@@ -141,7 +141,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 
-# Pharma Zero-Disk Invariant: Exclusively use MemoryFileUploadHandler.
+# Use in-memory upload handler only (no temp files to disk).
 # Disables Django's TemporaryFileUploadHandler so no file is ever spooled to disk.
 FILE_UPLOAD_HANDLERS = [
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
