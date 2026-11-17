@@ -33,9 +33,9 @@ Inspired by the clean simplicity of **iLovePDF**, iLoveChem eliminates the frict
 
 ---
 
-## 🛡️ Pharma Zero-Disk Invariant (Security & IP Protection)
+## 🛡️ Privacy & In-Memory Architecture
 
-In chemical and pharmaceutical research, molecular intellectual property is critical. **iLoveChem** is architected with a strict zero-disk policy:
+**iLoveChem** is architected with a strict in-memory execution policy for data privacy:
 - **100% In-Memory RAM Execution:** All conversions and coordinate embeddings are executed in volatile RAM buffers (`io.BytesIO`, `io.StringIO`).
 - **Enforced Memory-Only Upload Handlers:** Configured with Django's `MemoryFileUploadHandler` up to 25 MB, preventing temporary file spooling to disk.
 - **Zero Database Persistence:** No user chemical structures, SMILES, or calculation results are stored in database models or disk logs.

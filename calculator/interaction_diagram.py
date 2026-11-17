@@ -1,7 +1,7 @@
 """
 iLoveChem ChemDock v3.2 - Publication-Grade 2D Interaction Diagram & PyMOL Session Generator
 PoseView / Maestro / LigPlot / PyMOL / ChimeraX Standard
-100% Volatile in-memory execution (Pharma Zero-Storage Invariant)
+100% Volatile in-memory execution (no files written to disk)
 """
 
 import math
