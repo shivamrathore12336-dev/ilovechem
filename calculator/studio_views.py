@@ -1,6 +1,7 @@
 import os
 import re
 import base64
+import logging
 from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -20,9 +21,12 @@ from .scientific_engine import QuantumLogParser, DeepContentSniffer, BatchSdfPro
 from openbabel import openbabel as ob
 from openbabel import pybel
 
+logger = logging.getLogger(__name__)
+
 def studio_view(request):
     return render(request, "calculator/studio.html", {
-        "target_registry": COMPLETE_TARGET_FORMATS
+        "target_registry": COMPLETE_TARGET_FORMATS,
+        "target_count": sum(len(group) for group in COMPLETE_TARGET_FORMATS.values()),
     })
 
 
@@ -31,7 +35,9 @@ def downloads_view(request):
 
 
 def about_view(request):
-    return render(request, "calculator/about.html")
+    return render(request, "calculator/about.html", {
+        "target_count": sum(len(group) for group in COMPLETE_TARGET_FORMATS.values()),
+    })
 
 
 
@@ -173,6 +179,7 @@ def api_convert_file(request):
                     }
                 }, status=status.HTTP_200_OK)
         except Exception:
+            logger.exception("Reaction-scheme ZIP export failed")
             return Response({"error": "Failed to generate the reaction-scheme archive."}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     # Special Case: Multi-Structure SDF batch export to ZIP (Loophole 5)
@@ -198,6 +205,7 @@ def api_convert_file(request):
                     }
                 }, status=status.HTTP_200_OK)
         except Exception:
+            logger.exception("SDF batch ZIP export failed")
             return Response({"error": "Failed to generate the SDF batch archive."}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     # Standard Single / Selected Molecule Conversion
@@ -272,8 +280,9 @@ def api_convert_file(request):
                     "is_druglike": (violations <= 1)
                 }
         except Exception:
-            pass
-        
+            # Descriptors are a bonus; the conversion itself already succeeded.
+            logger.warning("MedChem descriptor calculation failed", exc_info=True)
+
         return Response({
             "success": True,
             "is_zip": False,
@@ -287,6 +296,7 @@ def api_convert_file(request):
         }, status=status.HTTP_200_OK)
 
     except Exception:
+        logger.exception("Conversion to %s failed", target_format)
         return Response({"error": f"Conversion failed for target format '{target_format}'."}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 

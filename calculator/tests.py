@@ -178,7 +178,21 @@ class MolecularDockingEngineTests(TestCase):
         resp = self.client.get('/docking/')
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, "Molecular Docking Studio")
-        self.assertContains(resp, "3Dmol.js")
+        # The 3D viewer library is self-hosted and version-pinned (no third-party CDN at runtime).
+        self.assertContains(resp, "vendor/3Dmol-2.5.5.min")
+        self.assertNotContains(resp, "cdn.tailwindcss.com")
+        self.assertNotContains(resp, "@latest")
+
+    def test_api_fetch_rcsb_pdb_rejects_unicode_digits(self):
+        # str.isalnum() accepts non-ASCII digits; the ID check must not.
+        resp = self.client.get('/api/dock/fetch-pdb/\u0661\u0662\u0663\u0664/')
+        self.assertEqual(resp.status_code, 400)
+
+    def test_api_run_docking_rejects_non_finite_grid(self):
+        resp = self.client.post('/api/dock/run/', {
+            "receptor_pdb": "ATOM", "ligand_input": "CCO", "center_x": "nan",
+        }, content_type='application/json')
+        self.assertEqual(resp.status_code, 400)
 
     def test_api_fetch_rcsb_pdb_validation(self):
         resp = self.client.get('/api/dock/fetch-pdb/INVALID_TOO_LONG/')

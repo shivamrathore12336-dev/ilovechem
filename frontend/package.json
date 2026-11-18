@@ -1,0 +1,11 @@
+{
+  "name": "ilovechem-frontend",
+  "private": true,
+  "scripts": {
+    "build": "tailwindcss -c tailwind.config.js -i input.css -o ../calculator/static/css/app.css --minify",
+    "watch": "tailwindcss -c tailwind.config.js -i input.css -o ../calculator/static/css/app.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}

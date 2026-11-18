@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
@@ -31,9 +32,6 @@
     <meta name="twitter:title" content="iLoveChem | Universal Computational Chemistry File Converter">
     <meta name="twitter:description" content="Free, zero-storage chemical file converter for ORCA, Gaussian, PDB, PDBQT, SDF, and CIF. Created by Shivam Rathore.">
 
-    <!-- Favicon (SVG Erlenmeyer Flask Brand Mark) -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%232563EB'/%3E%3Cstop offset='100%25' stop-color='%234F46E5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3Cpath d='M13 7h6M14 7v6l-5.5 9c-.8 1.3.1 3 1.7 3h11.6c1.6 0 2.5-1.7 1.7-3L18 13V7' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M11 19c2-.8 4 .8 6 0' stroke='%2393C5FD' stroke-width='1.5' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='16' cy='15' r='1.2' fill='%2360A5FA'/%3E%3C/svg%3E">
-
     <!-- Schema.org WebApplication JSON-LD (For Google Rich Results) -->
     <script type="application/ld+json">
     {
@@ -57,369 +55,31 @@
       }
     }
     </script>
-    
-    <!-- Google Fonts: Plus Jakarta Sans + JetBrains Mono -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-                        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
-                    },
-                    colors: {
-                        brand: {
-                            blue: '#2563EB',
-                            blueHover: '#1D4ED8',
-                            dark: '#0F172A',
-                            slate: '#1E293B',
-                            border: '#E2E8F0',
-                            accent: '#3B82F6'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- 3Dmol.js WebGL Engine -->
-    <script src="https://3dmol.org/build/3Dmol-min.js"></script>
-
-    <style>
-        * { box-sizing: border-box; }
-        body { 
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background-color: #FAFBFC; 
-            color: #0F172A;
-            -webkit-font-smoothing: antialiased;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.04) 0px, transparent 55%),
-                radial-gradient(at 100% 0%, rgba(79, 70, 229, 0.035) 0px, transparent 55%),
-                radial-gradient(at 50% 100%, rgba(14, 165, 233, 0.03) 0px, transparent 55%);
-            background-attachment: fixed;
-        }
-        .font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
-
-        .btn-brand-primary {
-            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
-            color: #FFFFFF;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 2px 8px -2px rgba(37, 99, 235, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(37, 99, 235, 0.8);
-        }
-        .btn-brand-primary:hover {
-            background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
-            box-shadow: 0 8px 20px -2px rgba(37, 99, 235, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-            transform: translateY(-1px);
-        }
-        .btn-brand-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-brand-success {
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
-            color: #FFFFFF;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 2px 8px -2px rgba(5, 150, 105, 0.35);
-        }
-        .btn-brand-success:hover {
-            box-shadow: 0 8px 20px -2px rgba(5, 150, 105, 0.45);
-            transform: translateY(-1px);
-        }
-
-        .panel-surface {
-            background: #FFFFFF;
-            border: 1px solid rgba(226, 232, 240, 0.9);
-            box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 4px 16px -2px rgba(15, 23, 42, 0.04), inset 0 1px 0 0 #FFFFFF;
-        }
-
-        .tool-card {
-            background: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.03);
-            transition: border-color 0.15s ease, box-shadow 0.15s ease;
-            position: relative;
-        }
-        .tool-card:hover {
-            border-color: #2563EB;
-            box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
-        }
-
-        .drop-active {
-            border-color: #2563EB !important;
-            background-color: rgba(239, 246, 255, 0.7) !important;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15) !important;
-        }
-
-        .format-chip {
-            transition: all 0.15s ease;
-        }
-        .format-chip:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        pre::-webkit-scrollbar { width: 6px; height: 6px; }
-        pre::-webkit-scrollbar-track { background: #0F172A; }
-        pre::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        pre::-webkit-scrollbar-thumb:hover { background: #475569; }
-    </style>
+    {% include "calculator/partials/head_assets.html" %}
+    {% include "calculator/partials/viewer_assets.html" %}
 </head>
-<body class="min-h-full flex flex-col justify-between">
+<body class="min-h-full flex flex-col">
 
-    <!-- 1. APP HEADER (iLovePDF Clean Minimalist Style with Mega-Dropdown) -->
-    <header class="bg-white border-b border-slate-200/90 sticky top-0 z-40 shadow-xs">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-            
-            <!-- Left: Logo & Nav Links -->
-            <div class="flex items-center space-x-8">
-                <a href="/" class="flex items-center space-x-2.5 group">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-blue-500 flex items-center justify-center text-white shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform shrink-0">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M10 2v5.5L4.5 18a2.5 2.5 0 0 0 2.2 3.5h10.6a2.5 2.5 0 0 0 2.2-3.5L14 7.5V2" />
-                            <path d="M8.5 2h7" />
-                            <path d="M7 14.5c2.5-1 4.5 1 7 0" />
-                            <circle cx="12" cy="11" r="1.2" fill="currentColor" />
-                        </svg>
-                    </div>
-                    <div class="flex items-baseline space-x-1.5">
-                        <span class="text-2xl font-black tracking-tight text-slate-900">iLove<span class="text-blue-600">Chem</span></span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                    </div>
-                </a>
+    {% include "calculator/partials/header.html" with page="studio" %}
+    <div id="main" class="flex-1 flex flex-col">
 
-                <!-- Navigation Links (iLovePDF Style) -->
-                <nav class="hidden md:flex items-center space-x-1 text-sm font-semibold text-slate-700">
-                    <button type="button" onclick="selectToolFromGrid('orca', 'ORCA Generator', 'Generate DFT input files with spin parity')" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1 cursor-pointer">
-                        <span>ORCA</span>
-                    </button>
-                    <button type="button" onclick="selectToolFromGrid('gjf', 'Gaussian Builder', 'Convert 2D/3D molecules into .com / .gjf')" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1 cursor-pointer">
-                        <span>Gaussian</span>
-                    </button>
-                    <button type="button" onclick="selectToolFromGrid('pdbqt', 'AutoDock PDBQT', 'Prepare ligands & receptors for Vina docking')" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1 cursor-pointer">
-                        <span>AutoDock PDBQT</span>
-                    </button>
-                    <button type="button" onclick="selectToolFromGrid('cdxml', 'ChemDraw Unpacker', 'Extract schemes & SuperAtoms into 3D files')" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1 cursor-pointer">
-                        <span>ChemDraw</span>
-                    </button>
-                    <a href="/properties/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
-                        <i data-lucide="sliders" class="w-4 h-4 text-slate-500"></i>
-                        <span>Properties</span>
-                    </a>
-                    <a href="/docking/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
-                        <i data-lucide="crosshair" class="w-4 h-4 text-blue-600"></i>
-                        <span>Docking</span>
-                        <span class="px-1.5 py-0.5 text-[9px] uppercase font-mono tracking-wider font-extrabold bg-blue-600 text-white rounded-md">New</span>
-                    </a>
-                    <a href="/downloads/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1 cursor-pointer">
-                        <span>Downloads</span>
-                    </a>
-                    <a href="/about/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1 cursor-pointer">
-                        <span>About</span>
-                    </a>
-                </nav>
-            </div>
-
-            <!-- Right: Security Badge, Contact & Three-Dots Menu -->
-            <div class="flex items-center space-x-2.5 text-xs">
-
-
-                <a href="https://www.linkedin.com/in/shivam-rathore-medchem/" target="_blank"
-                    class="px-3.5 py-1.5 rounded-lg bg-[#0A66C2] hover:bg-[#084e96] text-white font-bold flex items-center gap-1.5 transition shadow-xs cursor-pointer" rel="noopener noreferrer">
-                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                    </svg>
-                    <span>Connect</span>
-                </a>
-
-                <!-- THREE-DOTS MENU TRIGGER & EXPANDABLE PLATFORM HUB (Far Right) -->
-                <div class="relative">
-                    <button type="button" id="mega-menu-btn" onclick="toggleMegaDropdown()" aria-label="All Chemistry Tools, About & Security"
-                        class="p-2 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-slate-100 border border-slate-200 transition flex items-center justify-center cursor-pointer shadow-2xs group" title="All Chemistry Tools, About & Security">
-                        <i data-lucide="more-vertical" class="w-5 h-5 text-slate-600 group-hover:text-blue-600 transition-colors"></i>
-                    </button>
-
-                    <!-- MEGA DROPDOWN POPUP (Aligned right-0 with Tools, About, and Security) -->
-                    <div id="mega-dropdown" class="hidden absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2.5 z-50 transition-all duration-150 text-left space-y-1">
-                        
-                        <!-- 1. Highlighted Clickable Link: About & Capabilities -->
-                        <a href="/about/" class="flex items-center gap-3 p-3 rounded-xl bg-blue-50 hover:bg-blue-100/80 text-blue-900 font-bold transition group border border-blue-200/60 shadow-2xs">
-                            <div class="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
-                                <i data-lucide="info" class="w-5 h-5"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="text-xs font-extrabold text-blue-950 group-hover:text-blue-600 flex items-center justify-between">
-                                    <span>About &amp; Capabilities</span>
-                                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-blue-600 group-hover:translate-x-1 transition-transform"></i>
-                                </div>
-                                <div class="text-[10px] text-blue-700/80 font-mono font-medium">Full platform dossier &rarr;</div>
-                            </div>
-                        </a>
-
-                        <div class="py-1 space-y-0.5">
-                            <div class="px-2.5 pt-1.5 pb-0.5 text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold">Platform &amp; Tools</div>
-                            <!-- Clickable: Inbuilt Molecular Docking Studio -->
-                            <a href="/docking/" class="flex items-center gap-2.5 px-2.5 py-2 rounded-xl bg-blue-50/50 hover:bg-blue-100/70 text-slate-800 hover:text-blue-600 transition font-bold text-xs group">
-                                <i data-lucide="crosshair" class="w-4 h-4 text-blue-600 shrink-0"></i>
-                                <span class="flex-1">Inbuilt Molecular Docking</span>
-                                <span class="text-[9px] uppercase font-mono font-bold bg-blue-600 text-white px-1.5 py-0.5 rounded">New</span>
-                            </a>
-
-                            <!-- Clickable: Software Downloads Hub -->
-                            <a href="/downloads/" class="flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 transition font-semibold text-xs group">
-                                <i data-lucide="download" class="w-4 h-4 text-blue-600 shrink-0"></i>
-                                <span class="flex-1">Software Downloads Hub</span>
-                                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform"></i>
-                            </a>
-
-                            <!-- Clickable: In-Memory Privacy Policy -->
-                            <a href="/about/#privacy-security" 
-                                class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-slate-100 text-slate-700 transition font-semibold text-xs group text-left cursor-pointer">
-                                <i data-lucide="shield-check" class="w-4 h-4 text-slate-500 shrink-0"></i>
-                                <span class="flex-1">In-Memory Privacy Policy</span>
-                                <span class="text-[10px] text-slate-400 font-mono">Dossier</span>
-                            </a>
-
-                            <!-- Clickable: 19 Benchmark Test Cases -->
-                            <button type="button" onclick="document.getElementById('presets-catalog-modal').classList.remove('hidden'); toggleMegaDropdown();" 
-                                class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 transition font-semibold text-xs group text-left cursor-pointer">
-                                <i data-lucide="flask-conical" class="w-4 h-4 text-indigo-600 shrink-0"></i>
-                                <span class="flex-1">19 Benchmark Test Cases</span>
-                                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform"></i>
-                            </button>
-
-                            <!-- Clickable: Cite in Research (BibTeX) -->
-                            <button type="button" onclick="document.getElementById('citation-modal').classList.remove('hidden'); toggleMegaDropdown();" 
-                                class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-indigo-600 transition font-semibold text-xs group text-left cursor-pointer">
-                                <i data-lucide="bookmark" class="w-4 h-4 text-indigo-600 shrink-0"></i>
-                                <span class="flex-1">Cite iLoveChem (BibTeX)</span>
-                                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform"></i>
-                            </button>
-
-                            <!-- Clickable: Python REST API -->
-                            <a href="/about/#rest-api" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 transition font-semibold text-xs group">
-                                <i data-lucide="terminal" class="w-4 h-4 text-slate-600 shrink-0"></i>
-                                <span class="flex-1">Python REST API Docs</span>
-                                <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-400"></i>
-                            </a>
-                        </div>
-
-                        <div class="pt-1 border-t border-slate-100 space-y-0.5">
-                            <!-- Clickable: GitHub Profile -->
-                            <a href="https://github.com/shivamrathore12336-dev" target="_blank" class="flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-slate-900 transition text-xs font-semibold" rel="noopener noreferrer">
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-                                <span class="flex-1">Developer GitHub</span>
-                                <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-400"></i>
-                            </a>
-                            <!-- Clickable: Creator Profile -->
-                            <a href="https://www.linkedin.com/in/shivam-rathore-medchem/" target="_blank" class="flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition text-xs font-semibold" rel="noopener noreferrer">
-                                <i data-lucide="user" class="w-4 h-4 text-sky-600 shrink-0"></i>
-                                <span class="flex-1">Created by Shivam Rathore</span>
-                                <svg class="w-3.5 h-3.5 fill-[#0A66C2]" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                            </a>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- Mobile Menu Button (Hamburger) -->
-                <button type="button" id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Toggle Navigation Menu"
-                    class="md:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition focus:outline-none cursor-pointer">
-                    <i data-lucide="menu" class="w-5 h-5" id="mobile-menu-icon"></i>
-                </button>
-            </div>
-        </div></header>
-
-    <!-- Mobile Navigation Drawer -->
-    <div id="mobile-nav-drawer" class="hidden md:hidden bg-white border-b border-slate-200 px-4 py-4 space-y-3 shadow-lg z-30 transition-all">
-        <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold px-1">Quick Chemistry Tools</div>
-        <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-            <button type="button" onclick="selectToolFromGrid('orca', 'ORCA Generator', 'Generate DFT input files'); toggleMobileMenu();" class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 hover:bg-red-50 text-slate-700 hover:text-red-700 border border-slate-100 transition text-left">
-                <i data-lucide="atom" class="w-4 h-4 text-red-500 shrink-0"></i>
-                <span>ORCA DFT</span>
-            </button>
-            <button type="button" onclick="selectToolFromGrid('gjf', 'Gaussian Builder', 'Convert into .com / .gjf'); toggleMobileMenu();" class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-100 transition text-left">
-                <i data-lucide="cpu" class="w-4 h-4 text-blue-500 shrink-0"></i>
-                <span>Gaussian</span>
-            </button>
-            <button type="button" onclick="selectToolFromGrid('pdbqt', 'AutoDock PDBQT', 'Prepare for Vina docking'); toggleMobileMenu();" class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border border-slate-100 transition text-left">
-                <i data-lucide="dna" class="w-4 h-4 text-emerald-500 shrink-0"></i>
-                <span>AutoDock PDBQT</span>
-            </button>
-            <button type="button" onclick="selectToolFromGrid('cdxml', 'ChemDraw Unpacker', 'Extract schemes & SuperAtoms'); toggleMobileMenu();" class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 hover:bg-teal-50 text-slate-700 hover:text-teal-700 border border-slate-100 transition text-left">
-                <i data-lucide="file-code" class="w-4 h-4 text-teal-500 shrink-0"></i>
-                <span>ChemDraw</span>
-            </button>
-        </div>
-        <div class="pt-2 border-t border-slate-100 flex flex-col space-y-1 text-xs font-semibold">
-            <a href="/about/" class="flex items-center justify-between p-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold transition">
-                <span class="flex items-center gap-2"><i data-lucide="info" class="w-4 h-4 text-blue-600"></i> About &amp; Capabilities</span>
-                <i data-lucide="arrow-right" class="w-4 h-4 text-blue-500"></i>
-            </a>
-            <a href="/downloads/" class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold transition">
-                <span class="flex items-center gap-2"><i data-lucide="download" class="w-4 h-4 text-blue-600"></i> Downloads Hub</span>
-                <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
-            </a>
-            <a href="/about/#privacy-security" class="flex items-center justify-between p-2 rounded-lg hover:bg-slate-100 text-slate-700 font-semibold transition text-left">
-                <span class="flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-slate-500"></i> Zero-Storage Policy</span>
-                <span class="text-[10px] text-slate-400 font-mono">Dossier</span>
-            </a>
-            <button type="button" onclick="document.getElementById('citation-modal').classList.remove('hidden'); toggleMobileMenu();" class="flex items-center justify-between p-2 rounded-lg hover:bg-slate-100 text-slate-800 font-semibold transition text-left">
-                <span class="flex items-center gap-2"><i data-lucide="bookmark" class="w-4 h-4 text-indigo-600"></i> Cite iLoveChem (BibTeX)</span>
-                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-            </button>
-            <button type="button" onclick="document.getElementById('presets-catalog-modal').classList.remove('hidden'); toggleMobileMenu();" class="flex items-center justify-between p-2 rounded-lg hover:bg-slate-100 text-slate-700 transition text-left">
-                <span class="flex items-center gap-2"><i data-lucide="flask-conical" class="w-4 h-4 text-indigo-500"></i> 19 Benchmark Test Cases</span>
-                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- 2. HERO SECTION (Benchling / BioRender Clean Scientific Style) -->
-    <section class="pt-10 pb-6 sm:pt-14 sm:pb-8 text-center px-4 max-w-4xl mx-auto space-y-4">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700">
-            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span>Universal CADD &amp; DFT File Studio</span>
-            <span class="text-slate-300">•</span>
-            <span class="text-slate-600 font-mono text-[11px]">Volatile RAM Architecture</span>
-        </div>
-
-        <h1 class="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-            Every format you need for <span class="text-blue-600">Computational Chemistry</span> in one place
+    <!-- Hero -->
+    <section class="pt-12 pb-8 px-4 max-w-3xl mx-auto">
+        <h1 class="text-3xl sm:text-4xl font-semibold text-slate-900 tracking-tight leading-tight">
+            Convert molecular files for quantum chemistry and docking
         </h1>
-        
-        <p class="text-slate-600 text-sm sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            High-fidelity, in-memory file transformation, quantum spin multiplicity verification, and structure preparation for ORCA, Gaussian, AutoDock, PyMOL, and Crystallography.
+        <p class="mt-4 text-slate-600 text-base sm:text-lg leading-relaxed">
+            Upload a structure and get input files for ORCA, Gaussian, AutoDock Vina and {{ target_count|add:"-3" }} other formats.
+            Charge and spin multiplicity are checked before you download. Files are processed in memory and not stored.
         </p>
-
-        <div class="pt-2 flex flex-wrap items-center justify-center gap-3">
-            <a href="/docking/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-xs transition">
-                <i data-lucide="crosshair" class="w-4 h-4"></i>
-                <span>Open Inbuilt ChemDock Studio</span>
-                <span class="bg-white/20 text-white px-2 py-0.5 rounded-md text-[10px] font-mono uppercase tracking-wider font-extrabold">Live 3D WebGL</span>
-                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        <div class="mt-6 flex flex-wrap items-center gap-3">
+            <a href="#tools-grid" onclick="scrollToToolsGrid(event)" class="btn-brand-primary inline-flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium">
+                Choose a conversion
             </a>
-            <button type="button" onclick="selectPresetShortcut('imatinib')" class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm border border-slate-200/90 shadow-2xs hover:border-blue-400 transition-all cursor-pointer">
-                <i data-lucide="flask-conical" class="w-4 h-4 text-blue-600"></i>
-                <span>Load Sample: Imatinib</span>
+            <button type="button" onclick="selectPresetShortcut('imatinib')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 text-sm font-medium">
+                Try a sample (imatinib)
             </button>
-        </div>
-
-        <!-- Capability Trust Tags -->
-        <div class="pt-2 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-500 font-medium">
-            <span class="inline-flex items-center gap-1.5"><i data-lucide="layers" class="w-3.5 h-3.5 text-slate-500"></i> 15+ CADD &amp; DFT Formats</span>
-            <span class="text-slate-300">•</span>
-            <span class="inline-flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i> In-Memory Processing</span>
-            <span class="text-slate-300">•</span>
-            <span class="inline-flex items-center gap-1.5"><i data-lucide="activity" class="w-3.5 h-3.5 text-blue-600"></i> Spin Multiplicity &amp; Parity Check</span>
+            <a href="/docking/" class="text-sm text-blue-700 hover:underline px-1">Molecular docking &rarr;</a>
         </div>
     </section>
 
@@ -427,13 +87,9 @@
     <section id="tools-grid" class="max-w-6xl mx-auto px-4 sm:px-6 mb-12">
         <div class="flex items-center justify-between mb-4 px-1">
             <div>
-                <h2 class="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">Chemistry Conversion Tools</h2>
-                <div class="text-sm font-bold text-slate-800">Select an Instrument or Drop a File Anywhere</div>
+                <h2 class="text-lg font-semibold text-slate-900">Conversions</h2>
+                <p class="text-sm text-slate-600">Pick a conversion, or drop a file anywhere on this page</p>
             </div>
-            <span class="text-xs font-mono text-slate-600 bg-white px-3 py-1 rounded-lg border border-slate-200/90 shadow-2xs flex items-center gap-1.5 font-semibold">
-                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span>12 Chemistry Formats</span>
-            </span>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             
@@ -446,20 +102,19 @@
                             <i data-lucide="atom" class="w-5 h-5"></i>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Quantum DFT</span>
+                            <span class="text-xs text-slate-500">Quantum DFT</span>
                         </div>
                     </div>
                     <div>
                         <div class="flex items-center justify-between">
                             <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">ORCA Generator</h3>
-                            <span class="font-mono text-[10px] text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">.inp</span>
+                            <span class="font-mono text-xs text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">.inp</span>
                         </div>
                         <p class="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">Build DFT .inp with automatic spin parity, def2-SVP, and %pal cores.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100/90 flex items-center justify-between text-[11px] font-bold text-blue-600">
-                    <span class="text-[10px] font-mono font-medium text-slate-400 group-hover:text-blue-600">DFT Syntax Lock</span>
-                    <span class="flex items-center gap-1">Use ORCA <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i></span>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-end text-xs font-bold text-blue-600">
+                    <span class="flex items-center gap-1">Use ORCA <i data-lucide="arrow-right" class="w-3.5 h-3.5 transition-transform"></i></span>
                 </div>
             </div>
 
@@ -471,19 +126,18 @@
                         <div class="w-10 h-10 rounded-xl bg-indigo-50/90 text-indigo-600 border border-indigo-100 flex items-center justify-center font-bold group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-2xs">
                             <i data-lucide="cpu" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">Quantum DFT</span>
+                        <span class="text-xs text-slate-500">Quantum DFT</span>
                     </div>
                     <div>
                         <div class="flex items-center justify-between">
                             <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">Gaussian Builder</h3>
-                            <span class="font-mono text-[10px] text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">.gjf / .com</span>
+                            <span class="font-mono text-xs text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">.gjf / .com</span>
                         </div>
                         <p class="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">Generate .com / .gjf route cards, memory directives, and coordinates.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100/90 flex items-center justify-between text-[11px] font-bold text-blue-600">
-                    <span class="text-[10px] font-mono font-medium text-slate-400 group-hover:text-blue-600">Route Card Auto</span>
-                    <span class="flex items-center gap-1">Use Gaussian <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i></span>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-end text-xs font-bold text-blue-600">
+                    <span class="flex items-center gap-1">Use Gaussian <i data-lucide="arrow-right" class="w-3.5 h-3.5 transition-transform"></i></span>
                 </div>
             </div>
 
@@ -492,22 +146,21 @@
                 class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-emerald-50/90 text-emerald-600 border border-emerald-100 flex items-center justify-center font-bold group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-2xs">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50/90 text-blue-600 border border-blue-100 flex items-center justify-center font-bold group-hover:bg-blue-600 group-hover:text-white transition-all shadow-2xs">
                             <i data-lucide="dna" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Docking CADD</span>
+                        <span class="text-xs text-slate-500">Docking CADD</span>
                     </div>
                     <div>
                         <div class="flex items-center justify-between">
                             <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">AutoDock PDBQT</h3>
-                            <span class="font-mono text-[10px] text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">.pdbqt</span>
+                            <span class="font-mono text-xs text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">.pdbqt</span>
                         </div>
                         <p class="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">Assign polar hydrogens, Gasteiger charges, and rotatable torsion bonds.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100/90 flex items-center justify-between text-[11px] font-bold text-blue-600">
-                    <span class="text-[10px] font-mono font-medium text-slate-400 group-hover:text-blue-600">Gasteiger Charges</span>
-                    <span class="flex items-center gap-1">Prep PDBQT <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i></span>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-end text-xs font-bold text-blue-600">
+                    <span class="flex items-center gap-1">Prep PDBQT <i data-lucide="arrow-right" class="w-3.5 h-3.5 transition-transform"></i></span>
                 </div>
             </div>
 
@@ -519,19 +172,18 @@
                         <div class="w-10 h-10 rounded-xl bg-cyan-50/90 text-cyan-600 border border-cyan-100 flex items-center justify-center font-bold group-hover:bg-cyan-600 group-hover:text-white transition-all shadow-2xs">
                             <i data-lucide="file-code" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded border border-cyan-100">ChemDraw 2D/3D</span>
+                        <span class="text-xs text-slate-500">ChemDraw 2D/3D</span>
                     </div>
                     <div>
                         <div class="flex items-center justify-between">
                             <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">ChemDraw Unpacker</h3>
-                            <span class="font-mono text-[10px] text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">.cdxml</span>
+                            <span class="font-mono text-xs text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">.cdxml</span>
                         </div>
                         <p class="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">Extract multi-molecule schemes, chemical drawings, and SuperAtoms.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100/90 flex items-center justify-between text-[11px] font-bold text-blue-600">
-                    <span class="text-[10px] font-mono font-medium text-slate-400 group-hover:text-blue-600">Multi-Fragment</span>
-                    <span class="flex items-center gap-1">Unpack CDXML <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i></span>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-end text-xs font-bold text-blue-600">
+                    <span class="flex items-center gap-1">Unpack CDXML <i data-lucide="arrow-right" class="w-3.5 h-3.5 transition-transform"></i></span>
                 </div>
             </div>
 
@@ -543,19 +195,18 @@
                         <div class="w-10 h-10 rounded-xl bg-purple-50/90 text-purple-600 border border-purple-100 flex items-center justify-center font-bold group-hover:bg-purple-600 group-hover:text-white transition-all shadow-2xs">
                             <i data-lucide="library" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-100">Screening</span>
+                        <span class="text-xs text-slate-500">Screening</span>
                     </div>
                     <div>
                         <div class="flex items-center justify-between">
                             <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">SDF Batch Splitter</h3>
-                            <span class="font-mono text-[10px] text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">.zip / .sdf</span>
+                            <span class="font-mono text-xs text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">.zip / .sdf</span>
                         </div>
                         <p class="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">Decompose multi-compound screening libraries into individual structures.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100/90 flex items-center justify-between text-[11px] font-bold text-blue-600">
-                    <span class="text-[10px] font-mono font-medium text-slate-400 group-hover:text-blue-600">ZIP Packaging</span>
-                    <span class="flex items-center gap-1">Split Library <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i></span>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-end text-xs font-bold text-blue-600">
+                    <span class="flex items-center gap-1">Split Library <i data-lucide="arrow-right" class="w-3.5 h-3.5 transition-transform"></i></span>
                 </div>
             </div>
 
@@ -564,22 +215,21 @@
                 class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-amber-50/90 text-amber-600 border border-amber-100 flex items-center justify-center font-bold group-hover:bg-amber-600 group-hover:text-white transition-all shadow-2xs">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50/90 text-blue-600 border border-blue-100 flex items-center justify-center font-bold group-hover:bg-blue-600 group-hover:text-white transition-all shadow-2xs">
                             <i data-lucide="gem" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-100">Solid-State</span>
+                        <span class="text-xs text-slate-500">Solid-State</span>
                     </div>
                     <div>
                         <div class="flex items-center justify-between">
                             <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">CIF Crystallography</h3>
-                            <span class="font-mono text-[10px] text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">.cif &rarr; .xyz</span>
+                            <span class="font-mono text-xs text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">.cif &rarr; .xyz</span>
                         </div>
                         <p class="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">Convert crystal unit cells with fractional coordinates into Cartesian XYZ.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100/90 flex items-center justify-between text-[11px] font-bold text-blue-600">
-                    <span class="text-[10px] font-mono font-medium text-slate-400 group-hover:text-blue-600">Fractional Ortho</span>
-                    <span class="flex items-center gap-1">Convert Crystal <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i></span>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-end text-xs font-bold text-blue-600">
+                    <span class="flex items-center gap-1">Convert Crystal <i data-lucide="arrow-right" class="w-3.5 h-3.5 transition-transform"></i></span>
                 </div>
             </div>
 
@@ -588,22 +238,21 @@
                 class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-rose-50/90 text-rose-600 border border-rose-100 flex items-center justify-center font-bold group-hover:bg-rose-600 group-hover:text-white transition-all shadow-2xs">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50/90 text-blue-600 border border-blue-100 flex items-center justify-center font-bold group-hover:bg-blue-600 group-hover:text-white transition-all shadow-2xs">
                             <i data-lucide="flask-conical" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-100">Curation</span>
+                        <span class="text-xs text-slate-500">Curation</span>
                     </div>
                     <div>
                         <div class="flex items-center justify-between">
                             <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">Salt Stripper</h3>
-                            <span class="font-mono text-[10px] text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">Clean Mol</span>
+                            <span class="font-mono text-xs text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">Clean Mol</span>
                         </div>
                         <p class="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">Remove spectator counter-ions while preserving organometallic bonds.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100/90 flex items-center justify-between text-[11px] font-bold text-blue-600">
-                    <span class="text-[10px] font-mono font-medium text-slate-400 group-hover:text-blue-600">Spectator Ion Clean</span>
-                    <span class="flex items-center gap-1">Strip Salts <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i></span>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-end text-xs font-bold text-blue-600">
+                    <span class="flex items-center gap-1">Strip Salts <i data-lucide="arrow-right" class="w-3.5 h-3.5 transition-transform"></i></span>
                 </div>
             </div>
 
@@ -615,19 +264,18 @@
                         <div class="w-10 h-10 rounded-xl bg-blue-50/90 text-blue-600 border border-blue-100 flex items-center justify-center font-bold group-hover:bg-blue-600 group-hover:text-white transition-all shadow-2xs">
                             <i data-lucide="eye" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">WebGL 3D</span>
+                        <span class="text-xs text-slate-500">WebGL 3D</span>
                     </div>
                     <div>
                         <div class="flex items-center justify-between">
                             <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">3D Inspector</h3>
-                            <span class="font-mono text-[10px] text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">Interactive</span>
+                            <span class="font-mono text-xs text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">Interactive</span>
                         </div>
                         <p class="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">Interactive 3D WebGL inspection, stereochemistry, and formula audit.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100/90 flex items-center justify-between text-[11px] font-bold text-blue-600">
-                    <span class="text-[10px] font-mono font-medium text-slate-400 group-hover:text-blue-600">Mol* GPU Render</span>
-                    <span class="flex items-center gap-1">Inspect 3D <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i></span>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-end text-xs font-bold text-blue-600">
+                    <span class="flex items-center gap-1">Inspect 3D <i data-lucide="arrow-right" class="w-3.5 h-3.5 transition-transform"></i></span>
                 </div>
             </div>
 
@@ -639,19 +287,18 @@
                         <div class="w-10 h-10 rounded-xl bg-violet-50/90 text-violet-600 border border-violet-100 flex items-center justify-center font-bold group-hover:bg-violet-600 group-hover:text-white transition-all shadow-2xs">
                             <i data-lucide="activity" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-violet-700 bg-violet-50 px-2 py-0.5 rounded border border-violet-100">MedChem</span>
+                        <span class="text-xs text-slate-500">MedChem</span>
                     </div>
                     <div>
                         <div class="flex items-center justify-between">
                             <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">Drug Properties</h3>
-                            <span class="font-mono text-[10px] text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">Ro5 / Radar</span>
+                            <span class="font-mono text-xs text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">Ro5 / Radar</span>
                         </div>
                         <p class="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">Calculate MW, LogP, TPSA, and Lipinski Ro5 compliance in real-time.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100/90 flex items-center justify-between text-[11px] font-bold text-blue-600">
-                    <span class="text-[10px] font-mono font-medium text-slate-400 group-hover:text-blue-600">Veber & Lipinski</span>
-                    <span class="flex items-center gap-1">Calculate Ro5 <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i></span>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-end text-xs font-bold text-blue-600">
+                    <span class="flex items-center gap-1">Calculate Ro5 <i data-lucide="arrow-right" class="w-3.5 h-3.5 transition-transform"></i></span>
                 </div>
             </div>
 
@@ -663,19 +310,18 @@
                         <div class="w-10 h-10 rounded-xl bg-teal-50/90 text-teal-600 border border-teal-100 flex items-center justify-center font-bold group-hover:bg-teal-600 group-hover:text-white transition-all shadow-2xs">
                             <i data-lucide="layers" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-100">Materials</span>
+                        <span class="text-xs text-slate-500">Materials</span>
                     </div>
                     <div>
                         <div class="flex items-center justify-between">
                             <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">Q-Chem / VASP</h3>
-                            <span class="font-mono text-[10px] text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">POSCAR</span>
+                            <span class="font-mono text-xs text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">POSCAR</span>
                         </div>
                         <p class="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">Prepare density functional theory and periodic boundary POSCAR files.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100/90 flex items-center justify-between text-[11px] font-bold text-blue-600">
-                    <span class="text-[10px] font-mono font-medium text-slate-400 group-hover:text-blue-600">Periodic Cell</span>
-                    <span class="flex items-center gap-1">Use Q-Chem <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i></span>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-end text-xs font-bold text-blue-600">
+                    <span class="flex items-center gap-1">Use Q-Chem <i data-lucide="arrow-right" class="w-3.5 h-3.5 transition-transform"></i></span>
                 </div>
             </div>
 
@@ -684,22 +330,21 @@
                 class="group tool-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-orange-50/90 text-orange-600 border border-orange-100 flex items-center justify-center font-bold group-hover:bg-orange-600 group-hover:text-white transition-all shadow-2xs">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50/90 text-blue-600 border border-blue-100 flex items-center justify-center font-bold group-hover:bg-blue-600 group-hover:text-white transition-all shadow-2xs">
                             <i data-lucide="maximize-2" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-orange-700 bg-orange-50 px-2 py-0.5 rounded border border-orange-100">Synthesis</span>
+                        <span class="text-xs text-slate-500">Synthesis</span>
                     </div>
                     <div>
                         <div class="flex items-center justify-between">
                             <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">SuperAtom Expander</h3>
-                            <span class="font-mono text-[10px] text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">Protecting</span>
+                            <span class="font-mono text-xs text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">Protecting</span>
                         </div>
                         <p class="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">Expand protecting groups (Boc, Ts, Ph, Cy) into explicit 3D atoms.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100/90 flex items-center justify-between text-[11px] font-bold text-blue-600">
-                    <span class="text-[10px] font-mono font-medium text-slate-400 group-hover:text-blue-600">Boc/Ts/Ph/Cy</span>
-                    <span class="flex items-center gap-1">Expand Atoms <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i></span>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-end text-xs font-bold text-blue-600">
+                    <span class="flex items-center gap-1">Expand Atoms <i data-lucide="arrow-right" class="w-3.5 h-3.5 transition-transform"></i></span>
                 </div>
             </div>
 
@@ -711,19 +356,18 @@
                         <div class="w-10 h-10 rounded-xl bg-blue-50/90 text-blue-600 border border-blue-100 flex items-center justify-center font-bold group-hover:bg-blue-600 group-hover:text-white transition-all shadow-2xs">
                             <i data-lucide="refresh-cw" class="w-5 h-5"></i>
                         </div>
-                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Universal</span>
+                        <span class="text-xs text-slate-500">Universal</span>
                     </div>
                     <div>
                         <div class="flex items-center justify-between">
                             <h3 class="font-bold text-slate-900 group-hover:text-blue-600 text-sm tracking-tight transition-colors">Any-to-Any Converter</h3>
-                            <span class="font-mono text-[10px] text-blue-600 bg-blue-50 font-bold px-1.5 py-0.5 rounded border border-blue-100">15+ Formats</span>
+                            <span class="font-mono text-xs text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">{{ target_count }} formats</span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">Direct bidirectional conversion between all 15+ formats with quantum parity.</p>
+                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">Direct bidirectional conversion between all {{ target_count }} formats with quantum parity.</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100/90 flex items-center justify-between text-[11px] font-bold text-blue-600">
-                    <span class="text-[10px] font-mono font-medium text-slate-400 group-hover:text-blue-600">Spin & Charge Parity</span>
-                    <span class="flex items-center gap-1">All Formats <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i></span>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-end text-xs font-bold text-blue-600">
+                    <span class="flex items-center gap-1">All Formats <i data-lucide="arrow-right" class="w-3.5 h-3.5 transition-transform"></i></span>
                 </div>
             </div>
 
@@ -743,7 +387,7 @@
                     <div>
                         <div class="font-bold text-slate-900 text-sm flex items-center gap-2">
                             <span id="active-tool-title">ORCA Input Generator</span>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-200/60 text-blue-900 font-mono font-bold">Active Engine</span>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-blue-200/60 text-blue-900 font-mono font-bold">Active Engine</span>
                         </div>
                         <div id="active-tool-desc" class="text-slate-600 text-xs">Drop or select any molecular structure below to generate output.</div>
                     </div>
@@ -756,17 +400,17 @@
             <!-- Sleek Minimal Progress Step Indicator -->
             <div class="max-w-xl mx-auto flex items-center justify-between text-xs font-semibold text-slate-500 px-4 py-2 border-y border-slate-200/70">
                 <div id="step-pill-1" class="flex items-center gap-2 text-blue-600 font-bold">
-                    <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">1</span>
+                    <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">1</span>
                     <span>Upload & Inspect</span>
                 </div>
                 <div class="w-8 h-px bg-slate-200"></div>
                 <div id="step-pill-2" class="flex items-center gap-2 text-slate-400">
-                    <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">2</span>
+                    <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold">2</span>
                     <span>Target Format & Engine</span>
                 </div>
                 <div class="w-8 h-px bg-slate-200"></div>
                 <div id="step-pill-3" class="flex items-center gap-2 text-slate-400">
-                    <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">3</span>
+                    <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold">3</span>
                     <span>3D Verify & Download</span>
                 </div>
             </div>
@@ -786,33 +430,33 @@
                             Drop chemical file here or browse
                         </div>
                         <div class="text-xs text-slate-500 font-medium">
-                            15+ formats supported · 100% volatile in-memory RAM · Up to 25 MB
+                            {{ target_count }} output formats · 100% volatile in-memory RAM · Up to 25 MB
                         </div>
                     </div>
 
                     <!-- Supported Format Badges Row -->
                     <div class="flex flex-wrap items-center justify-center gap-1.5 pt-1">
-                        <span class="format-chip px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-[10px] font-semibold border border-slate-200/80">PDB</span>
-                        <span class="format-chip px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-[10px] font-semibold border border-slate-200/80">PDBQT</span>
-                        <span class="format-chip px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-[10px] font-semibold border border-slate-200/80">SDF</span>
-                        <span class="format-chip px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-[10px] font-semibold border border-slate-200/80">CIF</span>
-                        <span class="format-chip px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-mono text-[10px] font-bold border border-blue-200/80">ORCA (.inp)</span>
-                        <span class="format-chip px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 font-mono text-[10px] font-bold border border-indigo-200/80">Gaussian (.com)</span>
-                        <span class="format-chip px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-[10px] font-semibold border border-slate-200/80">CDXML</span>
-                        <span class="format-chip px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-[10px] font-semibold border border-slate-200/80">XYZ</span>
-                        <span class="format-chip px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 font-mono text-[10px] font-bold border border-slate-200/80">+8 more</span>
+                        <span class="format-chip px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-xs font-semibold border border-slate-200/80">PDB</span>
+                        <span class="format-chip px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-xs font-semibold border border-slate-200/80">PDBQT</span>
+                        <span class="format-chip px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-xs font-semibold border border-slate-200/80">SDF</span>
+                        <span class="format-chip px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-xs font-semibold border border-slate-200/80">CIF</span>
+                        <span class="format-chip px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-mono text-xs font-bold border border-blue-200/80">ORCA (.inp)</span>
+                        <span class="format-chip px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 font-mono text-xs font-bold border border-indigo-200/80">Gaussian (.com)</span>
+                        <span class="format-chip px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-xs font-semibold border border-slate-200/80">CDXML</span>
+                        <span class="format-chip px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-xs font-semibold border border-slate-200/80">XYZ</span>
+                        <span class="format-chip px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 font-mono text-xs font-bold border border-slate-200/80">+8 more</span>
                     </div>
 
                     <!-- iLovePDF Signature Big Primary Button -->
                     <button type="button" onclick="document.getElementById('file-selector').click()"
-                        class="btn-brand-primary font-bold text-base sm:text-lg px-10 py-4 rounded-xl flex items-center space-x-3 cursor-pointer mt-2 shadow-lg hover:scale-[1.02] transition-transform">
+                        class="btn-brand-primary font-bold text-base sm:text-lg px-10 py-4 rounded-xl flex items-center space-x-3 cursor-pointer mt-2 shadow-lg transition-transform">
                         <i data-lucide="folder-open" class="w-5 h-5"></i>
                         <span>Select Chemistry File</span>
                     </button>
                 </div>
 
                 <!-- Clean Format Badges Bar -->
-                <div class="mt-10 pt-6 border-t border-slate-100 flex flex-wrap items-center justify-center gap-2 text-[11px] font-mono text-slate-600">
+                <div class="mt-10 pt-6 border-t border-slate-100 flex flex-wrap items-center justify-center gap-2 text-xs font-mono text-slate-600">
                     <span class="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 font-semibold">ChemDraw (.cdxml, .cdx)</span>
                     <span class="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 font-semibold">Gaussian / ORCA (.log, .inp, .gjf)</span>
                     <span class="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 font-semibold">CIF & VASP POSCAR</span>
@@ -830,33 +474,33 @@
                     </div>
                     <div>
                         <span class="font-bold text-slate-900 block leading-tight">Sample Library</span>
-                        <span class="text-slate-400 text-[10px] hidden md:inline">1-Click benchmark edge cases:</span>
+                        <span class="text-slate-400 text-xs hidden md:inline">1-Click benchmark edge cases:</span>
                     </div>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
                     <button type="button" onclick="setPresetShortcut('reaction_scheme', 'orca')" 
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 font-semibold text-xs transition shadow-2xs hover:-translate-y-0.5">
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 font-semibold text-xs transition shadow-2xs">
                         <i data-lucide="git-fork" class="w-3.5 h-3.5 text-blue-600"></i>
                         <span>Reaction Scheme (.cdxml)</span>
                     </button>
                     <button type="button" onclick="setPresetShortcut('gaussian_log', 'xyz')" 
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 font-semibold text-xs transition shadow-2xs hover:-translate-y-0.5">
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 font-semibold text-xs transition shadow-2xs">
                         <i data-lucide="file-text" class="w-3.5 h-3.5 text-indigo-600"></i>
                         <span>Gaussian Log (.log)</span>
                     </button>
                     <button type="button" onclick="setPresetShortcut('cif_missing_h', 'xyz')" 
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 font-semibold text-xs transition shadow-2xs hover:-translate-y-0.5">
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 font-semibold text-xs transition shadow-2xs">
                         <i data-lucide="box" class="w-3.5 h-3.5 text-emerald-600"></i>
                         <span>CIF Crystal (Missing H)</span>
                     </button>
                     <button type="button" onclick="setPresetShortcut('pdb_complex', 'orca')" 
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 font-semibold text-xs transition shadow-2xs hover:-translate-y-0.5">
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 font-semibold text-xs transition shadow-2xs">
                         <i data-lucide="dna" class="w-3.5 h-3.5 text-purple-600"></i>
                         <span>PDB Complex (Waters)</span>
                     </button>
                     <button type="button" onclick="document.getElementById('presets-catalog-modal').classList.remove('hidden')" 
-                        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 font-bold text-xs transition shadow-2xs hover:-translate-y-0.5">
+                        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 font-bold text-xs transition shadow-2xs">
                         <span>All 19 Benchmarks</span>
                         <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
                     </button>
@@ -874,8 +518,8 @@
                         </div>
                         <div>
                             <div id="detected-format-label" class="font-bold text-slate-900 text-sm">File Recognized & Filtered</div>
-                            <div id="detected-sub-label" class="text-slate-600 text-[11px] mt-0.5">Reaction arrows and written text ignored. Ready to convert.</div>
-                            <div id="electronic-state-pill" class="hidden mt-1.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800 border border-blue-200 text-[10px] font-bold">
+                            <div id="detected-sub-label" class="text-slate-600 text-xs mt-0.5">Reaction arrows and written text ignored. Ready to convert.</div>
+                            <div id="electronic-state-pill" class="hidden mt-1.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800 border border-blue-200 text-xs font-bold">
                                 <i data-lucide="zap" class="w-3 h-3 text-blue-600"></i>
                                 <span id="electronic-state-text">Valence Parity Verified</span>
                             </div>
@@ -893,14 +537,14 @@
                             <i data-lucide="layers" class="w-4 h-4 text-blue-600"></i>
                             <span>Multiple Molecules Found on Drawing Sheet:</span>
                         </span>
-                        <span class="text-[11px] text-blue-700 font-mono font-bold" id="frag-count-tag">2 Structures Detected</span>
+                        <span class="text-xs text-blue-700 font-mono font-bold" id="frag-count-tag">2 Structures Detected</span>
                     </div>
 
                     <div class="flex flex-col sm:flex-row gap-2" id="frag-options-container">
                         <!-- Populated dynamically via inspectFragmentsInCDXML -->
                     </div>
 
-                    <div class="pt-2 flex items-center justify-between text-[11px] text-blue-900 border-t border-blue-200/80">
+                    <div class="pt-2 flex items-center justify-between text-xs text-blue-900 border-t border-blue-200/80">
                         <span>Need all chemical structures in this scheme?</span>
                         <button type="button" onclick="setModeAndConvert('all_zip')" class="font-bold underline hover:text-blue-950 flex items-center gap-1">
                             <i data-lucide="archive" class="w-3.5 h-3.5 text-blue-700"></i><span>Export All Molecules as ZIP Archive</span>
@@ -956,14 +600,14 @@
                                 <label class="font-bold text-slate-700 block mb-1">Total Charge</label>
                                 <input type="number" id="charge-input" value="0" step="1" 
                                     class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-mono font-bold focus:outline-none focus:border-blue-500" />
-                                <span class="text-[10px] text-slate-400 mt-1 block">Neutral = 0, Cation = +1, Anion = -1</span>
+                                <span class="text-xs text-slate-400 mt-1 block">Neutral = 0, Cation = +1, Anion = -1</span>
                             </div>
 
                             <div>
                                 <label class="font-bold text-slate-700 block mb-1">Spin Multiplicity</label>
                                 <input type="number" id="mult-input" value="1" min="1" step="1" 
                                     class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-mono font-bold focus:outline-none focus:border-blue-500" />
-                                <span class="text-[10px] text-emerald-600 font-medium mt-1 block">Parity-guarded (auto-corrected)</span>
+                                <span class="text-xs text-emerald-600 font-medium mt-1 block">Parity-guarded (auto-corrected)</span>
                             </div>
 
                             <div>
@@ -973,21 +617,21 @@
                                     <option value="strip_water">Strip Waters (HOH, WAT, SOL)</option>
                                     <option value="ligand_only">Extract Ligand Only (HETATM)</option>
                                 </select>
-                                <span class="text-[10px] text-slate-400 mt-1 block">Protects against colliding duplicates</span>
+                                <span class="text-xs text-slate-400 mt-1 block">Protects against colliding duplicates</span>
                             </div>
 
                             <div>
                                 <label class="font-bold text-slate-700 block mb-1">QM Functional / Method</label>
                                 <input type="text" id="method-input" value="B3LYP" 
                                     class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-mono font-bold focus:outline-none focus:border-blue-500" />
-                                <span class="text-[10px] text-slate-400 mt-1 block">e.g. B3LYP, PBE0, wB97X-D3, PBE</span>
+                                <span class="text-xs text-slate-400 mt-1 block">e.g. B3LYP, PBE0, wB97X-D3, PBE</span>
                             </div>
 
                             <div>
                                 <label class="font-bold text-slate-700 block mb-1">Basis Set</label>
                                 <input type="text" id="basis-input" value="def2-SVP" 
                                     class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-mono font-bold focus:outline-none focus:border-blue-500" />
-                                <span class="text-[10px] text-slate-400 mt-1 block">e.g. def2-SVP, def2-TZVP, 6-31G*</span>
+                                <span class="text-xs text-slate-400 mt-1 block">e.g. def2-SVP, def2-TZVP, 6-31G*</span>
                             </div>
 
                             <div class="flex items-center space-x-2 pt-5">
@@ -1004,7 +648,7 @@
                                         Strip Disconnected Counter-Ions & Solvents (Default Recommended)
                                     </label>
                                 </div>
-                                <p class="text-[11px] text-slate-600 pl-6">
+                                <p class="text-xs text-slate-600 pl-6">
                                     Automatically isolates active parent organic molecule by removing unbonded salts/solvents (Na⁺, Cl⁻, H₂O, TFA, acetate, mesylate) to prevent vacuum DFT dissociation crashes.
                                 </p>
                             </div>
@@ -1036,7 +680,7 @@
                         <i data-lucide="alert-circle" class="w-4 h-4 text-amber-600"></i>
                         <span>Scientific Integrity Actions Applied:</span>
                     </div>
-                    <ul id="scientific-warnings-list" class="list-disc list-inside space-y-0.5 text-[11px] text-amber-800 font-mono">
+                    <ul id="scientific-warnings-list" class="list-disc list-inside space-y-0.5 text-xs text-amber-800 font-mono">
                     </ul>
                 </div>
 
@@ -1067,7 +711,7 @@
                     </button>
 
                     <button type="button" id="send-docking-btn" onclick="sendConvertedToDocking()"
-                        class="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm flex items-center justify-center space-x-2 shadow-sm transition cursor-pointer" title="Send converted molecule directly into Molecular Docking Studio">
+                        class="bg-blue-600 w-full sm:w-auto px-5 py-3.5 rounded-xl text-white font-bold text-sm flex items-center justify-center space-x-2 shadow-sm transition cursor-pointer hover:bg-blue-700" title="Send converted molecule directly into Molecular Docking Studio">
                         <i data-lucide="crosshair" class="w-4 h-4"></i>
                         <span>Dock Molecule</span>
                     </button>
@@ -1094,7 +738,7 @@
                                 </span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/80 flex items-center gap-1">
+                                <span class="text-xs font-mono px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/80 flex items-center gap-1">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                                     <span>Validated Syntax</span>
                                 </span>
@@ -1109,16 +753,16 @@
                     <div class="md:col-span-5 bg-[#0B0F19] rounded-2xl relative overflow-hidden h-80 md:h-auto border border-slate-800 shadow-md flex flex-col">
                         <!-- 3D Toolbar Header -->
                         <div class="flex items-center justify-between px-3 py-2 bg-slate-900/90 border-b border-slate-800 text-xs z-10">
-                            <span class="text-[11px] font-mono font-bold text-slate-300 flex items-center gap-1.5">
+                            <span class="text-xs font-mono font-bold text-slate-300 flex items-center gap-1.5">
                                 <i data-lucide="box" class="w-3.5 h-3.5 text-blue-400"></i>
                                 <span>3D Mol* Viewer</span>
                             </span>
                             <div class="flex items-center space-x-1">
-                                <button type="button" onclick="set3DStyle('stick')" title="Stick Representation" class="style-3d-btn px-2 py-0.5 rounded text-[10px] font-mono bg-blue-600 text-white font-bold transition cursor-pointer">Stick</button>
-                                <button type="button" onclick="set3DStyle('sphere')" title="Sphere (CPK) Representation" class="style-3d-btn px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer">CPK</button>
-                                <button type="button" onclick="set3DStyle('line')" title="Wireframe Representation" class="style-3d-btn px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer">Wire</button>
-                                <button type="button" id="btn-bg-3d" onclick="toggle3DBackground()" title="Toggle Background (Dark / Academic White)" class="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer">White</button>
-                                <button type="button" onclick="export3DPNG()" title="Export Publication-Ready PNG Figure" class="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold transition cursor-pointer flex items-center gap-1">
+                                <button type="button" onclick="set3DStyle('stick')" title="Stick Representation" class="style-3d-btn px-2 py-0.5 rounded text-xs font-mono bg-blue-600 text-white font-bold transition cursor-pointer">Stick</button>
+                                <button type="button" onclick="set3DStyle('sphere')" title="Sphere (CPK) Representation" class="style-3d-btn px-2 py-0.5 rounded text-xs font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer">CPK</button>
+                                <button type="button" onclick="set3DStyle('line')" title="Wireframe Representation" class="style-3d-btn px-2 py-0.5 rounded text-xs font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer">Wire</button>
+                                <button type="button" id="btn-bg-3d" onclick="toggle3DBackground()" title="Toggle Background (Dark / Academic White)" class="px-2 py-0.5 rounded text-xs font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer">White</button>
+                                <button type="button" onclick="export3DPNG()" title="Export Publication-Ready PNG Figure" class="px-2 py-0.5 rounded text-xs font-mono bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold transition cursor-pointer flex items-center gap-1">
                                     <i data-lucide="camera" class="w-3 h-3"></i>
                                     <span>PNG</span>
                                 </button>
@@ -1134,7 +778,7 @@
                         <!-- WebGL Canvas Container -->
                         <div class="relative flex-1 min-h-[220px]">
                             <div id="stage-3d" class="absolute inset-0"></div>
-                            <div class="absolute bottom-2 right-2 text-[10px] font-mono text-slate-400 bg-slate-900/90 px-2 py-0.5 rounded pointer-events-none border border-slate-800/80">
+                            <div class="absolute bottom-2 right-2 text-xs font-mono text-slate-400 bg-slate-900/90 px-2 py-0.5 rounded pointer-events-none border border-slate-800/80">
                                 Drag to Rotate • Scroll to Zoom
                             </div>
                         </div>
@@ -1142,14 +786,14 @@
                 </div>
 
                 <!-- Interactive Medicinal Chemistry & Drug-Likeness Dashboard -->
-                <div id="medchem-dashboard" class="hidden mt-5 p-5 rounded-2xl bg-gradient-to-r from-slate-50 via-blue-50/20 to-indigo-50/30 border border-slate-200">
+                <div id="medchem-dashboard" class="bg-slate-50 hidden mt-5 p-5 rounded-2xl border border-slate-200">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-3 border-b border-slate-200/80 gap-2">
                         <div class="flex items-center space-x-2">
                             <div class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
                                 <i data-lucide="activity" class="w-4 h-4"></i>
                             </div>
-                            <span class="font-black text-slate-900 text-sm">Medicinal Chemistry &amp; Drug-Likeness</span>
-                            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold">RDKit In-Memory</span>
+                            <span class="font-semibold text-slate-900 text-sm">Medicinal Chemistry &amp; Drug-Likeness</span>
+                            <span class="text-xs font-mono px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold">RDKit In-Memory</span>
                         </div>
                         <div id="lipinski-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
                             <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-600"></i>
@@ -1159,34 +803,34 @@
 
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 text-center">
                         <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mol. Weight</div>
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Mol. Weight</div>
                             <div id="prop-mw" class="text-base font-extrabold text-slate-900 mt-0.5">-</div>
-                            <div class="text-[9px] text-slate-500 font-mono mt-0.5">&lt; 500 Da</div>
+                            <div class="text-xs text-slate-500 font-mono mt-0.5">&lt; 500 Da</div>
                         </div>
                         <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">LogP</div>
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">LogP</div>
                             <div id="prop-logp" class="text-base font-extrabold text-slate-900 mt-0.5">-</div>
-                            <div class="text-[9px] text-slate-500 font-mono mt-0.5">&lt; 5.0</div>
+                            <div class="text-xs text-slate-500 font-mono mt-0.5">&lt; 5.0</div>
                         </div>
                         <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">H-Donors (HBD)</div>
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">H-Donors (HBD)</div>
                             <div id="prop-hbd" class="text-base font-extrabold text-slate-900 mt-0.5">-</div>
-                            <div class="text-[9px] text-slate-500 font-mono mt-0.5">&le; 5</div>
+                            <div class="text-xs text-slate-500 font-mono mt-0.5">&le; 5</div>
                         </div>
                         <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">H-Acceptors (HBA)</div>
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">H-Acceptors (HBA)</div>
                             <div id="prop-hba" class="text-base font-extrabold text-slate-900 mt-0.5">-</div>
-                            <div class="text-[9px] text-slate-500 font-mono mt-0.5">&le; 10</div>
+                            <div class="text-xs text-slate-500 font-mono mt-0.5">&le; 10</div>
                         </div>
                         <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Polar Area (TPSA)</div>
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Polar Area (TPSA)</div>
                             <div id="prop-tpsa" class="text-base font-extrabold text-slate-900 mt-0.5">-</div>
-                            <div class="text-[9px] text-slate-500 font-mono mt-0.5">&lt; 140 &#8491;&sup2;</div>
+                            <div class="text-xs text-slate-500 font-mono mt-0.5">&lt; 140 &#8491;&sup2;</div>
                         </div>
                         <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rot. Bonds</div>
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Rot. Bonds</div>
                             <div id="prop-rotb" class="text-base font-extrabold text-slate-900 mt-0.5">-</div>
-                            <div class="text-[9px] text-slate-500 font-mono mt-0.5">&le; 10</div>
+                            <div class="text-xs text-slate-500 font-mono mt-0.5">&le; 10</div>
                         </div>
                     </div>
                 </div>
@@ -1207,7 +851,7 @@
                     <div>
                         <div class="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-2">
                             <span>Essential Computational Chemistry Software & Downloads</span>
-                            <span class="hidden md:inline-flex px-2 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono font-bold">10 Free Tools</span>
+                            <span class="hidden md:inline-flex px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono font-bold">10 Free Tools</span>
                         </div>
                         <div class="text-xs text-slate-500 mt-0.5">
                             AutoDock Vina, PyMOL, ORCA, ChimeraX, Avogadro 2, and GROMACS official direct links.
@@ -1259,126 +903,19 @@
         </div>
     </section>
 
-    <!-- 5. GLOBAL DARK MINIMALIST FOOTER (iLovePDF Style - Exact replica of Image 2) -->
-    <footer class="bg-[#18181B] text-slate-400 pt-16 pb-12 border-t border-slate-800 text-xs">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
-            
-            <!-- 4 Columns Grid (Clean, Balanced & Minimalist) -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                
-                <!-- Col 1: PRODUCT -->
-                <div class="space-y-3">
-                    <div class="text-white font-bold text-xs uppercase tracking-wider">Product</div>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><a href="/" class="hover:text-white transition">Converter Studio</a></li>
-                        <li><a href="/properties/" class="hover:text-white transition text-blue-400 font-semibold">Properties Calculator</a></li>
-                        <li><a href="/docking/" class="hover:text-white transition text-blue-400 font-bold flex items-center gap-1.5"><span>Molecular Docking</span><span class="px-1.5 py-0.2 bg-blue-600 text-white rounded text-[8px] font-mono font-bold uppercase">New</span></a></li>
-                        <li><a href="/about/" class="hover:text-white transition text-indigo-400 font-bold">About &amp; Capabilities</a></li>
-                        <li><a href="/downloads/" class="hover:text-white transition text-blue-400 font-bold">Software Downloads</a></li>
-                        <li><a href="javascript:void(0)" onclick="selectToolFromGrid('orca', 'ORCA Generator', 'Generate DFT input files with spin parity')" class="hover:text-white transition">ORCA Generator</a></li>
-                        <li><a href="javascript:void(0)" onclick="selectToolFromGrid('gjf', 'Gaussian Builder', 'Convert 2D/3D molecules into .com / .gjf')" class="hover:text-white transition">Gaussian Builder</a></li>
-                        <li><a href="javascript:void(0)" onclick="selectToolFromGrid('pdbqt', 'AutoDock PDBQT Prep', 'Prepare ligands & receptors for Vina')" class="hover:text-white transition">AutoDock PDBQT</a></li>
-                        <li><a href="javascript:void(0)" onclick="selectToolFromGrid('xyz', 'CIF Crystallography', 'Convert crystal unit cells to XYZ')" class="hover:text-white transition">CIF Crystallography</a></li>
-                        <li><a href="#tools-grid" onclick="scrollToToolsGrid(event)" class="hover:text-white transition">All Chemistry Tools</a></li>
-                    </ul>
-                </div>
-
-                <!-- Col 2: SOLUTIONS -->
-                <div class="space-y-3">
-                    <div class="text-white font-bold text-xs uppercase tracking-wider">Solutions</div>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><span class="text-slate-300 font-semibold">Medicinal Chemistry</span></li>
-                        <li><span class="text-slate-300 font-semibold">Quantum DFT Groups</span></li>
-                        <li><span class="text-slate-300 font-semibold">Molecular Docking (CADD)</span></li>
-                        <li><span class="text-slate-300 font-semibold">Academic Teaching Labs</span></li>
-                    </ul>
-                </div>
-
-                <!-- Col 3: LEGAL & SECURITY -->
-                <div class="space-y-3">
-                    <div class="text-white font-bold text-xs uppercase tracking-wider">Security & Legal</div>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><a href="javascript:void(0)" onclick="document.getElementById('security-modal').classList.remove('hidden')" class="hover:text-white transition text-emerald-400 flex items-center gap-1.5 font-bold"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Zero-Disk Policy</a></li>
-                        <li><span class="hover:text-white transition">Volatile RAM Privacy</span></li>
-                        <li><span class="hover:text-white transition">Terms & Open License</span></li>
-                        <li><span class="hover:text-white transition">No Data Persistence</span></li>
-                        <li><span class="hover:text-white transition">In-Memory Execution</span></li>
-                    </ul>
-                </div>
-
-                <!-- Col 4: COMPANY / CREATOR & PLATFORMS -->
-                <div class="space-y-4">
-                    <div class="text-white font-bold text-xs uppercase tracking-wider">Company & Author</div>
-                    <div class="space-y-2">
-                        <div class="text-slate-200 font-bold">Created by Shivam Rathore</div>
-                        <p class="text-[11px] text-slate-500 leading-relaxed">
-                            Medicinal Chemist & CADD Developer dedicated to democratizing computational chemistry workflows.
-                        </p>
-                    </div>
-
-                    <!-- Platform Badges (Inspired by Image 2 App Store Badges) -->
-                    <div class="space-y-2 pt-2">
-                        <div class="p-2 rounded-lg bg-zinc-800/80 border border-zinc-700/80 flex items-center gap-2.5">
-                            <i data-lucide="cpu" class="w-4 h-4 text-sky-400"></i>
-                            <div>
-                                <div class="text-[10px] text-slate-400 uppercase">Engine Powered by</div>
-                                <div class="text-xs font-bold text-white">RDKit & OpenBabel</div>
-                            </div>
-                        </div>
-
-                        <div class="p-2 rounded-lg bg-zinc-800/80 border border-zinc-700/80 flex items-center gap-2.5">
-                            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
-                            <div>
-                                <div class="text-[10px] text-slate-400 uppercase">Security Invariant</div>
-                                <div class="text-xs font-bold text-white">100% In-Memory RAM</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Bottom Divider Bar (Exact Image 2 Layout) -->
-            <div class="pt-8 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                
-
-                <!-- Social Icons / Links -->
-                <div class="flex items-center space-x-4">
-                    <a href="https://www.linkedin.com/in/shivam-rathore-medchem/" target="_blank" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-[#0A66C2] text-slate-300 hover:text-white flex items-center justify-center transition" title="LinkedIn" rel="noopener noreferrer">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                        </svg>
-                    </a>
-
-                    <a href="https://github.com/shivamrathore12336-dev" target="_blank" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition" title="Developer GitHub" rel="noopener noreferrer">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-                    </a>
-
-                    <a href="mailto:Shivamrathore12336@gmail.com" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-blue-600 text-slate-300 hover:text-white flex items-center justify-center transition" title="Email">
-                        <i data-lucide="mail" class="w-4 h-4"></i>
-                    </a>
-                </div>
-
-                <!-- Copyright (iLovePDF Style) -->
-                <div class="text-slate-500 text-[11px] text-center sm:text-right font-medium">
-                    © iLoveChem 2026 ® • Universal Computational Chemistry Suite • Created by <strong class="text-slate-300 font-bold">Shivam Rathore</strong>
-                </div>
-
-            </div>
-
-        </div>
-    </footer>
+    </div>
+    {% include "calculator/partials/footer.html" with page="studio" %}
 
     <!-- Comprehensive About iLoveChem & Platform Capabilities Modal -->
     <div id="about-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
         <div class="bg-white rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-6 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between pb-4 border-b border-slate-100">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-blue-500/20">
-                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    <div class="bg-blue-600 w-10 h-10 rounded-xl text-white flex items-center justify-center font-bold shadow-md hover:bg-blue-700">
+                        <i data-lucide="flask-conical" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <h3 class="font-black text-slate-900 text-lg">About iLoveChem &amp; Platform Capabilities</h3>
+                        <h3 class="font-semibold text-slate-900 text-lg">About iLoveChem &amp; Platform Capabilities</h3>
                         <p class="text-xs text-slate-500 font-mono">Designed &amp; Developed by Shivam Rathore</p>
                     </div>
                 </div>
@@ -1401,15 +938,15 @@
 
                 <!-- Section 2: What iLoveChem Can Do (Written Capabilities) -->
                 <div class="space-y-3">
-                    <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider font-mono text-slate-500">Core Scientific Capabilities</h4>
+                    <h4 class="font-bold text-slate-900 text-xs font-mono text-slate-500">Core Scientific Capabilities</h4>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
                             <div class="font-bold text-slate-900 flex items-center gap-1.5">
                                 <span class="w-2 h-2 rounded-full bg-blue-600"></span>
-                                <span>15+ Chemical File Formats</span>
+                                <span>{{ target_count }} output formats</span>
                             </div>
-                            <p class="text-[11px] text-slate-600 leading-relaxed">
+                            <p class="text-xs text-slate-600 leading-relaxed">
                                 Instant bi-directional conversion between PDB, AutoDock PDBQT, SDF, MOL2, CIF crystals, XYZ clusters, ChemDraw CDXML, Gaussian / ORCA logs and input decks (.com, .gjf, .inp).
                             </p>
                         </div>
@@ -1419,7 +956,7 @@
                                 <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
                                 <span>Valence &amp; Spin Multiplicity Guard</span>
                             </div>
-                            <p class="text-[11px] text-slate-600 leading-relaxed">
+                            <p class="text-xs text-slate-600 leading-relaxed">
                                 Automatically audits total valence electrons to assign accurate spin states (singlet vs open-shell doublet / triplet), preventing SCF convergence failures in ORCA and Gaussian.
                             </p>
                         </div>
@@ -1429,7 +966,7 @@
                                 <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
                                 <span>Real-Time MedChem Ro5 Radar</span>
                             </div>
-                            <p class="text-[11px] text-slate-600 leading-relaxed">
+                            <p class="text-xs text-slate-600 leading-relaxed">
                                 Computes Lipinski Rule of 5 descriptors on the fly: Molecular Weight (MW), Wildman-Crippen LogP, H-Bond Donors (HBD), H-Bond Acceptors (HBA), TPSA (&Aring;&sup2;), and Rotatable Bonds.
                             </p>
                         </div>
@@ -1439,7 +976,7 @@
                                 <span class="w-2 h-2 rounded-full bg-teal-600"></span>
                                 <span>Reaction Scheme ZIP Unbundler</span>
                             </div>
-                            <p class="text-[11px] text-slate-600 leading-relaxed">
+                            <p class="text-xs text-slate-600 leading-relaxed">
                                 Intelligently filters reaction arrows, conditions, and written text from ChemDraw CDXML sheets, unbundling multiple reaction components into 3D files packaged in a single ZIP.
                             </p>
                         </div>
@@ -1452,7 +989,7 @@
                         <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
                         <span>Data Security &amp; In-Memory Privacy Policy</span>
                     </div>
-                    <ul class="space-y-1.5 text-[11px] text-emerald-900">
+                    <ul class="space-y-1.5 text-xs text-emerald-900">
                         <li class="flex items-start gap-1.5">
                             <span class="font-bold">&bull;</span>
                             <span><strong>100% Volatile RAM Execution:</strong> No uploaded structures, SMILES, or output files are ever stored on physical server disks or persistent databases.</span>
@@ -1472,7 +1009,7 @@
                 <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 text-xs">
                     <div>
                         <div class="font-bold text-slate-900">Created by Shivam Rathore</div>
-                        <div class="text-slate-500 text-[11px]">Medicinal Chemistry &amp; CADD Researcher</div>
+                        <div class="text-slate-500 text-xs">Medicinal Chemistry &amp; CADD Researcher</div>
                     </div>
                     <div class="flex items-center gap-2">
                         <a href="https://www.linkedin.com/in/shivam-rathore-medchem/" target="_blank" class="px-3 py-1.5 rounded-xl bg-[#0A66C2] text-white font-bold text-xs flex items-center gap-1.5 shadow-2xs hover:bg-[#084e96] transition" rel="noopener noreferrer">
@@ -1496,7 +1033,7 @@
                     <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
                         <i data-lucide="bookmark" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="font-black text-slate-900 text-base">Cite iLoveChem in Research</h3>
+                    <h3 class="font-semibold text-slate-900 text-base">Cite iLoveChem in Research</h3>
                 </div>
                 <button type="button" onclick="document.getElementById('citation-modal').classList.add('hidden')" class="text-slate-400 hover:text-slate-700 text-lg cursor-pointer">&times;</button>
             </div>
@@ -1505,7 +1042,7 @@
                 If you use <strong>iLoveChem</strong> for structure preparation, quantum input generation (ORCA/Gaussian), or docking (AutoDock Vina), please cite in your paper or thesis:
             </p>
 
-            <div class="bg-slate-900 text-slate-200 p-3.5 rounded-xl font-mono text-[11px] relative overflow-x-auto">
+            <div class="bg-slate-900 text-slate-200 p-3.5 rounded-xl font-mono text-xs relative overflow-x-auto">
                 <pre id="bibtex-citation">@software{ilovechem2026,
   author = {Shivam Rathore},
   title = {iLoveChem: Universal Computational Chemistry &amp; CADD Platform},
@@ -1515,7 +1052,7 @@
             </div>
 
             <div class="flex items-center justify-between pt-2">
-                <span class="text-[11px] text-slate-500 font-medium">Designed by Shivam Rathore</span>
+                <span class="text-xs text-slate-500 font-medium">Designed by Shivam Rathore</span>
                 <button type="button" onclick="copyBibTeX()" class="btn-brand-primary text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer">
                     <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                     <span id="copy-bibtex-text">Copy BibTeX</span>
@@ -1534,7 +1071,7 @@
                     </div>
                     <div>
                         <h3 class="text-lg font-bold text-slate-900">Benchmark Test Case Catalog</h3>
-                        <p class="text-[11px] text-slate-500 font-mono">19 Real-World Computational Chemistry Failure Modes</p>
+                        <p class="text-xs text-slate-500 font-mono">19 Real-World Computational Chemistry Failure Modes</p>
                     </div>
                 </div>
                 <button type="button" onclick="document.getElementById('presets-catalog-modal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer">
@@ -1547,112 +1084,112 @@
                 
                 <!-- Category 1: ChemDraw & Organic -->
                 <div class="space-y-2">
-                    <div class="font-bold text-slate-900 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    <div class="font-bold text-slate-900 uppercase tracking-wider text-xs flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-blue-500"></span>
                         <span>ChemDraw & Reaction Schemes</span>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <button type="button" onclick="selectPresetAndClose('reaction_scheme', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">⚡ Reaction Scheme (Multi-Mol) ➔ ORCA</div>
-                            <div class="text-[10px] text-slate-500">Filters arrows/text, extracts multiple fragments</div>
+                            <div class="text-xs text-slate-500">Filters arrows/text, extracts multiple fragments</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('meso_tartaric', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">⚖️ Meso-Tartaric Acid ➔ Symmetry</div>
-                            <div class="text-[10px] text-slate-500">Optical inactivity checksum ([α] = 0)</div>
+                            <div class="text-xs text-slate-500">Optical inactivity checksum ([α] = 0)</div>
                         </button>
                     </div>
                 </div>
 
                 <!-- Category 2: Quantum Chemistry Logs & Syntax -->
                 <div class="space-y-2">
-                    <div class="font-bold text-slate-900 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    <div class="font-bold text-slate-900 uppercase tracking-wider text-xs flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
                         <span>Quantum Chemistry (Gaussian & ORCA)</span>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <button type="button" onclick="selectPresetAndClose('gaussian_log', 'xyz')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">Gaussian Log ➔ Stationary Point</div>
-                            <div class="text-[10px] text-slate-500">Reverse-tail scan extracts final converged step</div>
+                            <div class="text-xs text-slate-500">Reverse-tail scan extracts final converged step</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('crashed_log', 'xyz')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">Crashed Log ➔ Lowest-Energy Rescue</div>
-                            <div class="text-[10px] text-slate-500">Recovers lowest SCF intermediate from aborted job</div>
+                            <div class="text-xs text-slate-500">Recovers lowest SCF intermediate from aborted job</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('giant_log', 'xyz')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">Giant Logs ➔ Tail-Stream Parser</div>
-                            <div class="text-[10px] text-slate-500">Sub-second tail seek with zero browser freezing</div>
+                            <div class="text-xs text-slate-500">Sub-second tail seek with zero browser freezing</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('ghost_atoms', 'gjf')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">Ghost Atoms (Bq) ➔ BSSE Preservation</div>
-                            <div class="text-[10px] text-slate-500">Preserves Bq dummy centers without crashes</div>
+                            <div class="text-xs text-slate-500">Preserves Bq dummy centers without crashes</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('radical_tempo', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">Radical TEMPO ➔ Auto-Doublet (2S+1)</div>
-                            <div class="text-[10px] text-slate-500">Odd electrons (87 e⁻) ➔ automatic Mult = 2</div>
+                            <div class="text-xs text-slate-500">Odd electrons (87 e⁻) ➔ automatic Mult = 2</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('acetate_anion', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">Acetate Anion (COO⁻) ➔ Charge -1</div>
-                            <div class="text-[10px] text-slate-500">Charge -1 with even electrons ➔ Singlet</div>
+                            <div class="text-xs text-slate-500">Charge -1 with even electrons ➔ Singlet</div>
                         </button>
                     </div>
                 </div>
 
                 <!-- Category 3: Crystallography & Materials -->
                 <div class="space-y-2">
-                    <div class="font-bold text-slate-900 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    <div class="font-bold text-slate-900 uppercase tracking-wider text-xs flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
                         <span>Crystallography & Materials</span>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <button type="button" onclick="selectPresetAndClose('cif_missing_h', 'xyz')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">CIF Crystal ➔ Auto-Protonate Missing H</div>
-                            <div class="text-[10px] text-slate-500">Fractional-to-Cartesian with auto valence H</div>
+                            <div class="text-xs text-slate-500">Fractional-to-Cartesian with auto valence H</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('split_crystal', 'xyz')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">Split Crystal Molecule ➔ Unwrapper</div>
-                            <div class="text-[10px] text-slate-500">Reassembles covalent bond split across [0,1] cell</div>
+                            <div class="text-xs text-slate-500">Reassembles covalent bond split across [0,1] cell</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('benzene_vasp', 'poscar')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">Molecule ➔ VASP (15Å Vacuum Box)</div>
-                            <div class="text-[10px] text-slate-500">Cubic supercell prevents periodic self-interaction</div>
+                            <div class="text-xs text-slate-500">Cubic supercell prevents periodic self-interaction</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('gromacs_box', 'gro')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">GROMACS (.gro) ➔ 1.0nm Clearance</div>
-                            <div class="text-[10px] text-slate-500">Bounding box with minimum 1.0nm simulation buffer</div>
+                            <div class="text-xs text-slate-500">Bounding box with minimum 1.0nm simulation buffer</div>
                         </button>
                     </div>
                 </div>
 
                 <!-- Category 4: Biomolecules, Metals & Fault-Tolerant -->
                 <div class="space-y-2">
-                    <div class="font-bold text-slate-900 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    <div class="font-bold text-slate-900 uppercase tracking-wider text-xs flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                         <span>Biomolecules & Organometallics</span>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <button type="button" onclick="selectPresetAndClose('pdb_complex', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">PDB Complex ➔ Strip Waters & Isolate</div>
-                            <div class="text-[10px] text-slate-500">Filters waters (HOH) and extracts pure ligand</div>
+                            <div class="text-xs text-slate-500">Filters waters (HOH) and extracts pure ligand</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('ferrocene', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">Ferrocene (Fe) ➔ UFF Metal Guard</div>
-                            <div class="text-[10px] text-slate-500">Universal Force Field prevents organometallic distortion</div>
+                            <div class="text-xs text-slate-500">Universal Force Field prevents organometallic distortion</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('cisplatin_metal', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">Cisplatin (Pt) ➔ UFF Metal Guard</div>
-                            <div class="text-[10px] text-slate-500">Preserves square-planar Pt coordination geometry</div>
+                            <div class="text-xs text-slate-500">Preserves square-planar Pt coordination geometry</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('salt_complex', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">Salt Complex ➔ Strip Counter-Ions</div>
-                            <div class="text-[10px] text-slate-500">Strips Cl⁻ from Aniline·HCl to prevent DFT crash</div>
+                            <div class="text-xs text-slate-500">Strips Cl⁻ from Aniline·HCl to prevent DFT crash</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('collapsed_zero', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">Zero-Coordinate Guard ➔ Origin Collapse Filter</div>
-                            <div class="text-[10px] text-slate-500">Detects collapsed coordinates and recovers 3D</div>
+                            <div class="text-xs text-slate-500">Detects collapsed coordinates and recovers 3D</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('disguised_xyz', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
                             <div class="font-bold text-slate-800">Disguised Extension ➔ Sniffer Recovery</div>
-                            <div class="text-[10px] text-slate-500">Parses true XYZ content despite fake .pdb extension</div>
+                            <div class="text-xs text-slate-500">Parses true XYZ content despite fake .pdb extension</div>
                         </button>
                     </div>
                 </div>
@@ -1671,7 +1208,7 @@
                     </div>
                     <div>
                         <h3 class="text-base font-bold text-slate-900">Zero-Storage & RAM Policy</h3>
-                        <p class="text-[11px] text-slate-500 font-mono">Confidentiality Guarantee</p>
+                        <p class="text-xs text-slate-500 font-mono">Confidentiality Guarantee</p>
                     </div>
                 </div>
                 <button type="button" onclick="document.getElementById('security-modal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer">
@@ -1684,7 +1221,7 @@
                     <div class="font-bold text-slate-900 flex items-center gap-1.5">
                         <span class="text-emerald-600">✓</span> 100% Volatile RAM Execution
                     </div>
-                    <p class="text-slate-500 text-[11px]">
+                    <p class="text-slate-500 text-xs">
                         Chemical files and structures exist purely in temporary Python memory buffers and are permanently discarded upon conversion.
                     </p>
                 </div>
@@ -1693,7 +1230,7 @@
                     <div class="font-bold text-slate-900 flex items-center gap-1.5">
                         <span class="text-emerald-600">✓</span> Zero Database Persistence
                     </div>
-                    <p class="text-slate-500 text-[11px]">
+                    <p class="text-slate-500 text-xs">
                         No database models, tables, or storage buckets store molecular graphs, SMILES strings, or coordinates.
                     </p>
                 </div>
@@ -1702,7 +1239,7 @@
                     <div class="font-bold text-slate-900 flex items-center gap-1.5">
                         <span class="text-emerald-600">✓</span> Zero AI Training Data Collection
                     </div>
-                    <p class="text-slate-500 text-[11px]">
+                    <p class="text-slate-500 text-xs">
                         Your proprietary drug candidates and unpublished coordinates are NEVER logged, saved, or used for model training.
                     </p>
                 </div>
@@ -1744,25 +1281,25 @@
         function updateStepPills(step) {
             if (step === 1) {
                 stepPill1.className = "flex items-center gap-2 text-blue-600 font-bold";
-                stepPill1.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold";
+                stepPill1.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold";
                 stepPill2.className = "flex items-center gap-2 text-slate-400";
-                stepPill2.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold";
+                stepPill2.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold";
                 stepPill3.className = "flex items-center gap-2 text-slate-400";
-                stepPill3.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold";
+                stepPill3.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold";
             } else if (step === 2) {
                 stepPill1.className = "flex items-center gap-2 text-emerald-600 font-bold";
-                stepPill1.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px] font-bold";
+                stepPill1.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold";
                 stepPill2.className = "flex items-center gap-2 text-blue-600 font-bold";
-                stepPill2.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold";
+                stepPill2.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold";
                 stepPill3.className = "flex items-center gap-2 text-slate-400";
-                stepPill3.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold";
+                stepPill3.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold";
             } else if (step === 3) {
                 stepPill1.className = "flex items-center gap-2 text-emerald-600 font-bold";
-                stepPill1.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px] font-bold";
+                stepPill1.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold";
                 stepPill2.className = "flex items-center gap-2 text-emerald-600 font-bold";
-                stepPill2.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px] font-bold";
+                stepPill2.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold";
                 stepPill3.className = "flex items-center gap-2 text-blue-600 font-bold";
-                stepPill3.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold";
+                stepPill3.querySelector('span:first-child').className = "w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold";
             }
         }
 
@@ -1867,7 +1404,7 @@
                         btn.className = `px-3.5 py-2.5 rounded-xl border text-xs font-semibold flex items-center justify-between flex-1 transition ${i === 0 ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:border-blue-400'}`;
                         const labelText = `Molecule #${i+1} (${atomCount} atoms)`;
                         const tagText = isMain ? '(Main Product)' : '(Fragment)';
-                        btn.innerHTML = `<span class="font-bold">${labelText}</span> <span class="text-[10px] uppercase font-bold opacity-80">${tagText}</span>`;
+                        btn.innerHTML = `<span class="font-bold">${labelText}</span> <span class="text-xs uppercase font-bold opacity-80">${tagText}</span>`;
                         btn.onclick = () => selectFragment(i, btn);
                         container.appendChild(btn);
                     });
@@ -1893,7 +1430,7 @@
                     const btn = document.createElement('button');
                     btn.type = 'button';
                     btn.className = `px-3 py-2 rounded-xl border text-xs font-semibold flex items-center justify-between flex-1 transition ${i === 0 ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-700 border-slate-200 hover:border-blue-400'}`;
-                    btn.innerHTML = `<span>Molecule #${i+1}</span> <span class="text-[10px] opacity-75">${i === 0 ? '(Main Product)' : ''}</span>`;
+                    btn.innerHTML = `<span>Molecule #${i+1}</span> <span class="text-xs opacity-75">${i === 0 ? '(Main Product)' : ''}</span>`;
                     btn.onclick = () => selectFragment(i, btn);
                     container.appendChild(btn);
                 }
@@ -2154,20 +1691,20 @@
                 // Scientific Audit Badges
                 if (meta.salt_detected) {
                     if (meta.salts_stripped) {
-                        badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-teal-50 text-teal-800 border border-teal-200 text-[10px] font-mono font-bold">Counter-Ions Stripped (${escapeHtml((meta.detected_salts || []).join(', '))})</span>`;
+                        badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-teal-50 text-teal-800 border border-teal-200 text-xs font-mono font-bold">Counter-Ions Stripped (${escapeHtml((meta.detected_salts || []).join(', '))})</span>`;
                     } else {
-                        badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-mono font-bold">Salt Complex Retained (${escapeHtml((meta.detected_salts || []).join(', '))})</span>`;
+                        badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-xs font-mono font-bold">Salt Complex Retained (${escapeHtml((meta.detected_salts || []).join(', '))})</span>`;
                     }
                 }
                 if (['poscar', 'cif', 'pwi'].includes(targetFormat)) {
-                    badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-sky-50 text-sky-800 border border-sky-200 text-[10px] font-mono font-bold">15 Å Vacuum Box</span>`;
+                    badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-sky-50 text-sky-800 border border-sky-200 text-xs font-mono font-bold">15 Å Vacuum Box</span>`;
                 }
                 if (meta.has_metals) {
-                    badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-purple-50 text-purple-800 border border-purple-200 text-[10px] font-mono font-bold">Metal UFF Guard (${escapeHtml((meta.metal_symbols || []).join(','))})</span>`;
+                    badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-purple-50 text-purple-800 border border-purple-200 text-xs font-mono font-bold">Metal UFF Guard (${escapeHtml((meta.metal_symbols || []).join(','))})</span>`;
                 }
-                badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-mono font-bold">Parity Validated</span>`;
+                badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-mono font-bold">Parity Validated</span>`;
                 if (meta.electronic_state) {
-                    badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-800 border border-indigo-200 text-[10px] font-mono font-bold">Spin Parity: ${escapeHtml(meta.electronic_state)}</span>`;
+                    badgesContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-800 border border-indigo-200 text-xs font-mono font-bold">Spin Parity: ${escapeHtml(meta.electronic_state)}</span>`;
                 }
 
                 // Handle Scientific Warnings / Actions
@@ -2293,9 +1830,9 @@
             document.querySelectorAll('.style-3d-btn').forEach(btn => {
                 const btnStyle = btn.getAttribute('onclick') || '';
                 if (btnStyle.includes(style)) {
-                    btn.className = 'style-3d-btn px-2 py-0.5 rounded text-[10px] font-mono bg-blue-600 text-white font-bold transition cursor-pointer';
+                    btn.className = 'style-3d-btn px-2 py-0.5 rounded text-xs font-mono bg-blue-600 text-white font-bold transition cursor-pointer';
                 } else {
-                    btn.className = 'style-3d-btn px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer';
+                    btn.className = 'style-3d-btn px-2 py-0.5 rounded text-xs font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer';
                 }
             });
         }
@@ -2453,64 +1990,11 @@
             cancelUpload();
         }
 
-        // iLovePDF Mega-Dropdown and Grid Interactions
-        function toggleMegaDropdown() {
-            const dropdown = document.getElementById('mega-dropdown');
-            const arrow = document.getElementById('mega-arrow');
-            if (!dropdown) return;
-            const isHidden = dropdown.classList.contains('hidden');
-            if (isHidden) {
-                dropdown.classList.remove('hidden');
-                if (arrow) arrow.classList.add('rotate-180');
-                // Viewport boundary guard
-                const rect = dropdown.getBoundingClientRect();
-                if (rect.right > window.innerWidth - 16) {
-                    dropdown.style.left = 'auto';
-                    dropdown.style.right = '0px';
-                } else if (rect.left < 16) {
-                    dropdown.style.left = '0px';
-                    dropdown.style.right = 'auto';
-                }
-            } else {
-                dropdown.classList.add('hidden');
-                if (arrow) arrow.classList.remove('rotate-180');
-            }
-        }
 
-        function toggleMobileMenu() {
-            const drawer = document.getElementById('mobile-nav-drawer');
-            const icon = document.getElementById('mobile-menu-icon');
-            if (drawer) {
-                const isHidden = drawer.classList.contains('hidden');
-                if (isHidden) {
-                    drawer.classList.remove('hidden');
-                    if (icon) icon.setAttribute('data-lucide', 'x');
-                } else {
-                    drawer.classList.add('hidden');
-                    if (icon) icon.setAttribute('data-lucide', 'menu');
-                }
-                if (window.lucide) lucide.createIcons();
-            }
-        }
 
-        document.addEventListener('click', function(e) {
-            const dropdown = document.getElementById('mega-dropdown');
-            const btn = document.getElementById('mega-menu-btn');
-            if (dropdown && !dropdown.contains(e.target) && !btn.contains(e.target)) {
-                dropdown.classList.add('hidden');
-                const arrow = document.getElementById('mega-arrow');
-                if (arrow) arrow.classList.remove('rotate-180');
-            }
 
-            const mobileDrawer = document.getElementById('mobile-nav-drawer');
-            const mobileBtn = document.getElementById('mobile-menu-btn');
-            if (mobileDrawer && !mobileDrawer.contains(e.target) && mobileBtn && !mobileBtn.contains(e.target) && !mobileDrawer.classList.contains('hidden')) {
-                mobileDrawer.classList.add('hidden');
-                const icon = document.getElementById('mobile-menu-icon');
-                if (icon) icon.setAttribute('data-lucide', 'menu');
-                if (window.lucide) lucide.createIcons();
-            }
-        });
+
+        
 
                 function escapeHtml(str) {
             if (str == null) return '';

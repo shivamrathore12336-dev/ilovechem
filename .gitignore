@@ -49,3 +49,7 @@ benchmark_results_*.json
 /test_*.py
 /verify_*.py
 
+# Collected static files (built by `collectstatic`) and local frontend tooling
+staticfiles/
+frontend/node_modules/
+

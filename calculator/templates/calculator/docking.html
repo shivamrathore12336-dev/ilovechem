@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
@@ -7,7 +8,7 @@
     
     <!-- Primary SEO Meta Tags -->
     <meta name="title" content="Inbuilt Molecular Docking Studio | iLoveChem">
-    <meta name="description" content="Free, 100% in-browser and native molecular docking studio. Compute binding affinities (kcal/mol), search pocket conformational space, inspect 3D active sites, and calculate hydrogen bonds in real-time. Zero disk storage.">
+    <meta name="description" content="Free molecular docking studio. Compute binding affinities (kcal/mol), search pocket conformational space, inspect 3D active sites, and calculate hydrogen bonds in real-time. Zero disk storage.">
     <meta name="keywords" content="molecular docking, autodock vina, binding affinity, protein-ligand docking, cadd, drug discovery, rcsb pdb, in-silico screening, chembl, computational chemistry, Shivam Rathore, ilovechem">
     <meta name="author" content="Shivam Rathore">
     <meta name="robots" content="index, follow">
@@ -17,7 +18,7 @@
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="iLoveChem">
     <meta property="og:title" content="Inbuilt Molecular Docking Studio | iLoveChem">
-    <meta property="og:description" content="Free, 100% in-browser molecular docking studio. Compute binding affinities (kcal/mol), search pocket conformational space, inspect 3D active sites, and calculate hydrogen bonds in real-time. Zero disk storage.">
+    <meta property="og:description" content="Free molecular docking studio. Compute binding affinities (kcal/mol), search pocket conformational space, inspect 3D active sites, and calculate hydrogen bonds in real-time. Zero disk storage.">
     <meta property="og:url" content="https://ilovechem.onrender.com/docking/">
     <meta property="og:image" content="https://ilovechem.onrender.com/og-image.png">
     <meta property="og:image:width" content="1200">
@@ -26,252 +27,31 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Inbuilt Molecular Docking Studio | iLoveChem">
-    <meta name="twitter:description" content="In-browser molecular docking studio. Real-time binding affinities, RCSB PDB fetch, active site cavity, and 3D H-bonds.">
+    <meta name="twitter:description" content="Molecular docking studio. Real-time binding affinities, RCSB PDB fetch, active site cavity, and 3D H-bonds.">
     <meta name="twitter:image" content="https://ilovechem.onrender.com/og-image.png">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%232563EB'/%3E%3Cstop offset='100%25' stop-color='%234F46E5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%23ffffff' stroke-width='2.5'/%3E%3Cpath d='M16 4v6M16 22v6M4 16h6M22 16h6' stroke='%23ffffff' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%2360A5FA'/%3E%3C/svg%3E">
-
-    <!-- Google Fonts: Plus Jakarta Sans + JetBrains Mono -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-                        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
-                    },
-                    colors: {
-                        brand: {
-                            blue: '#2563EB',
-                            blueHover: '#1D4ED8',
-                            dark: '#0F172A',
-                            slate: '#1E293B',
-                            border: '#E2E8F0',
-                            accent: '#3B82F6'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- 3Dmol.js WebGL Engine -->
-    <script src="https://3dmol.org/build/3Dmol-min.js"></script>
-
-    <style>
-        * { box-sizing: border-box; }
-        body { 
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background-color: #FAFBFC; 
-            color: #0F172A;
-            -webkit-font-smoothing: antialiased;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.035) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(79, 70, 229, 0.03) 0px, transparent 50%),
-                radial-gradient(at 50% 100%, rgba(14, 165, 233, 0.025) 0px, transparent 50%);
-            background-attachment: fixed;
-        }
-        .font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
-
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #F1F5F9;
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #CBD5E1;
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94A3B8;
-        }
-        .viewer-box {
-            position: relative;
-            width: 100%;
-            height: 360px;
-            background: radial-gradient(circle at center, #0F172A 0%, #020617 100%);
-            border-radius: 1.25rem;
-            overflow: hidden;
-            box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.3);
-            border: 1px solid rgba(30, 41, 59, 0.6);
-        }
-        @media (min-width: 640px) {
-            .viewer-box {
-                height: 520px;
-            }
-        }
-        @keyframes pulse-ring {
-            0% { transform: scale(0.97); opacity: 0.8; }
-            50% { transform: scale(1.03); opacity: 0.4; }
-            100% { transform: scale(0.97); opacity: 0.8; }
-        }
-        .pulsing-grid {
-            animation: pulse-ring 3s infinite ease-in-out;
-        }
-        .dock-card {
-            background: #FFFFFF;
-            border: 1px solid rgba(226, 232, 240, 0.85);
-            box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 2px 8px -2px rgba(15, 23, 42, 0.03);
-            transition: all 0.2s ease;
-        }
-    </style>
+    {% include "calculator/partials/head_assets.html" %}
+    {% include "calculator/partials/viewer_assets.html" %}
 </head>
-<body class="min-h-full flex flex-col justify-between">
+<body class="min-h-full flex flex-col">
 
-    <!-- 1. APP HEADER -->
-    <header class="bg-white/95 backdrop-blur-md border-b border-slate-200/90 sticky top-0 z-40 shadow-xs">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-            
-            <!-- Left: Logo & Nav Links -->
-            <div class="flex items-center space-x-6 sm:space-x-8">
-                <a href="/" class="flex items-center space-x-2.5 group">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-blue-500 flex items-center justify-center text-white shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform shrink-0">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M10 2v5.5L4.5 18a2.5 2.5 0 0 0 2.2 3.5h10.6a2.5 2.5 0 0 0 2.2-3.5L14 7.5V2" />
-                            <path d="M8.5 2h7" />
-                            <path d="M7 14.5c2.5-1 4.5 1 7 0" />
-                            <circle cx="12" cy="11" r="1.2" fill="currentColor" />
-                        </svg>
-                    </div>
-                    <div class="flex items-baseline space-x-1.5">
-                        <span class="text-2xl font-black tracking-tight text-slate-900">iLove<span class="text-blue-600">Chem</span></span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                    </div>
-                </a>
+    {% include "calculator/partials/header.html" with page="docking" %}
+    <div id="main" class="flex-1 flex flex-col">
 
-                <!-- Navigation Links -->
-                <nav class="hidden md:flex items-center space-x-1 text-sm font-semibold text-slate-700">
-                    <a href="/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
-                        <i data-lucide="flask-conical" class="w-4 h-4 text-slate-500"></i>
-                        <span>Converter Studio</span>
-                    </a>
-                    <a href="/properties/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
-                        <i data-lucide="sliders" class="w-4 h-4 text-slate-500"></i>
-                        <span>Properties</span>
-                    </a>
-                    <a href="/docking/" class="px-3 py-2 rounded-lg bg-blue-50 text-blue-600 font-bold transition flex items-center gap-1.5 shadow-2xs">
-                        <i data-lucide="crosshair" class="w-4 h-4 text-blue-600"></i>
-                        <span>Molecular Docking</span>
-                        <span class="px-1.5 py-0.5 text-[9px] uppercase font-mono tracking-wider font-extrabold bg-blue-600 text-white rounded-md">New</span>
-                    </a>
-                    <a href="/downloads/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
-                        <i data-lucide="download" class="w-4 h-4 text-slate-500"></i>
-                        <span>Downloads</span>
-                    </a>
-                    <a href="/about/" class="px-3 py-2 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer">
-                        <i data-lucide="info" class="w-4 h-4 text-slate-500"></i>
-                        <span>About</span>
-                    </a>
-                </nav>
-            </div>
-
-            <!-- Right Actions -->
-            <div class="flex items-center space-x-2.5 text-xs">
-
-
-                <a href="https://www.linkedin.com/in/shivam-rathore-medchem/" target="_blank"
-                    class="px-3.5 py-1.5 rounded-lg bg-[#0A66C2] hover:bg-[#084e96] text-white font-bold flex items-center gap-1.5 transition shadow-xs cursor-pointer" rel="noopener noreferrer">
-                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                    </svg>
-                    <span>Connect</span>
-                </a>
-            
-                <!-- Mobile Menu Button (Hamburger) -->
-                <button type="button" id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Toggle Navigation Menu"
-                    class="md:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition focus:outline-none cursor-pointer">
-                    <i data-lucide="menu" class="w-5 h-5" id="mobile-menu-icon"></i>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Mobile Navigation Drawer -->
-    <div id="mobile-nav-drawer" class="hidden md:hidden bg-white border-b border-slate-200 px-4 py-4 space-y-3 shadow-lg z-30 transition-all">
-        <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold px-1">Navigation</div>
-        <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-            <a href="/" class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-100 transition">
-                <i data-lucide="flask-conical" class="w-4 h-4 text-blue-600 shrink-0"></i>
-                <span>Converter Studio</span>
-            </a>
-            <a href="/properties/" class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-100 transition">
-                <i data-lucide="sliders" class="w-4 h-4 text-blue-600 shrink-0"></i>
-                <span>Properties</span>
-            </a>
-            <a href="/docking/" class="flex items-center gap-2 p-2.5 rounded-xl bg-blue-50 text-blue-700 font-bold border border-blue-200 transition">
-                <i data-lucide="crosshair" class="w-4 h-4 text-blue-600 shrink-0"></i>
-                <span>Docking Studio</span>
-            </a>
-            <a href="/downloads/" class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-100 transition">
-                <i data-lucide="download" class="w-4 h-4 text-blue-600 shrink-0"></i>
-                <span>Downloads</span>
-            </a>
-        </div>
-        <div class="pt-2 border-t border-slate-100 flex flex-col space-y-1 text-xs font-semibold">
-            <a href="/about/" class="flex items-center justify-between p-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold transition">
-                <span class="flex items-center gap-2"><i data-lucide="info" class="w-4 h-4 text-blue-600"></i> About &amp; Capabilities</span>
-                <i data-lucide="chevron-right" class="w-4 h-4 text-blue-500"></i>
-            </a>
-            <a href="https://www.linkedin.com/in/shivam-rathore-medchem/" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-2 rounded-lg hover:bg-slate-100 text-slate-700 font-semibold transition">
-                <span class="flex items-center gap-2">
-                    <svg class="w-3.5 h-3.5 fill-[#0A66C2]" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                    <span>Connect on LinkedIn</span>
-                </span>
-                <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-400"></i>
-            </a>
-            <a href="https://github.com/shivamrathore12336-dev" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-2 rounded-lg hover:bg-slate-100 text-slate-700 font-semibold transition">
-                <span class="flex items-center gap-2">
-                    <svg class="w-3.5 h-3.5 fill-current text-slate-700" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-                    <span>Developer GitHub</span>
-                </span>
-                <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-400"></i>
-            </a>
-        </div>
-    </div>
-
-    <!-- 2. HERO / BADGE STRIP (Benchling / BioRender Clean Scientific Style) -->
-    <div class="border-b border-slate-200/80 bg-white py-5 shadow-2xs">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <!-- Page header -->
+    <div class="border-b border-slate-200 bg-white py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-                <div class="flex flex-wrap items-center gap-2 mb-1.5">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/80 shadow-2xs">
-                        <span class="w-2 h-2 rounded-full bg-blue-600"></span>
-                        ChemDock In-Browser Engine 2.0
-                    </span>
-                    <span class="text-xs text-slate-500 font-mono">AutoDock Vina Calibration · 100% Volatile RAM</span>
-                </div>
-                <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                    Inbuilt Molecular Docking Studio
-                </h1>
-                <p class="text-xs sm:text-sm text-slate-600 mt-1 max-w-3xl leading-relaxed">
-                    Empirical free energy scoring (&Delta;G in kcal/mol), Monte Carlo simulated annealing, 
-                    real-time active-site pocket detection, and automated 3D hydrogen bond contact profiling.
+                <h1 class="text-2xl sm:text-3xl font-semibold text-slate-900 tracking-tight">Molecular docking</h1>
+                <p class="text-sm sm:text-base text-slate-600 mt-2 max-w-3xl leading-relaxed">
+                    Dock a ligand into a protein pocket and rank poses by estimated binding energy (&Delta;G, kcal/mol).
+                    Calculations run on the server in memory and nothing is stored. Scores come from a built-in empirical
+                    scoring function and are estimates, so confirm important results with AutoDock Vina.
                 </p>
             </div>
-            
             <div class="flex items-center gap-2 shrink-0">
-                <a href="/about/#molecular-docking" target="_blank"
-                    class="px-3.5 py-2 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50 text-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
-                    <i data-lucide="book-open" class="w-3.5 h-3.5 text-blue-600"></i>
-                    <span>Methodology &amp; Physics</span>
-                </a>
-                <button type="button" onclick="document.getElementById('methodology-modal').classList.remove('hidden')" 
-                    class="px-3.5 py-2 rounded-xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
-                    <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-400"></i>
-                    <span>Scoring Algorithm</span>
-                </button>
+                <a href="/about/#molecular-docking" class="px-3.5 py-2 rounded-md border border-slate-300 hover:bg-slate-50 text-slate-800 text-sm">Methodology</a>
+                <button type="button" onclick="document.getElementById('methodology-modal').classList.remove('hidden')"
+                    class="px-3.5 py-2 rounded-md border border-slate-300 hover:bg-slate-50 text-slate-800 text-sm">Scoring function</button>
             </div>
         </div>
     </div>
@@ -287,41 +67,41 @@
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-black">1</span>
-                            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Target Macromolecule</h2>
+                            <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-semibold">1</span>
+                            <h2 class="text-sm font-bold text-slate-900">Target Macromolecule</h2>
                         </div>
-                        <span id="receptor-status-badge" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-slate-100 text-slate-500 max-w-[150px] sm:max-w-[200px] truncate inline-block align-middle" title="Target Status">
+                        <span id="receptor-status-badge" class="px-2 py-0.5 text-xs font-mono font-bold rounded-md bg-slate-100 text-slate-500 max-w-[150px] sm:max-w-[200px] truncate inline-block align-middle" title="Target Status">
                             No Receptor
                         </span>
                     </div>
 
                     <!-- Quick Benchmark Presets Bar -->
                     <div class="mb-3.5 p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
-                        <div class="flex items-center justify-between text-[11px] font-bold text-blue-900 mb-1.5">
+                        <div class="flex items-center justify-between text-xs font-bold text-blue-900 mb-1.5">
                             <span class="flex items-center gap-1.5">
-                                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-600"></i>
-                                <span>Quick Benchmark Presets:</span>
+                                <i data-lucide="flask-conical" class="w-3.5 h-3.5 text-blue-600"></i>
+                                <span>Example complexes</span>
                             </span>
-                            <span class="text-[10px] text-blue-600 font-normal">1-Click Load</span>
+                            
                         </div>
                         <div class="grid grid-cols-2 gap-1.5 text-xs">
                             <button type="button" onclick="loadBenchmarkPreset('1IEP')"
-                                class="px-2 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 text-blue-800 rounded-lg text-left text-[11px] font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Imatinib (Gleevec) with BCR-Abl Tyrosine Kinase">
+                                class="px-2 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 text-blue-800 rounded-lg text-left text-xs font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Imatinib (Gleevec) with BCR-Abl Tyrosine Kinase">
                                 <span><b>1IEP</b> · Imatinib / Abl</span>
                                 <i data-lucide="arrow-up-right" class="w-3 h-3 text-blue-500"></i>
                             </button>
                             <button type="button" onclick="loadBenchmarkPreset('2HU4')"
-                                class="px-2 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 text-blue-800 rounded-lg text-left text-[11px] font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Oseltamivir (Tamiflu) with Influenza Neuraminidase">
+                                class="px-2 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 text-blue-800 rounded-lg text-left text-xs font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Oseltamivir (Tamiflu) with Influenza Neuraminidase">
                                 <span><b>2HU4</b> · Tamiflu / N1</span>
                                 <i data-lucide="arrow-up-right" class="w-3 h-3 text-blue-500"></i>
                             </button>
                             <button type="button" onclick="loadBenchmarkPreset('2ITY')"
-                                class="px-2 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 text-blue-800 rounded-lg text-left text-[11px] font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Gefitinib (Iressa) with EGFR Kinase">
+                                class="px-2 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 text-blue-800 rounded-lg text-left text-xs font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Gefitinib (Iressa) with EGFR Kinase">
                                 <span><b>2ITY</b> · Gefitinib / EGFR</span>
                                 <i data-lucide="arrow-up-right" class="w-3 h-3 text-blue-500"></i>
                             </button>
                             <button type="button" onclick="loadBenchmarkPreset('1CX2')"
-                                class="px-2 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 text-blue-800 rounded-lg text-left text-[11px] font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Aspirin / SC-558 with COX-2">
+                                class="px-2 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 text-blue-800 rounded-lg text-left text-xs font-medium transition flex items-center justify-between shadow-2xs cursor-pointer" title="Load Aspirin / SC-558 with COX-2">
                                 <span><b>1CX2</b> · Aspirin / COX-2</span>
                                 <i data-lucide="arrow-up-right" class="w-3 h-3 text-blue-500"></i>
                             </button>
@@ -335,7 +115,7 @@
                         </label>
                         <div class="flex gap-2">
                             <div class="relative flex-1">
-                                <input type="text" id="pdb-id-input" placeholder="Enter 4-character RCSB PDB ID" maxlength="4"
+                                <input type="text" id="pdb-id-input" placeholder="e.g. 1IEP" maxlength="4"
                                     class="w-full uppercase font-mono px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition" />
                                 <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-mono">PDB</span>
                             </div>
@@ -353,7 +133,7 @@
                     <div>
                         <div class="flex items-center justify-between text-xs text-slate-500 mb-1">
                             <span class="font-semibold">Or upload custom PDB / mmCIF file:</span>
-                            <button type="button" onclick="toggleReceptorPasteArea()" class="text-blue-600 hover:underline font-medium text-[11px]">
+                            <button type="button" onclick="toggleReceptorPasteArea()" class="text-blue-600 hover:underline font-medium text-xs">
                                 Paste Raw Text
                             </button>
                         </div>
@@ -362,13 +142,13 @@
                             class="border-2 border-dashed border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-blue-50/40 rounded-xl p-3 text-center cursor-pointer transition group">
                             <i data-lucide="upload" class="w-5 h-5 text-slate-400 group-hover:text-blue-600 mx-auto mb-1 transition"></i>
                             <div class="text-xs font-semibold text-slate-700 group-hover:text-blue-700">Click to select PDB file</div>
-                            <div class="text-[10px] text-slate-400">Standard RCSB .pdb, .ent, or .cif (up to 25 MB)</div>
+                            <div class="text-xs text-slate-400">Standard RCSB .pdb, .ent, or .cif (up to 25 MB)</div>
                         </div>
 
                         <!-- Collapsible Raw PDB Textarea -->
                         <div id="receptor-raw-wrapper" class="hidden mt-2">
                             <textarea id="receptor-raw-text" rows="4" placeholder="Paste PDB lines (ATOM / HETATM)..."
-                                class="w-full font-mono text-[11px] p-2 bg-slate-900 text-slate-200 rounded-xl border border-slate-700 focus:outline-none custom-scrollbar" onchange="onRawReceptorChanged()"></textarea>
+                                class="w-full font-mono text-xs p-2 bg-slate-900 text-slate-200 rounded-xl border border-slate-700 focus:outline-none custom-scrollbar" onchange="onRawReceptorChanged()"></textarea>
                         </div>
                     </div>
 
@@ -378,30 +158,30 @@
                             <i data-lucide="target" class="w-4 h-4 text-amber-600 shrink-0"></i>
                             <div>
                                 <span class="font-bold" id="pocket-ligand-name">Co-Crystal Pocket Detected</span>
-                                <div class="text-[10px] text-amber-700 font-mono" id="pocket-ligand-coords">Auto-centered at active site</div>
+                                <div class="text-xs text-amber-700 font-mono" id="pocket-ligand-coords">Auto-centered at active site</div>
                             </div>
                         </div>
-                        <button type="button" onclick="applyDetectedPocket()" class="px-2 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-[10px] font-bold transition">
+                        <button type="button" onclick="applyDetectedPocket()" class="px-2 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition">
                             Apply Center
                         </button>
                     </div>
 
                     <!-- Receptor Telemetry Metadata Strip (When Loaded) -->
                     <div id="receptor-meta-strip" class="hidden mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200/90 text-xs shadow-2xs">
-                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200/70 text-[11px] font-bold text-slate-800">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200/70 text-xs font-bold text-slate-800">
                             <span class="flex items-center gap-1.5 text-blue-600">
                                 <i data-lucide="dna" class="w-3.5 h-3.5"></i>
                                 <span id="receptor-title-label">Target Loaded</span>
                             </span>
-                            <span id="receptor-res-label" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-mono text-[10px] font-bold border border-emerald-200">Crystal Structure</span>
+                            <span id="receptor-res-label" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-mono text-xs font-bold border border-emerald-200">Crystal Structure</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 text-[11px]">
+                        <div class="grid grid-cols-2 gap-2 text-xs">
                             <div>
-                                <span class="text-slate-400 block text-[10px] uppercase font-mono">Method</span>
+                                <span class="text-slate-400 block text-xs uppercase font-mono">Method</span>
                                 <span id="receptor-method-label" class="font-semibold text-slate-700">X-Ray Diffraction</span>
                             </div>
                             <div>
-                                <span class="text-slate-400 block text-[10px] uppercase font-mono">Chains & Atoms</span>
+                                <span class="text-slate-400 block text-xs uppercase font-mono">Chains & Atoms</span>
                                 <span id="receptor-chains-label" class="font-semibold text-slate-700 font-mono">Polymer Chain</span>
                             </div>
                         </div>
@@ -412,10 +192,10 @@
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-black">2</span>
-                            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Ligand Small Molecule</h2>
+                            <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-semibold">2</span>
+                            <h2 class="text-sm font-bold text-slate-900">Ligand Small Molecule</h2>
                         </div>
-                        <span id="ligand-status-badge" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-slate-100 text-slate-500 max-w-[150px] sm:max-w-[200px] truncate inline-block align-middle" title="Ligand Status">
+                        <span id="ligand-status-badge" class="px-2 py-0.5 text-xs font-mono font-bold rounded-md bg-slate-100 text-slate-500 max-w-[150px] sm:max-w-[200px] truncate inline-block align-middle" title="Ligand Status">
                             No Ligand
                         </span>
                     </div>
@@ -424,7 +204,7 @@
                     <div class="mb-3">
                         <div class="flex items-center justify-between mb-1">
                             <label class="text-xs font-semibold text-slate-700">Ligand SMILES or Structure:</label>
-                            <span class="text-[11px] text-slate-400 font-mono">RDKit 3D ETKDGv3</span>
+                            <span class="text-xs text-slate-400 font-mono">RDKit 3D ETKDGv3</span>
                         </div>
                         <textarea id="ligand-input-text" rows="2" placeholder="Enter Canonical SMILES or structure coordinates..."
                             class="w-full font-mono text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition custom-scrollbar"
@@ -448,10 +228,10 @@
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-black">3</span>
-                            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Search Space (Grid Box)</h2>
+                            <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-semibold">3</span>
+                            <h2 class="text-sm font-bold text-slate-900">Search Space (Grid Box)</h2>
                         </div>
-                        <span class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                        <span class="px-2 py-0.5 text-xs font-mono font-bold rounded-md bg-blue-50 text-blue-700 border border-blue-200">
                             Interactive 3D Bounding Box
                         </span>
                     </div>
@@ -460,26 +240,26 @@
                     <div class="mb-4">
                         <div class="text-xs font-semibold text-slate-700 mb-2 flex items-center justify-between">
                             <span>Grid Center (Ångströms):</span>
-                            <button type="button" onclick="centerBoxOnReceptor()" class="text-[11px] text-blue-600 hover:underline font-semibold flex items-center gap-1">
+                            <button type="button" onclick="centerBoxOnReceptor()" class="text-xs text-blue-600 hover:underline font-semibold flex items-center gap-1">
                                 <i data-lucide="maximize" class="w-3 h-3"></i>
                                 <span>Center on Target</span>
                             </button>
                         </div>
                         <div class="grid grid-cols-3 gap-2">
                             <div>
-                                <label class="text-[10px] font-mono font-bold text-slate-500 block mb-0.5">X Centroid</label>
+                                <label class="text-xs font-mono font-bold text-slate-500 block mb-0.5">X Centroid</label>
                                 <input type="number" id="grid-center-x" step="0.5" value="0.0" 
                                     class="w-full px-2.5 py-1.5 font-mono text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:bg-white focus:border-blue-600 outline-none"
                                     onchange="onGridParamsChanged()" />
                             </div>
                             <div>
-                                <label class="text-[10px] font-mono font-bold text-slate-500 block mb-0.5">Y Centroid</label>
+                                <label class="text-xs font-mono font-bold text-slate-500 block mb-0.5">Y Centroid</label>
                                 <input type="number" id="grid-center-y" step="0.5" value="0.0" 
                                     class="w-full px-2.5 py-1.5 font-mono text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:bg-white focus:border-blue-600 outline-none"
                                     onchange="onGridParamsChanged()" />
                             </div>
                             <div>
-                                <label class="text-[10px] font-mono font-bold text-slate-500 block mb-0.5">Z Centroid</label>
+                                <label class="text-xs font-mono font-bold text-slate-500 block mb-0.5">Z Centroid</label>
                                 <input type="number" id="grid-center-z" step="0.5" value="0.0" 
                                     class="w-full px-2.5 py-1.5 font-mono text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:bg-white focus:border-blue-600 outline-none"
                                     onchange="onGridParamsChanged()" />
@@ -491,23 +271,23 @@
                     <div class="mb-2">
                         <div class="text-xs font-semibold text-slate-700 mb-2 flex items-center justify-between">
                             <span>Grid Dimensions (Ångströms):</span>
-                            <span class="text-[11px] font-mono text-slate-500" id="box-volume-label">20 × 20 × 20 Å (8000 Å³)</span>
+                            <span class="text-xs font-mono text-slate-500" id="box-volume-label">20 × 20 × 20 Å (8000 Å³)</span>
                         </div>
                         <div class="grid grid-cols-3 gap-2">
                             <div>
-                                <label class="text-[10px] font-mono font-bold text-slate-500 block mb-0.5">Size X (Å)</label>
+                                <label class="text-xs font-mono font-bold text-slate-500 block mb-0.5">Size X (Å)</label>
                                 <input type="number" id="grid-size-x" min="10" max="40" step="1" value="20.0" 
                                     class="w-full px-2.5 py-1.5 font-mono text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:bg-white focus:border-blue-600 outline-none"
                                     onchange="onGridParamsChanged()" />
                             </div>
                             <div>
-                                <label class="text-[10px] font-mono font-bold text-slate-500 block mb-0.5">Size Y (Å)</label>
+                                <label class="text-xs font-mono font-bold text-slate-500 block mb-0.5">Size Y (Å)</label>
                                 <input type="number" id="grid-size-y" min="10" max="40" step="1" value="20.0" 
                                     class="w-full px-2.5 py-1.5 font-mono text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:bg-white focus:border-blue-600 outline-none"
                                     onchange="onGridParamsChanged()" />
                             </div>
                             <div>
-                                <label class="text-[10px] font-mono font-bold text-slate-500 block mb-0.5">Size Z (Å)</label>
+                                <label class="text-xs font-mono font-bold text-slate-500 block mb-0.5">Size Z (Å)</label>
                                 <input type="number" id="grid-size-z" min="10" max="40" step="1" value="20.0" 
                                     class="w-full px-2.5 py-1.5 font-mono text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:bg-white focus:border-blue-600 outline-none"
                                     onchange="onGridParamsChanged()" />
@@ -520,8 +300,8 @@
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-black">4</span>
-                            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Search Thoroughness</h2>
+                            <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-semibold">4</span>
+                            <h2 class="text-sm font-bold text-slate-900">Search Thoroughness</h2>
                         </div>
                     </div>
 
@@ -531,7 +311,7 @@
                             <input type="radio" name="exhaustiveness" value="4" class="peer hidden" />
                             <div class="peer-checked:border-blue-600 peer-checked:bg-blue-50/70 border border-slate-200 rounded-xl p-2 text-center transition h-full flex flex-col justify-between">
                                 <div class="text-xs font-bold text-slate-800">Classroom</div>
-                                <div class="text-[10px] text-slate-500 mt-1">4 Cycles (~1.5s)</div>
+                                <div class="text-xs text-slate-500 mt-1">4 Cycles (~1.5s)</div>
                             </div>
                         </label>
                         <label class="cursor-pointer">
@@ -539,34 +319,34 @@
                             <div class="peer-checked:border-blue-600 peer-checked:bg-blue-50/70 border-2 border-blue-600/40 rounded-xl p-2 text-center transition h-full flex flex-col justify-between shadow-2xs">
                                 <div class="text-xs font-bold text-blue-700 flex items-center justify-center gap-0.5">
                                     <span>Academic</span>
-                                    <span class="px-1 py-0.2 bg-blue-600 text-white rounded text-[8px] font-black uppercase">Rec</span>
+                                    <span class="px-1 py-0.2 bg-blue-600 text-white rounded text-xs font-semibold uppercase">Rec</span>
                                 </div>
-                                <div class="text-[10px] text-blue-600 font-semibold mt-1">8 Cycles (~3.5s)</div>
+                                <div class="text-xs text-blue-600 font-semibold mt-1">8 Cycles (~3.5s)</div>
                             </div>
                         </label>
                         <label class="cursor-pointer">
                             <input type="radio" name="exhaustiveness" value="16" class="peer hidden" />
                             <div class="peer-checked:border-blue-600 peer-checked:bg-blue-50/70 border border-slate-200 rounded-xl p-2 text-center transition h-full flex flex-col justify-between">
                                 <div class="text-xs font-bold text-slate-800">Publication</div>
-                                <div class="text-[10px] text-slate-500 mt-1">16 Cycles (~7s)</div>
+                                <div class="text-xs text-slate-500 mt-1">16 Cycles (~7s)</div>
                             </div>
                         </label>
                         <label class="cursor-pointer">
                             <input type="radio" name="exhaustiveness" value="64" class="peer hidden" />
                             <div class="peer-checked:border-indigo-600 peer-checked:bg-indigo-50/70 border border-slate-200 rounded-xl p-2 text-center transition h-full flex flex-col justify-between">
                                 <div class="text-xs font-bold text-indigo-900">Ultra-64</div>
-                                <div class="text-[10px] text-indigo-700 font-semibold mt-1">64 Cycles (~25s)</div>
+                                <div class="text-xs text-indigo-700 font-semibold mt-1">64 Cycles (~25s)</div>
                             </div>
                         </label>
                     </div>
 
                     <!-- Ligand Science & Flexibility Advisory -->
                     <div id="ligand-advisory-box" class="hidden mb-3.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
-                        <div class="flex items-center justify-between text-[11px] font-mono font-bold text-slate-700">
+                        <div class="flex items-center justify-between text-xs font-mono font-bold text-slate-700">
                             <span id="adv-torsion-count">Rotatable Bonds: --</span>
                             <span id="adv-molwt">MW: -- g/mol</span>
                         </div>
-                        <div id="adv-warhead-badge" class="hidden text-[10px] text-amber-700 font-semibold flex items-center gap-1">
+                        <div id="adv-warhead-badge" class="hidden text-xs text-amber-700 font-semibold flex items-center gap-1">
                             <i data-lucide="alert-triangle" class="w-3 h-3 text-amber-600 shrink-0"></i>
                             <span>Covalent warhead detected. Docking computes non-covalent pre-reaction binding.</span>
                         </div>
@@ -574,7 +354,7 @@
 
                     <!-- RUN DOCKING BUTTON -->
                     <button type="button" id="btn-run-docking" onclick="runMolecularDocking()"
-                        class="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-xl font-bold text-sm shadow-md shadow-blue-500/25 flex items-center justify-center gap-2 transition-all transform active:scale-[0.99] cursor-pointer">
+                        class="bg-blue-600 w-full py-3.5 px-4 text-white rounded-xl font-bold text-sm shadow-md flex items-center justify-center gap-2 transition-all transform active:scale-[0.99] cursor-pointer hover:bg-blue-700">
                         <i data-lucide="play" class="w-4 h-4 fill-current"></i>
                         <span>Start Molecular Docking</span>
                     </button>
@@ -612,7 +392,7 @@
                                 class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5 cursor-pointer">
                                 <i data-lucide="compass" class="w-3.5 h-3.5 text-slate-500"></i>
                                 <span>2D Interaction Map</span>
-                                <span id="tab-2d-badge" class="hidden text-[10px] font-mono px-1.5 py-0.2 bg-blue-100 text-blue-700 rounded-full font-bold">0</span>
+                                <span id="tab-2d-badge" class="hidden text-xs font-mono px-1.5 py-0.2 bg-blue-100 text-blue-700 rounded-full font-bold">0</span>
                             </button>
                         </div>
                         
@@ -684,13 +464,13 @@
 
                     <!-- 3D WebGL Canvas Container -->
                     <div id="docking-viewer-container" class="viewer-box shadow-inner border border-slate-800">
-                        <div id="viewer-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 text-slate-400">
+                        <div id="viewer-placeholder" class="absolute inset-0 z-10 pointer-events-none flex flex-col items-center justify-center text-center p-6 text-slate-400">
                             <div class="w-16 h-16 rounded-2xl bg-slate-800/80 border border-slate-700 flex items-center justify-center text-blue-400 mb-3 shadow-lg">
                                 <i data-lucide="atom" class="w-8 h-8"></i>
                             </div>
-                            <h3 class="text-sm font-bold text-slate-200 mb-1">Interactive 3D Viewport Ready</h3>
+                            <h3 class="text-sm font-semibold text-slate-200 mb-1">No structure loaded</h3>
                             <p class="text-xs text-slate-400 max-w-sm">
-                                Input a target macromolecule via RCSB PDB ID or file upload to render structural ribbons and configure active site search boundaries.
+                                Fetch a structure by PDB ID or upload a file to view it and set the search box.
                             </p>
                         </div>
                     </div>
@@ -712,7 +492,7 @@
                     </div>
 
                     <!-- Viewport Legend / Status Footer -->
-                    <div class="flex flex-wrap items-center justify-between text-[11px] text-slate-500 mt-2 px-1 gap-2">
+                    <div class="flex flex-wrap items-center justify-between text-xs text-slate-500 mt-2 px-1 gap-2">
                         <div id="status-3d-legend" class="flex flex-wrap items-center gap-3">
                             <span class="inline-flex items-center gap-1">
                                 <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span> Receptor Ribbon
@@ -730,7 +510,7 @@
                         <div id="status-2d-legend" class="hidden text-xs text-slate-500">
                             <span class="font-medium text-slate-700"><i data-lucide="info" class="w-3.5 h-3.5 text-blue-600 inline-block mr-1"></i><span class="font-medium text-slate-700">Tip:</span></span> Click any residue badge in the 2D diagram to zoom & highlight it in 3D.
                         </div>
-                        <div class="text-[10px] font-mono text-slate-400">
+                        <div class="text-xs font-mono text-slate-400">
                             Drag: Rotate • Shift+Drag: Pan • Scroll: Zoom
                         </div>
                     </div>
@@ -808,13 +588,13 @@
                             <div class="flex items-center gap-2">
                                 <i data-lucide="activity" class="w-4 h-4 text-blue-600"></i>
                                 <span class="text-xs font-bold text-slate-900">Protein-Ligand Interaction Profiler:</span>
-                                <span id="active-pose-tag" class="text-[10px] font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">
+                                <span id="active-pose-tag" class="text-xs font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">
                                     Pose #1
                                 </span>
                             </div>
 
                             <!-- Filter Pills -->
-                            <div class="flex items-center gap-1 text-[11px] font-semibold">
+                            <div class="flex items-center gap-1 text-xs font-semibold">
                                 <button type="button" onclick="filterInteractions('all')" id="flt-btn-all"
                                     class="px-2.5 py-0.5 rounded-md bg-blue-600 text-white font-bold transition cursor-pointer">All</button>
                                 <button type="button" onclick="filterInteractions('hbond')" id="flt-btn-hbond"
@@ -899,7 +679,7 @@
                 <p>
                     ChemDock implements the empirical free energy of binding scoring function (Trott & Olson, 2010):
                 </p>
-                <div class="bg-slate-900 text-cyan-300 p-3 rounded-xl font-mono text-[11px] overflow-x-auto">
+                <div class="bg-slate-900 text-cyan-300 p-3 rounded-xl font-mono text-xs overflow-x-auto">
                     &Delta;G = c_inter &Sigma; (f_gauss1 + f_gauss2 + f_repulsion + f_hydrophobic + f_hbond) / (1 + 0.05846 &middot; N_rot)
                 </div>
                 <ul class="list-disc pl-5 space-y-1 text-slate-600">
@@ -918,68 +698,8 @@
         </div>
     </div>
 
-    <!-- 6. UNIFIED ACADEMIC FOOTER -->
-    <footer class="bg-[#18181B] text-slate-400 pt-16 pb-12 border-t border-slate-800 text-xs mt-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <!-- Col 1: PRODUCT -->
-                <div class="space-y-3">
-                    <div class="text-white font-bold text-xs uppercase tracking-wider">Product</div>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><a href="/" class="hover:text-white transition">Converter Studio</a></li>
-                        <li><a href="/properties/" class="hover:text-white transition">Properties Calculator</a></li>
-                        <li><a href="/docking/" class="text-blue-400 font-bold flex items-center gap-1.5"><span>Molecular Docking</span><span class="px-1.5 py-0.2 bg-blue-600 text-white rounded text-[8px] font-mono font-bold uppercase">New</span></a></li>
-                        <li><a href="/about/" class="hover:text-white transition text-indigo-400 font-bold">About &amp; Capabilities</a></li>
-                        <li><a href="/downloads/" class="hover:text-white transition">Software Downloads</a></li>
-                    </ul>
-                </div>
-                <!-- Col 2: ENGINES -->
-                <div class="space-y-3">
-                    <div class="text-white font-bold text-xs uppercase tracking-wider">Engines &amp; Solvers</div>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><span>ChemDock Vectorized Monte Carlo</span></li>
-                        <li><span>RDKit C++ Torsion Tree Engine</span></li>
-                        <li><span>Empirical Free Energy Scoring (AutoDock)</span></li>
-                        <li><span>3Dmol.js WebGL &amp; SVG Interaction Profiler</span></li>
-                    </ul>
-                </div>
-                <!-- Col 3: SECURITY -->
-                <div class="space-y-3">
-                    <div class="text-white font-bold text-xs uppercase tracking-wider">Security &amp; Privacy</div>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><span class="text-emerald-400 font-semibold">100% Volatile RAM Execution</span></li>
-                        <li><span>No Server-Side Storage</span></li>
-                        <li><span>No Storage of PDB or SMILES</span></li>
-                        <li><span>No External Subprocess Wrappers</span></li>
-                    </ul>
-                </div>
-                <!-- Col 4: CITATION -->
-                <div class="space-y-3">
-                    <div class="text-white font-bold text-xs uppercase tracking-wider">Citation &amp; Credit</div>
-                    <p class="text-[11px] leading-relaxed text-slate-400">
-                        Designed &amp; built by <span class="text-white font-semibold">Shivam Rathore</span> for computational drug discovery and medicinal chemistry research.
-                    </p>
-                    <div class="pt-1">
-                        <a href="https://www.linkedin.com/in/shivam-rathore-medchem/" target="_blank" rel="noopener noreferrer"
-                            class="inline-flex items-center gap-1.5 text-blue-400 hover:text-blue-300 font-medium">
-                            <i data-lucide="linkedin" class="w-3.5 h-3.5"></i>
-                            <span>Connect on LinkedIn</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Bottom Line -->
-            <div class="border-t border-slate-800/80 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
-                <div>&copy; 2026 iLoveChem. Open scientific computational workbench.</div>
-                <div class="flex items-center gap-4">
-                    <a href="/about/#privacy-security" class="hover:text-slate-300 transition">Privacy Policy</a>
-                    <a href="/about/#molecular-docking" class="hover:text-slate-300 transition">Methodology</a>
-                    <a href="/about/#citation" class="hover:text-slate-300 transition">Citation</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+    </div>
+    {% include "calculator/partials/footer.html" with page="docking" %}
 
     <!-- CLIENT JAVASCRIPT STATE ENGINE -->
     <script>
@@ -1077,13 +797,13 @@
         function getPotencyBadge(dG) {
             if (dG === undefined || dG === null || isNaN(dG)) return "";
             if (dG <= -9.5) {
-                return '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">High Potency</span>';
+                return '<span class="px-2 py-0.5 rounded text-xs font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">High Potency</span>';
             } else if (dG <= -7.5) {
-                return '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Drug-Like</span>';
+                return '<span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Drug-Like</span>';
             } else if (dG <= -6.0) {
-                return '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">Moderate</span>';
+                return '<span class="px-2 py-0.5 rounded text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">Moderate</span>';
             } else {
-                return '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">Weak</span>';
+                return '<span class="px-2 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">Weak</span>';
             }
         }
 
@@ -1142,7 +862,7 @@
 
         function init3DViewer() {
             const container = document.getElementById("docking-viewer-container");
-            container.innerHTML = "";
+            // Keep #viewer-placeholder; 3Dmol appends its canvas next to it.
             const config = { backgroundColor: '#020617' };
             State.viewer = $3Dmol.createViewer(container, config);
             State.viewer.render();
@@ -1297,7 +1017,7 @@
 
                 // Update Status Badge
                 const statusBadge = document.getElementById("receptor-status-badge");
-                statusBadge.className = "px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-blue-100 text-blue-800 border border-blue-200";
+                statusBadge.className = "px-2 py-0.5 text-xs font-mono font-bold rounded-md bg-blue-100 text-blue-800 border border-blue-200";
                 statusBadge.innerText = `${data.pdb_id} Loaded`;
 
                 // Update Pocket Grid Inputs
@@ -1360,6 +1080,8 @@
         function renderReceptorIn3D() {
             if (!State.viewer || !State.receptorPdb) return;
 
+            const ph = document.getElementById("viewer-placeholder");
+            if (ph) ph.classList.add("hidden");
             State.viewer.clear();
 
             // Load receptor macromolecule
@@ -1731,7 +1453,7 @@
                 tr.innerHTML = `
                     <td class="py-2.5 px-3">
                         <span class="inline-flex items-center gap-1.5">
-                            <span class="w-5 h-5 rounded-full ${isActive ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-700'} flex items-center justify-center text-[10px] font-bold">
+                            <span class="w-5 h-5 rounded-full ${isActive ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-700'} flex items-center justify-center text-xs font-bold">
                                 ${pose.mode}
                             </span>
                         </span>
@@ -1756,10 +1478,10 @@
                         </span>
                     </td>
                     <td class="py-2.5 px-3 text-slate-600 font-semibold">
-                        <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 text-[11px]">${numInteractions} total</span>
+                        <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 text-xs">${numInteractions} total</span>
                     </td>
                     <td class="py-2.5 px-3 text-right">
-                        <button type="button" class="px-2 py-1 text-[11px] rounded bg-white hover:bg-blue-600 hover:text-white border border-slate-300 text-slate-700 font-bold transition">
+                        <button type="button" class="px-2 py-1 text-xs rounded bg-white hover:bg-blue-600 hover:text-white border border-slate-300 text-slate-700 font-bold transition">
                             ${isActive ? 'Active Pose' : 'Show 3D'}
                         </button>
                     </td>
@@ -1849,13 +1571,13 @@
             }
 
             if (items.length === 0) {
-                listContainer.innerHTML = `<div class="text-[11px] text-slate-400 italic p-2">No interactions detected for filter '${escapeHtml(filter)}'.</div>`;
+                listContainer.innerHTML = `<div class="text-xs text-slate-400 italic p-2">No interactions detected for filter '${escapeHtml(filter)}'.</div>`;
                 return;
             }
 
             items.forEach(item => {
                 const div = document.createElement("div");
-                div.className = "flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200/90 font-mono text-[11px] hover:border-blue-400 transition";
+                div.className = "flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200/90 font-mono text-xs hover:border-blue-400 transition";
                 
                 let badgeClass = "bg-amber-100 text-amber-800 border-amber-200";
                 if (item.kind === 'Salt Bridge') badgeClass = "bg-pink-100 text-pink-800 border-pink-200";
@@ -1875,7 +1597,7 @@
 
                 div.innerHTML = `
                     <div class="flex items-center gap-2">
-                        <span class="px-1.5 py-0.5 rounded text-[10px] font-bold border ${badgeClass}">${safeKind}</span>
+                        <span class="px-1.5 py-0.5 rounded text-xs font-bold border ${badgeClass}">${safeKind}</span>
                         <span class="font-bold text-slate-800">${safeLabel}</span>
                         <span class="text-slate-400">&bull;&bull;&bull;</span>
                         <span class="font-semibold text-slate-600">${safeRecAtom} &rarr; ${safeLigAtom}</span>
@@ -1884,7 +1606,7 @@
                         <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-bold font-mono">
                             ${safeDist} Å
                         </span>
-                        <button type="button" class="focus-res-btn px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-600 hover:text-white border border-blue-200 text-blue-700 font-bold transition cursor-pointer text-[10px]">
+                        <button type="button" class="focus-res-btn px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-600 hover:text-white border border-blue-200 text-blue-700 font-bold transition cursor-pointer text-xs">
                             3D Focus
                         </button>
                     </div>
@@ -1907,7 +1629,7 @@
             const warheadBadge = document.getElementById("adv-warhead-badge");
 
             if (text) {
-                badge.className = "px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-blue-100 text-blue-800 border border-blue-200";
+                badge.className = "px-2 py-0.5 text-xs font-mono font-bold rounded-md bg-blue-100 text-blue-800 border border-blue-200";
                 badge.innerText = `${State.ligandFormat.toUpperCase()} Loaded`;
 
                 // Quick advisory check
@@ -1919,7 +1641,7 @@
                     warheadBadge.classList.add("hidden");
                 }
             } else {
-                badge.className = "px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-slate-100 text-slate-500";
+                badge.className = "px-2 py-0.5 text-xs font-mono font-bold rounded-md bg-slate-100 text-slate-500";
                 badge.innerText = "No Ligand";
                 advBox.classList.add("hidden");
             }
@@ -1990,7 +1712,7 @@
             if (val) {
                 State.receptorPdb = val;
                 const statusBadge = document.getElementById("receptor-status-badge");
-                statusBadge.className = "px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300";
+                statusBadge.className = "px-2 py-0.5 text-xs font-mono font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300";
                 statusBadge.innerText = "Custom Raw PDB";
                 const metaStrip = document.getElementById("receptor-meta-strip");
                 if (metaStrip) {
@@ -2020,7 +1742,7 @@
             reader.onload = function(e) {
                 State.receptorPdb = e.target.result;
                 const statusBadge = document.getElementById("receptor-status-badge");
-                statusBadge.className = "px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300";
+                statusBadge.className = "px-2 py-0.5 text-xs font-mono font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300";
                 statusBadge.innerText = file.name;
                 const metaStrip = document.getElementById("receptor-meta-strip");
                 if (metaStrip) {
@@ -2198,21 +1920,7 @@
         }
 
         
-        function toggleMobileMenu() {
-            const drawer = document.getElementById('mobile-nav-drawer');
-            const icon = document.getElementById('mobile-menu-icon');
-            if (drawer) {
-                const isHidden = drawer.classList.contains('hidden');
-                if (isHidden) {
-                    drawer.classList.remove('hidden');
-                    if (icon) icon.setAttribute('data-lucide', 'x');
-                } else {
-                    drawer.classList.add('hidden');
-                    if (icon) icon.setAttribute('data-lucide', 'menu');
-                }
-                if (window.lucide) lucide.createIcons();
-            }
-        }
+
 
         function getCsrfToken() {
             const cookies = document.cookie.split(';');

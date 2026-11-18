@@ -1,6 +1,10 @@
-import urllib.request
-import ssl
 import functools
+import logging
+import math
+import re
+import ssl
+import urllib.error
+import urllib.request
 
 from django.shortcuts import render
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -10,6 +14,15 @@ from rest_framework import status
 
 from .docking_core import ChemDockEngine
 from .interaction_diagram import generate_2d_interaction_svg, generate_pymol_script
+
+logger = logging.getLogger(__name__)
+
+# Modern PDB IDs are 4 characters: a digit 1-9 followed by three letters/digits (ASCII only).
+PDB_ID_RE = re.compile(r"^[1-9][A-Za-z0-9]{3}$")
+
+MAX_RECEPTOR_CHARS = 10 * 1024 * 1024
+MAX_LIGAND_CHARS = 1 * 1024 * 1024
+GRID_SIZE_RANGE = (5.0, 60.0)  # Angstroms
 
 
 @ensure_csrf_cookie
@@ -26,11 +39,15 @@ def _fetch_rcsb_cached(clean_id: str) -> str:
     rcsb_url = f"https://files.rcsb.org/download/{clean_id}.pdb"
     ctx = ssl.create_default_context()
     req = urllib.request.Request(rcsb_url, headers={'User-Agent': 'iLoveChem-Docking-Engine/1.0'})
-    with urllib.request.urlopen(req, context=ctx, timeout=15) as resp:  # nosec: B310
-        if resp.status != 200:
-            raise FileNotFoundError(f"PDB ID '{clean_id}' not found on RCSB Protein Data Bank.")
-        raw_bytes = resp.read(26214400)  # Bounded to 25 MB maximum to avoid memory bloat
-        return raw_bytes.decode('utf-8', errors='ignore')
+    try:
+        with urllib.request.urlopen(req, context=ctx, timeout=15) as resp:  # nosec: B310
+            raw_bytes = resp.read(26214400)  # Bounded to 25 MB maximum to avoid memory bloat
+    except urllib.error.HTTPError as exc:
+        # urlopen raises on 4xx/5xx; it never returns a non-200 response object.
+        if exc.code == 404:
+            raise FileNotFoundError(clean_id) from exc
+        raise
+    return raw_bytes.decode('utf-8', errors='ignore')
 
 
 @api_view(['GET'])
@@ -40,7 +57,7 @@ def api_fetch_rcsb_pdb(request, pdb_id: str):
     Auto-detects co-crystallized ligand and calculates active site pocket centroid.
     """
     clean_id = pdb_id.strip().upper()
-    if not (clean_id.isalnum() and len(clean_id) == 4):
+    if not PDB_ID_RE.match(clean_id):
         return Response(
             {"success": False, "error": f"Invalid PDB ID format: '{clean_id}'. PDB IDs must be 4 alphanumeric characters (e.g. 1HSG, 6LU7, 3ERT)."},
             status=status.HTTP_400_BAD_REQUEST
@@ -54,8 +71,9 @@ def api_fetch_rcsb_pdb(request, pdb_id: str):
             status=status.HTTP_404_NOT_FOUND
         )
     except Exception:
+        logger.exception("RCSB fetch failed for %s", clean_id)
         return Response(
-            {"success": False, "error": "An internal error occurred while fetching the PDB structure."},
+            {"success": False, "error": "Could not reach the RCSB Protein Data Bank. Try again in a moment."},
             status=status.HTTP_502_BAD_GATEWAY
         )
 
@@ -90,9 +108,9 @@ def api_run_docking(request):
       - num_modes (int, optional): Number of ranked poses (default: 9)
     """
     data = request.data
-    receptor_pdb = data.get("receptor_pdb", "").strip()
-    ligand_input = data.get("ligand_input", "").strip()
-    ligand_format = data.get("ligand_format", "smiles").strip().lower()
+    receptor_pdb = str(data.get("receptor_pdb") or "").strip()
+    ligand_input = str(data.get("ligand_input") or "").strip()
+    ligand_format = str(data.get("ligand_format") or "smiles").strip().lower()
 
     if not receptor_pdb:
         return Response(
@@ -106,6 +124,12 @@ def api_run_docking(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+    if len(receptor_pdb) > MAX_RECEPTOR_CHARS or len(ligand_input) > MAX_LIGAND_CHARS:
+        return Response(
+            {"success": False, "error": "Input is too large for the in-browser docking engine."},
+            status=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
+        )
+
     try:
         center_x = float(data.get("center_x", 0.0))
         center_y = float(data.get("center_y", 0.0))
@@ -115,27 +139,37 @@ def api_run_docking(request):
         size_z = float(data.get("size_z", 20.0))
         exhaustiveness = max(1, min(64, int(data.get("exhaustiveness", 8))))
         num_modes = max(1, min(15, int(data.get("num_modes", 9))))
-    except (ValueError, TypeError) as e:
+    except (ValueError, TypeError):
         return Response(
-            {"success": False, "error": f"Invalid numerical grid coordinate or dimension: {str(e)}"},
+            {"success": False, "error": "Grid centre and size must be numbers."},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+    if not all(math.isfinite(v) for v in (center_x, center_y, center_z, size_x, size_y, size_z)):
+        return Response(
+            {"success": False, "error": "Grid values must be finite numbers."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    lo, hi = GRID_SIZE_RANGE
+    size_x, size_y, size_z = (min(max(v, lo), hi) for v in (size_x, size_y, size_z))
 
     # Step 1: Prepare rigid receptor PDBQT
     try:
         rec_pdbqt, rec_meta = ChemDockEngine.prepare_receptor_pdbqt(receptor_pdb, strip_co_crystal_ligands=True, pocket_center=(center_x, center_y, center_z), pocket_radius=max(size_x, size_y, size_z) + 12.0)
-    except Exception as e:
+    except Exception:
+        logger.exception("Receptor preparation failed")
         return Response(
-            {"success": False, "error": f"Receptor preparation failed: {str(e)}"},
+            {"success": False, "error": "Receptor preparation failed. Check that the PDB file is valid."},
             status=status.HTTP_422_UNPROCESSABLE_ENTITY
         )
 
     # Step 2: Prepare flexible ligand PDBQT
     try:
         lig_pdbqt, lig_meta = ChemDockEngine.prepare_ligand_pdbqt(ligand_input, input_format=ligand_format)
-    except Exception as e:
+    except Exception:
+        logger.exception("Ligand preparation failed")
         return Response(
-            {"success": False, "error": f"Ligand 3D conformation & PDBQT preparation failed: {str(e)}"},
+            {"success": False, "error": "Ligand preparation failed. Check the SMILES or structure."},
             status=status.HTTP_422_UNPROCESSABLE_ENTITY
         )
 
@@ -153,9 +187,10 @@ def api_run_docking(request):
             exhaustiveness=exhaustiveness,
             num_modes=num_modes
         )
-    except Exception as e:
+    except Exception:
+        logger.exception("Docking run failed")
         return Response(
-            {"success": False, "error": f"ChemDock docking calculation failed: {str(e)}"},
+            {"success": False, "error": "The docking calculation failed."},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
