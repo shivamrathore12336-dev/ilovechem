@@ -76,7 +76,7 @@
             <a href="#tools-grid" onclick="scrollToToolsGrid(event)" class="btn-brand-primary inline-flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium">
                 Choose a conversion
             </a>
-            <button type="button" onclick="selectPresetShortcut('imatinib')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 text-sm font-medium">
+            <button type="button" onclick="setPresetShortcut('imatinib', 'pdbqt')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 text-sm font-medium">
                 Try a sample (imatinib)
             </button>
             <a href="/docking/" class="text-sm text-blue-700 hover:underline px-1">Molecular docking &rarr;</a>
@@ -1074,8 +1074,8 @@
                         <p class="text-xs text-slate-500 font-mono">19 Real-World Computational Chemistry Failure Modes</p>
                     </div>
                 </div>
-                <button type="button" onclick="document.getElementById('presets-catalog-modal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer">
-                    ✕
+                <button type="button" onclick="document.getElementById('presets-catalog-modal').classList.add('hidden')" aria-label="Close benchmark catalog" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer font-bold text-lg leading-none">
+                    &times;
                 </button>
             </div>
 
@@ -1086,15 +1086,15 @@
                 <div class="space-y-2">
                     <div class="font-bold text-slate-900 uppercase tracking-wider text-xs flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                        <span>ChemDraw & Reaction Schemes</span>
+                        <span>ChemDraw &amp; Reaction Schemes</span>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <button type="button" onclick="selectPresetAndClose('reaction_scheme', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">⚡ Reaction Scheme (Multi-Mol) ➔ ORCA</div>
+                            <div class="font-bold text-slate-800">⚡ Reaction Scheme (Multi-Mol) &rarr; ORCA</div>
                             <div class="text-xs text-slate-500">Filters arrows/text, extracts multiple fragments</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('meso_tartaric', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">⚖️ Meso-Tartaric Acid ➔ Symmetry</div>
+                            <div class="font-bold text-slate-800">⚖️ Meso-Tartaric Acid &rarr; Symmetry</div>
                             <div class="text-xs text-slate-500">Optical inactivity checksum ([α] = 0)</div>
                         </button>
                     </div>
@@ -1104,32 +1104,32 @@
                 <div class="space-y-2">
                     <div class="font-bold text-slate-900 uppercase tracking-wider text-xs flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-                        <span>Quantum Chemistry (Gaussian & ORCA)</span>
+                        <span>Quantum Chemistry (Gaussian &amp; ORCA)</span>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <button type="button" onclick="selectPresetAndClose('gaussian_log', 'xyz')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">Gaussian Log ➔ Stationary Point</div>
+                            <div class="font-bold text-slate-800">Gaussian Log &rarr; Stationary Point</div>
                             <div class="text-xs text-slate-500">Reverse-tail scan extracts final converged step</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('crashed_log', 'xyz')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">Crashed Log ➔ Lowest-Energy Rescue</div>
+                            <div class="font-bold text-slate-800">Crashed Log &rarr; Lowest-Energy Rescue</div>
                             <div class="text-xs text-slate-500">Recovers lowest SCF intermediate from aborted job</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('giant_log', 'xyz')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">Giant Logs ➔ Tail-Stream Parser</div>
+                            <div class="font-bold text-slate-800">Giant Logs &rarr; Tail-Stream Parser</div>
                             <div class="text-xs text-slate-500">Sub-second tail seek with zero browser freezing</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('ghost_atoms', 'gjf')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">Ghost Atoms (Bq) ➔ BSSE Preservation</div>
+                            <div class="font-bold text-slate-800">Ghost Atoms (Bq) &rarr; BSSE Preservation</div>
                             <div class="text-xs text-slate-500">Preserves Bq dummy centers without crashes</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('radical_tempo', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">Radical TEMPO ➔ Auto-Doublet (2S+1)</div>
-                            <div class="text-xs text-slate-500">Odd electrons (87 e⁻) ➔ automatic Mult = 2</div>
+                            <div class="font-bold text-slate-800">Radical TEMPO &rarr; Auto-Doublet (2S+1)</div>
+                            <div class="text-xs text-slate-500">Odd electrons (87 e⁻) &rarr; automatic Mult = 2</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('acetate_anion', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">Acetate Anion (COO⁻) ➔ Charge -1</div>
-                            <div class="text-xs text-slate-500">Charge -1 with even electrons ➔ Singlet</div>
+                            <div class="font-bold text-slate-800">Acetate Anion (COO⁻) &rarr; Charge -1</div>
+                            <div class="text-xs text-slate-500">Charge -1 with even electrons &rarr; Singlet</div>
                         </button>
                     </div>
                 </div>
@@ -1138,23 +1138,23 @@
                 <div class="space-y-2">
                     <div class="font-bold text-slate-900 uppercase tracking-wider text-xs flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
-                        <span>Crystallography & Materials</span>
+                        <span>Crystallography &amp; Materials</span>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <button type="button" onclick="selectPresetAndClose('cif_missing_h', 'xyz')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">CIF Crystal ➔ Auto-Protonate Missing H</div>
+                            <div class="font-bold text-slate-800">CIF Crystal &rarr; Auto-Protonate Missing H</div>
                             <div class="text-xs text-slate-500">Fractional-to-Cartesian with auto valence H</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('split_crystal', 'xyz')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">Split Crystal Molecule ➔ Unwrapper</div>
+                            <div class="font-bold text-slate-800">Split Crystal Molecule &rarr; Unwrapper</div>
                             <div class="text-xs text-slate-500">Reassembles covalent bond split across [0,1] cell</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('benzene_vasp', 'poscar')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">Molecule ➔ VASP (15Å Vacuum Box)</div>
+                            <div class="font-bold text-slate-800">Molecule &rarr; VASP (15Å Vacuum Box)</div>
                             <div class="text-xs text-slate-500">Cubic supercell prevents periodic self-interaction</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('gromacs_box', 'gro')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">GROMACS (.gro) ➔ 1.0nm Clearance</div>
+                            <div class="font-bold text-slate-800">GROMACS (.gro) &rarr; 1.0nm Clearance</div>
                             <div class="text-xs text-slate-500">Bounding box with minimum 1.0nm simulation buffer</div>
                         </button>
                     </div>
@@ -1164,31 +1164,31 @@
                 <div class="space-y-2">
                     <div class="font-bold text-slate-900 uppercase tracking-wider text-xs flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <span>Biomolecules & Organometallics</span>
+                        <span>Biomolecules &amp; Organometallics</span>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <button type="button" onclick="selectPresetAndClose('pdb_complex', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">PDB Complex ➔ Strip Waters & Isolate</div>
+                            <div class="font-bold text-slate-800">PDB Complex &rarr; Strip Waters &amp; Isolate</div>
                             <div class="text-xs text-slate-500">Filters waters (HOH) and extracts pure ligand</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('ferrocene', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">Ferrocene (Fe) ➔ UFF Metal Guard</div>
+                            <div class="font-bold text-slate-800">Ferrocene (Fe) &rarr; UFF Metal Guard</div>
                             <div class="text-xs text-slate-500">Universal Force Field prevents organometallic distortion</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('cisplatin_metal', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">Cisplatin (Pt) ➔ UFF Metal Guard</div>
+                            <div class="font-bold text-slate-800">Cisplatin (Pt) &rarr; UFF Metal Guard</div>
                             <div class="text-xs text-slate-500">Preserves square-planar Pt coordination geometry</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('salt_complex', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">Salt Complex ➔ Strip Counter-Ions</div>
+                            <div class="font-bold text-slate-800">Salt Complex &rarr; Strip Counter-Ions</div>
                             <div class="text-xs text-slate-500">Strips Cl⁻ from Aniline·HCl to prevent DFT crash</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('collapsed_zero', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">Zero-Coordinate Guard ➔ Origin Collapse Filter</div>
+                            <div class="font-bold text-slate-800">Zero-Coordinate Guard &rarr; Origin Collapse Filter</div>
                             <div class="text-xs text-slate-500">Detects collapsed coordinates and recovers 3D</div>
                         </button>
                         <button type="button" onclick="selectPresetAndClose('disguised_xyz', 'orca')" class="p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white text-left transition">
-                            <div class="font-bold text-slate-800">Disguised Extension ➔ Sniffer Recovery</div>
+                            <div class="font-bold text-slate-800">Disguised Extension &rarr; Sniffer Recovery</div>
                             <div class="text-xs text-slate-500">Parses true XYZ content despite fake .pdb extension</div>
                         </button>
                     </div>
@@ -1479,8 +1479,13 @@
             setPresetShortcut(type, target);
         }
 
-        function setPresetShortcut(type, target) {
-            document.getElementById('target-format-select').value = target;
+        window.selectPresetShortcut = function (type, target) {
+            return setPresetShortcut(type, target || 'pdbqt');
+        };
+
+        function setPresetShortcut(type, target = 'pdbqt') {
+            const formatSelect = document.getElementById('target-format-select');
+            if (formatSelect) formatSelect.value = target || 'pdbqt';
             activePresetName = type;
             activeFile = null;
             selectedFragmentIdx = 0;
@@ -1651,7 +1656,7 @@
             }
 
             try {
-                const csrfToken = getCookie('csrftoken');
+                const csrfToken = (window.getCsrfToken ? window.getCsrfToken() : (window.getCookie ? window.getCookie('csrftoken') : '')) || '';
                 const reqHeaders = {};
                 if (csrfToken) reqHeaders['X-CSRFToken'] = csrfToken;
                 const response = await fetch('/api/convert/', {
@@ -1750,11 +1755,11 @@
                     const medchemBox = document.getElementById('medchem-dashboard');
                     if (res.medchem && medchemBox) {
                         medchemBox.classList.remove('hidden');
-                        document.getElementById('prop-mw').textContent = (res.medchem.mw || '-') + ' Da';
+                        document.getElementById('prop-mw').textContent = (res.medchem.mw !== undefined && res.medchem.mw !== null ? res.medchem.mw : '-') + ' Da';
                         document.getElementById('prop-logp').textContent = res.medchem.logp !== undefined ? res.medchem.logp : '-';
                         document.getElementById('prop-hbd').textContent = res.medchem.hbd !== undefined ? res.medchem.hbd : '-';
                         document.getElementById('prop-hba').textContent = res.medchem.hba !== undefined ? res.medchem.hba : '-';
-                        document.getElementById('prop-tpsa').textContent = (res.medchem.tpsa || '-') + ' Å²';
+                        document.getElementById('prop-tpsa').textContent = (res.medchem.tpsa !== undefined && res.medchem.tpsa !== null ? res.medchem.tpsa : '-') + ' Å²';
                         document.getElementById('prop-rotb').textContent = res.medchem.rotb !== undefined ? res.medchem.rotb : '-';
                         
                         const badge = document.getElementById('lipinski-badge');
@@ -1790,16 +1795,27 @@
         function render3DStage(molBlock) {
             currentMolBlock = molBlock;
             const stage = document.getElementById('stage-3d');
-            if (!stage3DViewer) {
-                stage3DViewer = $3Dmol.createViewer(stage, { backgroundColor: '#0B0F19' });
+            if (!stage) return;
+            if (window.ilovechemUtils && !window.ilovechemUtils.hasWebGLSupport()) {
+                window.ilovechemUtils.renderWebGLFallback(stage);
+                return;
             }
-            stage3DViewer.clear();
-            stage3DViewer.addModel(molBlock, "mol");
-            apply3DStyle(current3DStyle);
-            stage3DViewer.zoomTo();
-            stage3DViewer.render();
-            if (is3DSpinning) {
-                stage3DViewer.spin(true);
+            try {
+                if (!stage3DViewer) {
+                    stage3DViewer = $3Dmol.createViewer(stage, { backgroundColor: '#0B0F19' });
+                }
+                stage3DViewer.clear();
+                stage3DViewer.addModel(molBlock, "mol");
+                apply3DStyle(current3DStyle);
+                stage3DViewer.zoomTo();
+                stage3DViewer.render();
+                if (is3DSpinning) {
+                    stage3DViewer.spin(true);
+                }
+            } catch (err) {
+                if (window.ilovechemUtils) {
+                    window.ilovechemUtils.renderWebGLFallback(stage);
+                }
             }
         }
 
@@ -1916,7 +1932,7 @@
             navigator.clipboard.writeText(shareUrl).then(() => {
                 showToast("Shareable link copied to clipboard", "success", 3000);
             }).catch(() => {
-                prompt("Copy this shareable link:", shareUrl);
+                showToast("Share URL: " + shareUrl, "info", 5000);
             });
         }
 

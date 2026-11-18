@@ -59,7 +59,10 @@ def _rebuild_conformer_with_rdkit(mol: pybel.Molecule) -> Optional[pybel.Molecul
             return None
         rd_mol.RemoveAllConformers()
         if AllChem.EmbedMolecule(rd_mol, AllChem.ETKDGv3()) != 0:
-            return None
+            params = AllChem.ETKDGv3()
+            params.useRandomCoords = True
+            if AllChem.EmbedMolecule(rd_mol, params) != 0:
+                return None
         if AllChem.MMFFHasAllMoleculeParams(rd_mol):
             AllChem.MMFFOptimizeMolecule(rd_mol, maxIters=500)
         elif AllChem.UFFHasAllMoleculeParams(rd_mol):
@@ -149,7 +152,7 @@ def parse_and_extract_atoms(
                 
                 # Pick requested fragment (or default to largest product)
                 target_frag = fragments[0]
-                if fragment_index < len(fragments):
+                if 0 <= fragment_index < len(fragments):
                     target_frag = fragments[fragment_index]
                 else:
                     target_frag = sorted(fragments, key=lambda x: x['atom_count'], reverse=True)[0]
@@ -172,8 +175,19 @@ def parse_and_extract_atoms(
             if rd_mol:
                 if add_hydrogens:
                     rd_mol = Chem.AddHs(rd_mol)
-                AllChem.EmbedMolecule(rd_mol, AllChem.ETKDGv3())
-                AllChem.MMFFOptimizeMolecule(rd_mol)
+                embed_res = AllChem.EmbedMolecule(rd_mol, AllChem.ETKDGv3())
+                if embed_res == -1:
+                    params = AllChem.ETKDGv3()
+                    params.useRandomCoords = True
+                    embed_res = AllChem.EmbedMolecule(rd_mol, params)
+                if embed_res != -1 and rd_mol.GetNumConformers() > 0:
+                    try:
+                        if AllChem.MMFFHasAllMoleculeParams(rd_mol):
+                            AllChem.MMFFOptimizeMolecule(rd_mol)
+                        else:
+                            AllChem.UFFOptimizeMolecule(rd_mol)
+                    except (ValueError, RuntimeError):
+                        pass
                 molblock = Chem.MolToMolBlock(rd_mol)
                 py_mol = pybel.readstring("mol", molblock)
                 meta_info["parsed_by"] = "RDKit InChI Engine (3D Conformer)"
@@ -228,10 +242,14 @@ def parse_and_extract_atoms(
             if scan_res:
                 rev_coords, parser_label = scan_res
                 ob_mol = ob.OBMol()
+                ob_mol.BeginModify()
                 for sym, x, y, z in rev_coords:
                     at = ob_mol.NewAtom()
                     at.SetAtomicNum(ob.GetAtomicNum(sym))
-                    at.SetVector(x, y, z)
+                    at.SetVector(float(x), float(y), float(z))
+                ob_mol.EndModify()
+                ob_mol.ConnectTheDots()
+                ob_mol.PerceiveBondOrders()
                 py_mol = pybel.Molecule(ob_mol)
                 meta_info["parsed_by"] = f"Streaming Tail Parser ({parser_label})"
                 meta_info["formula"] = py_mol.formula
@@ -254,11 +272,15 @@ def parse_and_extract_atoms(
                 atom_nos = data.atomnos
                 
                 ob_mol = ob.OBMol()
+                ob_mol.BeginModify()
                 for i, at_num in enumerate(atom_nos):
                     at = ob_mol.NewAtom()
                     at.SetAtomicNum(int(at_num))
                     coord = final_coords[i]
                     at.SetVector(float(coord[0]), float(coord[1]), float(coord[2]))
+                ob_mol.EndModify()
+                ob_mol.ConnectTheDots()
+                ob_mol.PerceiveBondOrders()
                 
                 py_mol = pybel.Molecule(ob_mol)
                 pkg = getattr(data, 'metadata', {}).get('package', 'Quantum Log')
@@ -273,10 +295,14 @@ def parse_and_extract_atoms(
             if rescue_res:
                 res_coords, parser_label, min_energy, step_num = rescue_res
                 ob_mol = ob.OBMol()
+                ob_mol.BeginModify()
                 for sym, x, y, z in res_coords:
                     at = ob_mol.NewAtom()
                     at.SetAtomicNum(ob.GetAtomicNum(sym))
-                    at.SetVector(x, y, z)
+                    at.SetVector(float(x), float(y), float(z))
+                ob_mol.EndModify()
+                ob_mol.ConnectTheDots()
+                ob_mol.PerceiveBondOrders()
                 py_mol = pybel.Molecule(ob_mol)
                 meta_info["parsed_by"] = parser_label
                 meta_info["formula"] = py_mol.formula
@@ -328,7 +354,14 @@ def parse_and_extract_atoms(
         try:
             content_str = input_bytes.decode('utf-8', errors='ignore')
             f_in = io.StringIO(content_str)
-            fmt_map = {"cif": "cif", "poscar": "vasp", "contcar": "vasp", "pwi": "espresso-in"}
+            fmt_map = {
+                "cif": "cif",
+                "poscar": "vasp",
+                "contcar": "vasp",
+                "pwi": "espresso-in",
+                "cell": "castep-cell",
+                "res": "shelx",
+            }
             atoms = ase_io.read(f_in, format=fmt_map.get(in_format, "cif"))
 
             # Issue 14: Periodic Boundary Wrapping & Split Molecule Unwrapper
@@ -339,10 +372,14 @@ def parse_and_extract_atoms(
                 )
             
             ob_mol = ob.OBMol()
+            ob_mol.BeginModify()
             for at in atoms:
                 o_at = ob_mol.NewAtom()
                 o_at.SetAtomicNum(int(at.number))
                 o_at.SetVector(float(at.position[0]), float(at.position[1]), float(at.position[2]))
+            ob_mol.EndModify()
+            ob_mol.ConnectTheDots()
+            ob_mol.PerceiveBondOrders()
             
             has_h = any(at.number == 1 for at in atoms)
             if add_hydrogens and in_format == "cif" and not has_h:
@@ -367,7 +404,7 @@ def parse_and_extract_atoms(
     try:
         ob_fmt = in_format
         if in_format in ["gjf", "com"]: ob_fmt = "gjf"
-        elif in_format in ["inp"]: ob_fmt = "orca"
+        elif in_format in ["inp"]: ob_fmt = "orcainp"
 
         raw_text = input_bytes.decode('utf-8', errors='ignore')
         # Loophole 6: Ghost / Dummy Atom Normalization
@@ -399,7 +436,7 @@ def parse_and_extract_atoms(
             has_3d = True
 
         used_rdkit_conformer = False
-        if not has_3d or in_format in ["cdx", "smi", "smiles", "mol"]:
+        if not has_3d or in_format in ["cdx", "smi", "smiles"]:
             meta_info["is_2d"] = True
             
             # Pre-strip salts and counter-ions before 3D conformer embedding
@@ -472,11 +509,19 @@ def parse_and_extract_atoms(
             if rd_mol:
                 if add_hydrogens:
                     rd_mol = Chem.AddHs(rd_mol)
-                AllChem.EmbedMolecule(rd_mol, AllChem.ETKDGv3())
-                try:
-                    AllChem.MMFFOptimizeMolecule(rd_mol)
-                except Exception:
-                    AllChem.UFFOptimizeMolecule(rd_mol)
+                embed_res = AllChem.EmbedMolecule(rd_mol, AllChem.ETKDGv3())
+                if embed_res == -1:
+                    params = AllChem.ETKDGv3()
+                    params.useRandomCoords = True
+                    embed_res = AllChem.EmbedMolecule(rd_mol, params)
+                if embed_res != -1 and rd_mol.GetNumConformers() > 0:
+                    try:
+                        if AllChem.MMFFHasAllMoleculeParams(rd_mol):
+                            AllChem.MMFFOptimizeMolecule(rd_mol)
+                        else:
+                            AllChem.UFFOptimizeMolecule(rd_mol)
+                    except (ValueError, RuntimeError):
+                        pass
                 mb = Chem.MolToMolBlock(rd_mol)
                 mol = pybel.readstring("mol", mb)
                 meta_info["parsed_by"] = "RDKit ETKDGv3"
@@ -772,9 +817,10 @@ def export_to_target_format(
             pdbqt_str = mol.write("pdbqt")
             clean_lines = []
             for line in pdbqt_str.splitlines():
-                if (line.startswith("ATOM") or line.startswith("HETATM")) and ("nan" in line.lower() or "inf" in line.lower()):
-                    if len(line) >= 76:
-                        line = line[:70] + "+0.000" + line[76:]
+                if line.startswith(("ATOM  ", "HETATM")) and len(line) >= 76:
+                    charge_slice = line[66:76].lower()
+                    if "nan" in charge_slice or "inf" in charge_slice:
+                        line = line[:66] + "  +0.000" + line[76:]
                 clean_lines.append(line)
             pdbqt_str = "\n".join(clean_lines) + "\n"
             return _finalize(pdbqt_str, "docking_ligand.pdbqt")

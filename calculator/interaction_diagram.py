@@ -6,6 +6,7 @@ PoseView / Maestro / LigPlot / PyMOL / ChimeraX Standard
 
 import math
 import re
+import html
 from typing import List, Dict, Any
 from rdkit import Chem
 from rdkit.Chem import AllChem
@@ -29,7 +30,24 @@ def generate_2d_interaction_svg(
     Includes bi-directional interactive attributes for clicking residues to highlight in 3D viewport.
     """
     if isinstance(smiles_or_mol, str):
-        mol = Chem.MolFromSmiles(smiles_or_mol)
+        s = smiles_or_mol.strip()
+        if "\n" in s or "M  END" in s:
+            try:
+                mol = Chem.MolFromMolBlock(s, sanitize=False)
+            except Exception:
+                mol = None
+            if not mol:
+                try:
+                    mol = Chem.MolFromPDBBlock(s, sanitize=False)
+                except Exception:
+                    mol = None
+        else:
+            mol = Chem.MolFromSmiles(s)
+            if not mol:
+                try:
+                    mol = Chem.MolFromSmiles(s, sanitize=False)
+                except Exception:
+                    mol = None
     else:
         mol = smiles_or_mol
 
@@ -205,16 +223,20 @@ def generate_2d_interaction_svg(
         badge_w, badge_h = 72, 28
         bx = rx - badge_w / 2.0
         by = ry - badge_h / 2.0
+        safe_resn = html.escape(str(r_data["resn"]))
+        safe_resi = html.escape(str(r_data["resi"]))
+        safe_chain = html.escape(str(r_data["chain"]))
+        safe_label = html.escape(str(r_data["res_label"]))
         svg_elements.append(
             f'<g class="residue-interactive cursor-pointer group" '
-            f'onclick="highlightResidueIn3D(\'{r_data["resn"]}\', {r_data["resi"]}, \'{r_data["chain"]}\')" '
-            f'data-resn="{r_data["resn"]}" data-resi="{r_data["resi"]}" data-chain="{r_data["chain"]}">'
+            f'onclick="highlightResidueIn3D(\'{safe_resn}\', {safe_resi}, \'{safe_chain}\')" '
+            f'data-resn="{safe_resn}" data-resi="{safe_resi}" data-chain="{safe_chain}">'
             f'<rect x="{bx:.1f}" y="{by:.1f}" width="{badge_w}" height="{badge_h}" rx="8" '
             f'fill="{node_bg}" stroke="{r_data["color"]}" stroke-width="2" '
             f'class="transition duration-200 group-hover:stroke-white group-hover:brightness-125" />'
             f'<text x="{rx:.1f}" y="{ry+4.5:.1f}" fill="{r_data["color"]}" font-size="10.5" '
             f'font-family="monospace" font-weight="bold" text-anchor="middle" '
-            f'class="select-none">{r_data["res_label"]}</text>'
+            f'class="select-none">{safe_label}</text>'
             f'</g>'
         )
 

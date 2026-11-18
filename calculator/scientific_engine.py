@@ -47,15 +47,16 @@ class SaltAndSolventStripper:
 
     KNOWN_SALTS_AND_SOLVENTS = {
         # Inorganic / Polyatomic counter-ions
-        "H2O", "OH2", "H2O1", "H3O", "NH4", "SO4", "HSO4", "NO3", "PO4", "HPO4", "H2PO4",
-        "CLO4", "BF4", "PF6", "CN", "SCN", "HCL", "HBR", "HI",
+        "H2O", "OH", "OH2", "H2O1", "H3O", "NH4", "SO4", "HSO4", "NO3", "PO4", "HPO4", "H2PO4",
+        "CO3", "HCO3", "CLO4", "BF4", "PF6", "CN", "SCN", "HCL", "HBR", "HI",
+        "H2SO4", "HNO3", "H3PO4",
         # Small organic acids & counterions
         "C2H3O2", "C2H4O2", "CH3COO", "HCOO", "CHO2", "CH2O2",
-        "C2HF3O2", "C2F3O2", "CF3COO", "TFA",
-        "CH4O3S", "CH3SO3", "C7H8O3S", "C7H7SO3", "C2H2O4", "C2O4",
+        "C2HF3O2", "C2F3O2", "CF3COO", "CF3CO2", "CF3CO2H", "TFA",
+        "CH4O3S", "CH3SO3", "CH4SO3", "C7H8O3S", "C7H7SO3", "C2H2O4", "C2O4",
         # Common crystallization solvents
         "CH4O", "C2H6O", "C3H8O", "C3H6O", "C2H3N", "CH2CL2", "CHCL3",
-        "C4H10O", "C4H8O", "C2H6OS", "C3H7NO"
+        "C4H10O", "C4H8O", "C2H6OS", "C2H6SO", "C3H7NO"
     }
 
     @classmethod
@@ -337,21 +338,33 @@ class QuantumLogParser:
         lines = content_str.splitlines()
         steps = []
         curr_energy = None
+        pending_coords = None
+        pending_label = None
         
         for i, line in enumerate(lines):
             # Gaussian: SCF Done:  E(RB3LYP) =  -123.45678
             m_gau = re.search(r'SCF Done:\s+E\([^\)]+\)\s*=\s*([-\d\.]+)', line)
             if m_gau:
-                try: curr_energy = float(m_gau.group(1))
-                except ValueError: pass
+                try:
+                    curr_energy = float(m_gau.group(1))
+                    if pending_coords:
+                        steps.append((curr_energy, len(steps) + 1, pending_coords, pending_label or "Gaussian Abnormally Terminated Job"))
+                        pending_coords = None
+                except ValueError:
+                    pass
                 
             # ORCA: FINAL SINGLE POINT ENERGY      -123.45678
             m_orca = re.search(r'FINAL SINGLE POINT ENERGY\s+([-\d\.]+)', line)
             if m_orca:
-                try: curr_energy = float(m_orca.group(1))
-                except ValueError: pass
+                try:
+                    curr_energy = float(m_orca.group(1))
+                    if pending_coords:
+                        steps.append((curr_energy, len(steps) + 1, pending_coords, pending_label or "ORCA Abnormally Terminated Job"))
+                        pending_coords = None
+                except ValueError:
+                    pass
 
-            if ('Standard orientation:' in line or 'Input orientation:' in line) and curr_energy is not None:
+            if 'Standard orientation:' in line or 'Input orientation:' in line:
                 coords = []
                 j = i + 5
                 while j < len(lines):
@@ -368,9 +381,12 @@ class QuantumLogParser:
                             pass
                     j += 1
                 if coords:
-                    steps.append((curr_energy, len(steps) + 1, coords, "Gaussian Abnormally Terminated Job"))
+                    pending_coords = coords
+                    pending_label = "Gaussian Abnormally Terminated Job"
+                    if curr_energy is not None:
+                        steps.append((curr_energy, len(steps) + 1, coords, pending_label))
 
-            if 'CARTESIAN COORDINATES (ANGSTROEM)' in line and curr_energy is not None:
+            if 'CARTESIAN COORDINATES (ANGSTROEM)' in line:
                 coords = []
                 j = i + 2
                 while j < len(lines):
@@ -386,7 +402,10 @@ class QuantumLogParser:
                             break
                     j += 1
                 if coords:
-                    steps.append((curr_energy, len(steps) + 1, coords, "ORCA Abnormally Terminated Job"))
+                    pending_coords = coords
+                    pending_label = "ORCA Abnormally Terminated Job"
+                    if curr_energy is not None:
+                        steps.append((curr_energy, len(steps) + 1, coords, pending_label))
 
         if not steps:
             return None
@@ -454,12 +473,12 @@ class PDBBioSanitizer:
         
         # Multi-Model NMR / MD Trajectory Handler:
         # If file contains MODEL records, only process MODEL 1 to ensure a clean single conformer
-        has_models = any(l.startswith("MODEL") for l in lines)
+        has_models = any(re.match(r"^MODEL\s+\d+", l) for l in lines)
         if has_models:
             model_1_lines = []
             in_first_model = False
             for l in lines:
-                if l.startswith("MODEL"):
+                if re.match(r"^MODEL\s+\d+", l):
                     parts = l.split()
                     if len(parts) >= 2 and parts[1] == "1":
                         in_first_model = True
@@ -469,7 +488,7 @@ class PDBBioSanitizer:
                     if in_first_model:
                         break
                 else:
-                    if in_first_model or not any(x.startswith("MODEL 1") for x in lines):
+                    if in_first_model:
                         model_1_lines.append(l)
             if model_1_lines:
                 lines = model_1_lines
@@ -540,6 +559,10 @@ class PDBBioSanitizer:
 
         return "\n".join(clean_lines)
 
+    @classmethod
+    def sanitize_pdb_content(cls, pdb_str: str, filter_mode: str = "all") -> Tuple[str, dict]:
+        return cls.sanitize_pdb(pdb_str, filter_mode), {}
+
 
 class CrystalSolidStateEngine:
     @staticmethod
@@ -585,32 +608,20 @@ class CrystalHydrogenator:
             ob_mol.PerceiveBondOrders()
 
         initial_count = ob_mol.NumAtoms()
+        target_valences = {6: 4, 7: 3, 8: 2, 16: 2}
         for at in ob.OBMolAtomIter(ob_mol):
             z = at.GetAtomicNum()
-            deg = at.GetExplicitDegree()
-            
-            # Never add hydrogens to transition metals
-            if z in TRANSITION_AND_HEAVY_METALS:
+            if z in TRANSITION_AND_HEAVY_METALS or z not in target_valences:
                 at.SetImplicitHCount(0)
                 continue
 
-            needed_h = 0
-            if z == 6: # Carbon
-                if deg == 1: needed_h = 3
-                elif deg == 2:
-                    needed_h = 1 if at.IsInRing() else 2
-                elif deg == 3:
-                    needed_h = 0 if at.IsInRing() else 1
-            elif z == 8: # Oxygen
-                if deg == 1: needed_h = 1 # Hydroxyl
-            elif z == 7: # Nitrogen
-                if deg == 1: needed_h = 2 # Primary amine
-                elif deg == 2: needed_h = 1 # Secondary amine
-            elif z == 16: # Sulfur
-                if deg == 1: needed_h = 1 # Thiol
-            
-            if needed_h > 0:
+            target_v = target_valences[z]
+            explicit_bo_sum = sum(b.GetBondOrder() for b in ob.OBAtomBondIter(at))
+            if 0 < explicit_bo_sum < target_v:
+                needed_h = int(max(0, target_v - explicit_bo_sum))
                 at.SetImplicitHCount(needed_h)
+            else:
+                at.SetImplicitHCount(0)
 
         ob_mol.AddHydrogens()
         added = ob_mol.NumAtoms() - initial_count
@@ -994,7 +1005,12 @@ class BatchSdfProcessor:
         for blk in raw_blocks:
             cleaned = blk.strip()
             if cleaned and ("M  END" in cleaned or "V2000" in cleaned or "V3000" in cleaned or len(cleaned.splitlines()) >= 4):
-                valid_records.append(cleaned + "\nM  END\n$$$$\n")
+                if not cleaned.endswith("M  END"):
+                    if "M  END" in cleaned:
+                        cleaned = cleaned[:cleaned.rfind("M  END") + 6]
+                    else:
+                        cleaned = cleaned + "\nM  END"
+                valid_records.append(cleaned + "\n$$$$\n")
         return valid_records
 
     @staticmethod
@@ -1133,4 +1149,8 @@ class MesoCompoundDetector:
             pass
 
         return False, warnings
+
+
+PDBSanitizer = PDBBioSanitizer
+KNOWN_SALTS_AND_SOLVENTS = SaltAndSolventStripper.KNOWN_SALTS_AND_SOLVENTS
 

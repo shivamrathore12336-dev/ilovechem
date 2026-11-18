@@ -9,6 +9,8 @@ from .chem_utils import (
     generate_2d_base64_image
 )
 
+MAX_SMILES_LEN = 2000
+
 def home_view(request):
     """
     Main interactive dashboard view.
@@ -20,11 +22,14 @@ def home_view(request):
     selected_smiles = default_smiles
 
     if request.method == "POST":
-        selected_smiles = request.POST.get("smiles", "").strip()
+        raw = request.POST.get("smiles", "")
+        selected_smiles = str(raw).strip() if raw is not None else ""
 
     if selected_smiles:
         context["input_smiles"] = selected_smiles
-        if not validate_smiles(selected_smiles):
+        if len(selected_smiles) > MAX_SMILES_LEN:
+            context["error"] = f"SMILES input exceeds maximum allowed length ({MAX_SMILES_LEN} characters)."
+        elif not validate_smiles(selected_smiles):
             context["error"] = f"Invalid SMILES string: '{selected_smiles}'. Please verify the chemical notation."
         else:
             props = calculate_properties(selected_smiles)
@@ -51,10 +56,28 @@ def api_calculate_properties(request):
     JSON API Endpoint for external tools and programmatic use.
     POST Body: {"smiles": "..."}
     """
-    smiles = request.data.get("smiles", "").strip()
-    if not smiles or not validate_smiles(smiles):
+    if not isinstance(request.data, dict):
+        return Response({"error": "Invalid JSON object payload."}, status=status.HTTP_400_BAD_REQUEST)
+
+    raw_smiles = request.data.get("smiles", "")
+    if not isinstance(raw_smiles, str):
+        return Response({"error": "Field 'smiles' must be a string."}, status=status.HTTP_400_BAD_REQUEST)
+
+    smiles = raw_smiles.strip()
+    if not smiles:
         return Response(
-            {"error": "Valid 'smiles' string is required."},
+            {"error": "Please provide a non-empty 'smiles' parameter."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    if len(smiles) > MAX_SMILES_LEN:
+        return Response(
+            {"error": f"SMILES input exceeds maximum length ({MAX_SMILES_LEN} chars)."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if not validate_smiles(smiles):
+        return Response(
+            {"error": f"Invalid SMILES string: '{smiles}'. Could not parse chemical structure."},
             status=status.HTTP_400_BAD_REQUEST
         )
 

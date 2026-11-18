@@ -328,18 +328,28 @@
             const container = document.getElementById('3d-container');
             if (!container) return;
 
-            viewer = $3Dmol.createViewer(container, {
-                backgroundColor: '#0F172A',
-                antialias: true
-            });
-
             {% if mol_block %}
-            const molData = `{{ mol_block|escapejs }}`;
-            if (molData && molData.trim().length > 0) {
+            const molData = "{{ mol_block|escapejs }}";
+            if (!molData || !molData.trim()) return;
+
+            if (window.ilovechemUtils && !window.ilovechemUtils.hasWebGLSupport()) {
+                window.ilovechemUtils.renderWebGLFallback(container);
+                return;
+            }
+
+            try {
+                viewer = $3Dmol.createViewer(container, {
+                    backgroundColor: '#0F172A',
+                    antialias: true
+                });
                 viewer.addModel(molData, "mol");
                 apply3DStyle(currentStyle);
                 viewer.zoomTo();
                 viewer.render();
+            } catch (err) {
+                if (window.ilovechemUtils) {
+                    window.ilovechemUtils.renderWebGLFallback(container);
+                }
             }
             {% endif %}
         }
@@ -394,12 +404,28 @@
                     console.error("Failed to parse JSON data:", e);
                 }
             }
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `chem_properties_${Date.now()}.json`;
-            a.click();
+            const jsonStr = JSON.stringify(data, null, 2);
+            if (window.ilovechemUtils && window.ilovechemUtils.downloadBlob) {
+                window.ilovechemUtils.downloadBlob(jsonStr, `chem_properties_${Date.now()}.json`, 'application/json');
+            } else {
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `chem_properties_${Date.now()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(url), 250);
+            }
+        }
+
+        function escapeCsvCell(val) {
+            const str = String(val === undefined || val === null ? '' : val);
+            if (/[",\r\n#]/.test(str)) {
+                return '"' + str.replace(/"/g, '""') + '"';
+            }
+            return str;
         }
 
         function downloadCSV() {
@@ -433,14 +459,20 @@
                 ["Veber Violations", data.veber_violations !== undefined ? data.veber_violations : 0, "Max 0"],
                 ["Veber Status", data.veber_pass ? "PASSED" : "FLAGGED", "Oral Bioavailability"]
             ];
-            const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.map(x => `"${x}"`).join(",")).join("\n");
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `chem_descriptors_${Date.now()}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const csvContent = rows.map(e => e.map(escapeCsvCell).join(",")).join("\r\n");
+            if (window.ilovechemUtils && window.ilovechemUtils.downloadBlob) {
+                window.ilovechemUtils.downloadBlob(csvContent, `chem_descriptors_${Date.now()}.csv`, 'text/csv;charset=utf-8;');
+            } else {
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.setAttribute("href", url);
+                link.setAttribute("download", `chem_descriptors_${Date.now()}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => URL.revokeObjectURL(url), 250);
+            }
         }
 
         

@@ -33,7 +33,7 @@ def docking_studio_view(request):
     return render(request, "calculator/docking.html")
 
 
-@functools.lru_cache(maxsize=8)
+@functools.lru_cache(maxsize=2)
 def _fetch_rcsb_cached(clean_id: str) -> str:
     """In-memory LRU cache for RCSB PDB structures. Prevents redundant remote downloads and caps buffer to 25 MB."""
     rcsb_url = f"https://files.rcsb.org/download/{clean_id}.pdb"
@@ -108,6 +108,11 @@ def api_run_docking(request):
       - num_modes (int, optional): Number of ranked poses (default: 9)
     """
     data = request.data
+    if not isinstance(data, dict):
+        return Response(
+            {"success": False, "error": "Invalid JSON object payload."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
     receptor_pdb = str(data.get("receptor_pdb") or "").strip()
     ligand_input = str(data.get("ligand_input") or "").strip()
     ligand_format = str(data.get("ligand_format") or "smiles").strip().lower()
@@ -241,19 +246,21 @@ def api_run_docking(request):
 
 def _merge_receptor_and_pose_to_pdb(receptor_pdb: str, pose_pdbqt: str) -> str:
     """Merges receptor protein lines with docked ligand coordinates into a standard PDB complex."""
-    out_lines = []
-    for line in receptor_pdb.splitlines():
-        rec = line[0:6].strip()
-        if rec in ["CRYST1", "ATOM"]:
-            out_lines.append(line)
-
-    out_lines.append("TER")
-
-    atom_idx = 1000
-    for line in pose_pdbqt.splitlines():
-        if (line.startswith("ATOM") or line.startswith("HETATM")) and len(line) >= 54:
-            atom_idx += 1
-            # Format as HETATM LIG X 900
+    out = []
+    max_serial = 0
+    for line in (receptor_pdb or "").splitlines():
+        if line.startswith(("ATOM  ", "HETATM", "CRYST1", "TER")):
+            out.append(line.rstrip())
+            if line.startswith(("ATOM  ", "HETATM")) and len(line) >= 11:
+                try:
+                    max_serial = max(max_serial, int(line[6:11].strip()))
+                except ValueError:
+                    pass
+    out.append("TER")
+    atom_idx = max(max_serial + 1, 1)
+    for line in (pose_pdbqt or "").splitlines():
+        if (line.startswith("ATOM  ") or line.startswith("HETATM")) and len(line) >= 54:
+            serial_str = f"{min(atom_idx, 99999):5d}"
             name = line[12:16].strip()
             x = line[30:38]
             y = line[38:46]
@@ -261,8 +268,7 @@ def _merge_receptor_and_pose_to_pdb(receptor_pdb: str, pose_pdbqt: str) -> str:
             element = line[77:79].strip() if len(line) >= 79 else ""
             if not element:
                 element = name[:1]
-            pdb_line = f"HETATM{atom_idx:5d} {name:<4s} LIG Z 900    {x}{y}{z}  1.00 20.00          {element:>2s}"
-            out_lines.append(pdb_line)
-
-    out_lines.append("END")
-    return "\n".join(out_lines) + "\n"
+            out.append(f"HETATM{serial_str} {name:<4s} LIG Z 900    {x}{y}{z}  1.00 20.00          {element:>2s}")
+            atom_idx += 1
+    out.append("END")
+    return "\n".join(out) + "\n"

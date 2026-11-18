@@ -862,10 +862,20 @@
 
         function init3DViewer() {
             const container = document.getElementById("docking-viewer-container");
-            // Keep #viewer-placeholder; 3Dmol appends its canvas next to it.
-            const config = { backgroundColor: '#020617' };
-            State.viewer = $3Dmol.createViewer(container, config);
-            State.viewer.render();
+            if (!container) return;
+            if (window.ilovechemUtils && !window.ilovechemUtils.hasWebGLSupport()) {
+                window.ilovechemUtils.renderWebGLFallback(document.getElementById("docking-viewport"));
+                return;
+            }
+            try {
+                const config = { backgroundColor: '#020617' };
+                State.viewer = $3Dmol.createViewer(container, config);
+                State.viewer.render();
+            } catch (err) {
+                if (window.ilovechemUtils) {
+                    window.ilovechemUtils.renderWebGLFallback(document.getElementById("docking-viewport"));
+                }
+            }
         }
 
         // Viewport Mode Tabs Switcher
@@ -1057,7 +1067,7 @@
                         if (resEl) resEl.innerText = data.resolution ? `${data.resolution} Å` : "Crystal Structure";
                         if (methodEl) methodEl.innerText = data.experimental_method || "X-ray Diffraction";
                         if (chainsEl) {
-                            const atomsCount = State.receptorPdb ? (State.receptorPdb.match(/\nATOM  /g) || []).length : 0;
+                            const atomsCount = State.receptorPdb ? (State.receptorPdb.match(/^ATOM  /gm) || []).length : 0;
                             chainsEl.innerText = atomsCount > 0 ? `${atomsCount.toLocaleString()} atoms` : "Polymer chain";
                         }
                     }
@@ -1078,29 +1088,36 @@
 
         // Render Receptor & Pocket in 3Dmol (PyMOL / ChimeraX Publication Standard)
         function renderReceptorIn3D() {
-            if (!State.viewer || !State.receptorPdb) return;
+            const emptyEl = document.getElementById("viewer-placeholder") || document.getElementById("viewer-empty-state");
+            if (emptyEl && State.receptorPdb) emptyEl.classList.add("hidden");
 
-            const ph = document.getElementById("viewer-placeholder");
-            if (ph) ph.classList.add("hidden");
-            State.viewer.clear();
-
-            // Load receptor macromolecule
-            State.viewer.addModel(State.receptorPdb, "pdb");
-
-            const hasActivePose = (State.dockingResults && State.dockingResults.poses && State.dockingResults.poses.length > 0);
-
-            // Style: Ribbon Cartoon
-            // When viewing a docked ligand, use ribbon transparency so binding cavity is visible without visual clutter
-            const ribbonOpacity = hasActivePose ? 0.38 : 0.88;
-
-            if (State.styleMode === "cartoon") {
-                State.viewer.setStyle({}, { cartoon: { color: 'spectrum', opacity: ribbonOpacity } });
-            } else if (State.styleMode === "surface") {
-                State.viewer.setStyle({}, { cartoon: { color: 'cyan', opacity: 0.4 } });
-                State.viewer.addSurface($3Dmol.SurfaceType.MS, { opacity: 0.3, color: 'white' });
-            } else {
-                State.viewer.setStyle({}, { line: { color: 'spectrum' } });
+            if (!State.viewer || !State.receptorPdb) {
+                if (window.ilovechemUtils && !window.ilovechemUtils.hasWebGLSupport()) {
+                    window.ilovechemUtils.renderWebGLFallback(document.getElementById("docking-viewport"));
+                }
+                return;
             }
+
+            try {
+                State.viewer.clear();
+
+                // Load receptor macromolecule
+                State.viewer.addModel(State.receptorPdb, "pdb");
+
+                const hasActivePose = (State.dockingResults && State.dockingResults.poses && State.dockingResults.poses.length > 0);
+
+                // Style: Ribbon Cartoon
+                // When viewing a docked ligand, use ribbon transparency so binding cavity is visible without visual clutter
+                const ribbonOpacity = hasActivePose ? 0.38 : 0.88;
+
+                if (State.styleMode === "cartoon") {
+                    State.viewer.setStyle({}, { cartoon: { color: 'spectrum', opacity: ribbonOpacity } });
+                } else if (State.styleMode === "surface") {
+                    State.viewer.setStyle({}, { cartoon: { color: 'cyan', opacity: 0.4 } });
+                    State.viewer.addSurface($3Dmol.SurfaceType.MS, { opacity: 0.3, color: 'white' });
+                } else {
+                    State.viewer.setStyle({}, { line: { color: 'spectrum' } });
+                }
 
             // Highlight Active Site Pocket Residues (within 6.5Å of Grid Center)
             const cx = parseFloat(document.getElementById("grid-center-x").value) || 0.0;
@@ -1143,7 +1160,12 @@
                 });
             }
 
-            State.viewer.render();
+                State.viewer.render();
+            } catch (err) {
+                if (window.ilovechemUtils) {
+                    window.ilovechemUtils.renderWebGLFallback(document.getElementById("docking-viewport"));
+                }
+            }
         }
 
         // Draw Interactive 3D Grid Box
@@ -1725,7 +1747,7 @@
                     if (resEl) resEl.innerText = "Pasted Text";
                     if (methodEl) methodEl.innerText = "Direct Input";
                     if (chainsEl) {
-                        const count = (val.match(/\nATOM  /g) || []).length;
+                        const count = (val.match(/^ATOM  /gm) || []).length;
                         chainsEl.innerText = count > 0 ? `${count.toLocaleString()} atoms` : "PDB coordinates";
                     }
                 }
@@ -1755,7 +1777,7 @@
                     if (resEl) resEl.innerText = `${(file.size / 1024).toFixed(1)} KB`;
                     if (methodEl) methodEl.innerText = "Local Upload";
                     if (chainsEl) {
-                        const count = (State.receptorPdb.match(/\nATOM  /g) || []).length;
+                        const count = (State.receptorPdb.match(/^ATOM  /gm) || []).length;
                         chainsEl.innerText = count > 0 ? `${count.toLocaleString()} atoms` : "Macromolecule";
                     }
                 }
@@ -1772,7 +1794,8 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 document.getElementById("ligand-input-text").value = e.target.result;
-                State.ligandFormat = file.name.endsWith(".pdbqt") ? "pdbqt" : (file.name.endsWith(".pdb") ? "pdb" : "sdf");
+                const lowerName = (file.name || "").toLowerCase();
+                State.ligandFormat = lowerName.endsWith(".pdbqt") ? "pdbqt" : (lowerName.endsWith(".pdb") ? "pdb" : "sdf");
                 updateLigandStatus();
             };
             reader.readAsText(file);
@@ -1901,36 +1924,30 @@
 
         function downloadLigandPosesPDBQT() {
             if (!State.dockingResults || !State.dockingResults.poses) {
-                alert("No ligand poses available to download.");
+                showToast("No ligand poses available to download.", "warning");
                 return;
             }
             let content = "";
             State.dockingResults.poses.forEach(p => {
                 content += p.pdbqt_block + "\n";
             });
-            const blob = new Blob([content], { type: "text/plain" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "docked_ligand_poses.pdbqt";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            if (window.ilovechemUtils && window.ilovechemUtils.downloadBlob) {
+                window.ilovechemUtils.downloadBlob(content, "docked_ligand_poses.pdbqt", "text/plain;charset=utf-8;");
+            } else {
+                const blob = new Blob([content], { type: "text/plain" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "docked_ligand_poses.pdbqt";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(url), 250);
+            }
         }
 
-        
-
-
         function getCsrfToken() {
-            const cookies = document.cookie.split(';');
-            for (let c of cookies) {
-                c = c.trim();
-                if (c.startsWith("csrftoken=")) {
-                    return c.substring("csrftoken=".length);
-                }
-            }
-            return "";
+            return (window.getCsrfToken ? window.getCsrfToken() : (window.getCookie ? window.getCookie('csrftoken') : '')) || '';
         }
     </script>
 </body>

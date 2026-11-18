@@ -9,7 +9,7 @@ import openbabel.pybel as pybel
 # Empirical AutoDock Vina Scoring Weights (Trott & Olson, J. Comput. Chem. 2010)
 WEIGHT_GAUSS1 = -0.035579
 WEIGHT_GAUSS2 = -0.005156
-WEIGHT_REPULSION = 0.048881
+WEIGHT_REPULSION = 0.840245
 WEIGHT_HYDROPHOBIC = -0.035069
 WEIGHT_HBOND = -0.587439
 WEIGHT_ROT = 0.05846
@@ -99,6 +99,22 @@ def _rotation_matrix_from_axis_angle(axis: np.ndarray, angle: float) -> np.ndarr
     ], dtype=np.float64)
 
 
+def _is_bond_in_ring(adj: Dict[int, List[int]], u: int, v: int) -> bool:
+    visited = {u}
+    queue = [u]
+    while queue:
+        curr = queue.pop(0)
+        if curr == v:
+            return True
+        for nbr in adj[curr]:
+            if (curr == u and nbr == v) or (curr == v and nbr == u):
+                continue
+            if nbr not in visited:
+                visited.add(nbr)
+                queue.append(nbr)
+    return False
+
+
 def _find_rotatable_bonds_and_trees(coords: np.ndarray, atom_types: List[str]) -> List[Tuple[int, int, List[int]]]:
     N = len(coords)
     if N < 4:
@@ -120,25 +136,7 @@ def _find_rotatable_bonds_and_trees(coords: np.ndarray, atom_types: List[str]) -
     rotatable = []
     for u, v in bonds:
         if len(adj[u]) >= 2 and len(adj[v]) >= 2:
-            in_ring = False
-            q = deque([(u, -1)])
-            visited = {u}
-            while q:
-                curr, parent = q.popleft()
-                for nbr in adj[curr]:
-                    if (curr == u and nbr == v) or (curr == v and nbr == u):
-                        continue
-                    if nbr not in visited:
-                        visited.add(nbr)
-                        q.append((nbr, curr))
-                    elif nbr != parent:
-                        if nbr == v or curr == v:
-                            in_ring = True
-                            break
-                if in_ring:
-                    break
-
-            if not in_ring:
+            if not _is_bond_in_ring(adj, u, v):
                 moving = {v}
                 q2 = deque([v])
                 while q2:
@@ -165,6 +163,11 @@ def _find_rotatable_bonds_and_trees(coords: np.ndarray, atom_types: List[str]) -
     return rotatable
 
 
+def _identify_rotatable_bonds(coords: np.ndarray, atom_types: List[str]) -> List[Tuple[int, int]]:
+    trees = _find_rotatable_bonds_and_trees(coords, atom_types)
+    return [(u, v) for u, v, _ in trees]
+
+
 def _relax_pose_gradients(
     rec_coords: np.ndarray,
     rec_types: List[str],
@@ -187,6 +190,16 @@ def _relax_pose_gradients(
         num_rotatable_bonds=num_rotatable
     )
 
+    rec_is_hydro = np.array([t in HYDROPHOBIC_ATOMS for t in rec_types], dtype=bool)
+    lig_is_hydro = np.array([t in HYDROPHOBIC_ATOMS for t in lig_types], dtype=bool)
+    hydro_mask = rec_is_hydro[:, np.newaxis] & lig_is_hydro[np.newaxis, :]
+
+    rec_is_donor = np.array([t in HBOND_DONORS for t in rec_types], dtype=bool)
+    rec_is_acceptor = np.array([t in HBOND_ACCEPTORS for t in rec_types], dtype=bool)
+    lig_is_donor = np.array([t in HBOND_DONORS for t in lig_types], dtype=bool)
+    lig_is_acceptor = np.array([t in HBOND_ACCEPTORS for t in lig_types], dtype=bool)
+    hbond_mask = (rec_is_donor[:, np.newaxis] & lig_is_acceptor[np.newaxis, :]) | (rec_is_acceptor[:, np.newaxis] & lig_is_donor[np.newaxis, :])
+
     for _ in range(steps):
         diff = curr_coords[np.newaxis, :, :] - rec_coords[:, np.newaxis, :]  # (N_rec, N_lig, 3)
         dists = np.linalg.norm(diff, axis=-1)
@@ -198,9 +211,9 @@ def _relax_pose_gradients(
 
         g1 = -0.035579 * (-2.0 * d / 0.25) * np.exp(-((d / 0.5)**2))
         g2 = -0.005156 * (-2.0 * (d - 3.0) / 4.0) * np.exp(-(((d - 3.0) / 2.0)**2))
-        rep = np.where(d < 0.0, 2.0 * 0.048881 * d, 0.0)
-        hydro = np.where((d >= 0.5) & (d <= 1.5), -0.035069 * (-1.0), 0.0)
-        hbond = np.where((d >= -0.7) & (d <= 0.0), -0.587439 * (-1.0 / 0.7), 0.0)
+        rep = np.where(d < 0.0, 2.0 * WEIGHT_REPULSION * d, 0.0)
+        hydro = np.where((d >= 0.5) & (d <= 1.5) & hydro_mask, -0.035069 * (-1.0), 0.0)
+        hbond = np.where((d >= -0.7) & (d <= 0.0) & hbond_mask, -0.587439 * (-1.0 / 0.7), 0.0)
 
         dE_dd = (g1 + g2 + rep + hydro + hbond) * cutoff_mask
         grad_per_atom = np.sum(dE_dd[:, :, np.newaxis] * unit_vec, axis=0)  # (N_lig, 3)
@@ -433,9 +446,11 @@ class ChemDockEngine:
                 try:
                     res_name = line[17:20].strip()
                     atom_name = line[12:16].strip()
-                    elem = line[76:78].strip().upper() if len(line) >= 78 else ""
-                    if not elem:
-                        elem = re.sub(r"[0-9\s]", "", atom_name)[:1].upper()
+                    raw_elem = line[76:78].strip() if len(line) >= 78 else ""
+                    if not raw_elem:
+                        cleaned_name = re.sub(r"[0-9\s]", "", atom_name).upper()
+                        raw_elem = cleaned_name[:2] if cleaned_name[:2] in {"CL", "BR", "ZN", "MG", "FE", "MN", "CU", "CA", "NA"} else cleaned_name[:1]
+                    elem = raw_elem.upper()
 
                     ad_type = PDB_TO_AUTODOCK_ATOM_TYPES.get((res_name, atom_name))
                     if not ad_type:
@@ -449,10 +464,10 @@ class ChemDockEngine:
                             ad_type = "SA"
                         elif elem == "P":
                             ad_type = "P"
-                        elif elem in ["ZN", "MG", "CA", "FE", "MN", "CU"]:
+                        elif elem in ["ZN", "MG", "CA", "FE", "MN", "CU", "CL", "BR", "NA"]:
                             ad_type = elem
                         elif elem == "H":
-                            ad_type = "HD" if atom_name.startswith("H") and "N" in line else "H"
+                            ad_type = "HD" if atom_name.startswith("H") and ("N" in atom_name or "O" in atom_name or "N" in line[17:20]) else "H"
                         else:
                             ad_type = elem[:2]
 
@@ -462,8 +477,8 @@ class ChemDockEngine:
                     elif (res_name, atom_name) in [("ARG", "NH1"), ("ARG", "NH2"), ("LYS", "NZ")]:
                         charge = 0.500
 
-                    base = line[:66].ljust(66)
-                    pdbqt_line = f"{base}{charge:6.3f} {ad_type:>2s}"
+                    base = line[:54].ljust(54) + "  1.00  0.00"
+                    pdbqt_line = f"{base}{charge:10.3f} {ad_type:<2s}"
                     fast_pdbqt_lines.append(pdbqt_line)
                     atom_count += 1
                 except Exception:
@@ -498,7 +513,7 @@ class ChemDockEngine:
             fmt = "smi"
 
         ob_mol = pybel.readstring(fmt, s)
-        if fmt == "smi":
+        if not ob_mol.OBMol.Has3D():
             try:
                 ob_mol.make3D(forcefield='mmff94', steps=300)
             except Exception:
@@ -506,6 +521,7 @@ class ChemDockEngine:
                     ob_mol.make3D(forcefield='uff', steps=200)
                 except Exception:
                     pass
+        ob_mol.addh()
 
         for a in ob_mol.atoms:
             try:
@@ -730,9 +746,15 @@ class ChemDockEngine:
                         if ra['is_ca'] and pocket_dict[res_key]['ca_coord'] is None:
                             pocket_dict[res_key]['ca_coord'] = r_coord.tolist()
 
-                # 1. Hydrogen Bond (2.3 - 3.5 A between heteroatoms)
+                # 1. Hydrogen Bond (2.3 - 3.5 A between donor and acceptor heteroatoms)
                 if 2.3 <= dist <= 3.5:
-                    if l_type in HETERO and r_type in HETERO:
+                    is_hbond = (
+                        (l_type in {'HD', 'N', 'NA'} and r_type in {'O', 'OA', 'NA', 'SA'})
+                        or (r_type in {'HD', 'N', 'NA'} and l_type in {'O', 'OA', 'NA', 'SA'})
+                        or ('HD' in (l_type, r_type))
+                        or (l_type in HETERO and r_type in HETERO and not (l_type == 'OA' and r_type == 'OA'))
+                    )
+                    if is_hbond:
                         hb_key = (res_key, r_aname, l_idx)
                         if hb_key not in seen_hb:
                             seen_hb.add(hb_key)
@@ -1150,3 +1172,5 @@ class ChemDockEngine:
 
 # Backwards compatibility alias for tests and existing callers
 DockingEngine = ChemDockEngine
+prepare_receptor_pdbqt = ChemDockEngine.prepare_receptor_pdbqt
+prepare_ligand_pdbqt = ChemDockEngine.prepare_ligand_pdbqt

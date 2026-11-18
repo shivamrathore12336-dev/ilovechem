@@ -46,8 +46,9 @@ ALLOWED_HOSTS = [
 # Canonical public origin used for robots.txt and sitemap.xml.
 SITE_URL = os.environ.get('SITE_URL', 'https://ilovechem.onrender.com')
 
-# Behind Render's TLS-terminating proxy, trust X-Forwarded-Proto so request.is_secure() is correct.
+# Behind Render's TLS-terminating proxy, trust X-Forwarded-Proto and host so request.is_secure() is correct.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
 
 
 # Application definition
@@ -186,7 +187,11 @@ def _env_bool(name: str, default: bool = False) -> bool:
     return os.environ.get(name, str(default)).lower() in ('true', '1', 't', 'yes')
 
 SECURE_SSL_REDIRECT = _env_bool('SECURE_SSL_REDIRECT')
-SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '0'))
+try:
+    SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '0'))
+except (TypeError, ValueError):
+    SECURE_HSTS_SECONDS = 0
+
 SECURE_HSTS_INCLUDE_SUBDOMAINS = _env_bool('SECURE_HSTS_INCLUDE_SUBDOMAINS')
 SECURE_HSTS_PRELOAD = _env_bool('SECURE_HSTS_PRELOAD')
 SESSION_COOKIE_SECURE = _env_bool('SESSION_COOKIE_SECURE')
@@ -200,5 +205,9 @@ CSRF_TRUSTED_ORIGINS = [
     'https://ilovechem.onrender.com',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
+    'http://localhost:10000',
+    'http://127.0.0.1:10000',
 ]
+if SITE_URL and SITE_URL.startswith(('http://', 'https://')) and SITE_URL not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append(SITE_URL.rstrip('/'))
 

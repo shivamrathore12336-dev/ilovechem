@@ -53,21 +53,21 @@
             </div>
 
             <!-- Category Filter Buttons -->
-            <div class="flex flex-wrap items-center justify-center gap-2 text-xs font-semibold">
-                <button type="button" onclick="filterSoftware('all', this)" class="sw-tab-btn active-sw-tab px-4 py-2 rounded-full bg-blue-600 text-white font-bold transition shadow-xs cursor-pointer">
+            <div class="flex flex-wrap items-center justify-center gap-2 text-xs font-semibold" role="group" aria-label="Software Category Filters">
+                <button type="button" onclick="filterSoftware('all', this)" aria-pressed="true" class="sw-tab-btn active-sw-tab px-4 py-2 rounded-full bg-blue-600 text-white font-bold transition shadow-xs cursor-pointer">
                     All Software (10)
                 </button>
-                <button type="button" onclick="filterSoftware('docking', this)" class="sw-tab-btn px-4 py-2 rounded-full bg-white text-slate-700 border border-slate-200 hover:border-blue-400 transition cursor-pointer">
+                <button type="button" onclick="filterSoftware('docking', this)" aria-pressed="false" class="sw-tab-btn px-4 py-2 rounded-full bg-white text-slate-700 border border-slate-200 hover:border-blue-400 transition cursor-pointer">
                     Molecular Docking (CADD)
                 </button>
-                <button type="button" onclick="filterSoftware('visual', this)" class="sw-tab-btn px-4 py-2 rounded-full bg-white text-slate-700 border border-slate-200 hover:border-blue-400 transition cursor-pointer">
+                <button type="button" onclick="filterSoftware('visual', this)" aria-pressed="false" class="sw-tab-btn px-4 py-2 rounded-full bg-white text-slate-700 border border-slate-200 hover:border-blue-400 transition cursor-pointer">
                     3D Visualization
                 </button>
-                <button type="button" onclick="filterSoftware('quantum', this)" class="sw-tab-btn px-4 py-2 rounded-full bg-white text-slate-700 border border-slate-200 hover:border-blue-400 transition cursor-pointer">
+                <button type="button" onclick="filterSoftware('quantum', this)" aria-pressed="false" class="sw-tab-btn px-4 py-2 rounded-full bg-white text-slate-700 border border-slate-200 hover:border-blue-400 transition cursor-pointer">
                     Quantum Chemistry (DFT)
                 </button>
-                <button type="button" onclick="filterSoftware('md', this)" class="sw-tab-btn px-4 py-2 rounded-full bg-white text-slate-700 border border-slate-200 hover:border-blue-400 transition cursor-pointer">
-                    Molecular Dynamics & Tools
+                <button type="button" onclick="filterSoftware('md', this)" aria-pressed="false" class="sw-tab-btn px-4 py-2 rounded-full bg-white text-slate-700 border border-slate-200 hover:border-blue-400 transition cursor-pointer">
+                    Molecular Dynamics &amp; Tools
                 </button>
             </div>
 
@@ -404,18 +404,22 @@
 
         function filterSoftware(category, btn) {
             document.querySelectorAll('.sw-tab-btn').forEach(b => {
-                b.className = 'sw-tab-btn px-4 py-2 rounded-full bg-white text-slate-700 border border-slate-200 hover:border-blue-400 transition cursor-pointer';
+                const isActive = (b === btn);
+                b.setAttribute('aria-pressed', String(isActive));
+                b.classList.toggle('active-sw-tab', isActive);
+                b.classList.toggle('bg-blue-600', isActive);
+                b.classList.toggle('text-white', isActive);
+                b.classList.toggle('font-bold', isActive);
+                b.classList.toggle('bg-white', !isActive);
+                b.classList.toggle('text-slate-700', !isActive);
             });
-            btn.className = 'sw-tab-btn active-sw-tab px-4 py-2 rounded-full bg-blue-600 text-white font-bold transition shadow-xs cursor-pointer';
 
             const cards = document.querySelectorAll('.sw-card');
             cards.forEach(card => {
-                const cats = card.getAttribute('data-category') || '';
-                if (category === 'all' || cats.includes(category)) {
-                    card.classList.remove('hidden');
-                } else {
-                    card.classList.add('hidden');
-                }
+                const rawCats = (card.getAttribute('data-category') || '').trim();
+                const tokens = rawCats ? rawCats.split(/\s+/) : [];
+                const match = (category === 'all') || tokens.includes(category);
+                card.classList.toggle('hidden', !match);
             });
         }
     </script>

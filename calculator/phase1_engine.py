@@ -88,9 +88,10 @@ def sanitize_and_extract_all_fragments(raw_text: str) -> Tuple[List[Dict[str, An
             
             # Inspect if node has superatom text label (e.g. <s font="1">Ph</s>)
             superatom_label = None
-            text_el = n.find('.//s')
-            if text_el is not None and text_el.text:
-                candidate = text_el.text.strip().upper()
+            s_spans = n.findall('.//s')
+            full_text = "".join(s.text or "" for s in s_spans).strip()
+            if full_text:
+                candidate = full_text.upper()
                 if candidate in SUPERATOM_EXPANSIONS:
                     superatom_label = candidate
                     stats["superatoms_detected"].append(candidate)
@@ -116,7 +117,7 @@ def sanitize_and_extract_all_fragments(raw_text: str) -> Tuple[List[Dict[str, An
 
             p = n.get('p', '0 0').split()
             x = float(p[0]) / 20.0
-            y = float(p[1]) / 20.0
+            y = -float(p[1]) / 20.0
             
             nodes[nid] = {
                 'elem': elem,
@@ -130,7 +131,11 @@ def sanitize_and_extract_all_fragments(raw_text: str) -> Tuple[List[Dict[str, An
         for b in frag.iter('b'):
             bid_start = b.get('B')
             bid_end = b.get('E')
-            order = int(b.get('Order', '1'))
+            raw_order = b.get('Order', '1')
+            try:
+                order = float(raw_order)
+            except (ValueError, TypeError):
+                order = 1.0
             display = b.get('Display', '')
             if bid_start and bid_end and bid_start in nodes and bid_end in nodes:
                 bonds.append({
@@ -194,9 +199,14 @@ def build_3d_mol_from_fragment(frag_data: Dict[str, Any]) -> Optional[pybel.Mole
 
     bond_order_map = {
         1: Chem.BondType.SINGLE,
+        1.0: Chem.BondType.SINGLE,
+        1.5: Chem.BondType.AROMATIC,
         2: Chem.BondType.DOUBLE,
+        2.0: Chem.BondType.DOUBLE,
         3: Chem.BondType.TRIPLE,
-        4: Chem.BondType.AROMATIC
+        3.0: Chem.BondType.TRIPLE,
+        4: Chem.BondType.AROMATIC,
+        4.0: Chem.BondType.AROMATIC
     }
 
     # Add bonds between real nodes

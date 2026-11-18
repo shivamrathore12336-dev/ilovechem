@@ -1,4 +1,6 @@
-from django.test import TestCase, override_settings
+import json
+import numpy as np
+from django.test import TestCase, override_settings, Client
 
 from .scientific_engine import DeepContentSniffer
 
@@ -326,6 +328,93 @@ class MolecularDockingEngineTests(TestCase):
             "ATOM      2  C1  LIG     1      10.000  10.000  10.000  1.00 20.00    +0.000 C\n"
         )
         merged = _merge_receptor_and_pose_to_pdb(receptor, malformed_pose)
-        self.assertIn("HETATM 1001", merged)
+        self.assertIn("HETATM    2", merged)
         self.assertIn("LIG Z 900", merged)
         self.assertIn("END", merged)
+
+
+class RegressionBugFixTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+    def test_salt_and_solvent_formulas_use_letter_O_not_zero(self):
+        """Regression test for scientific_engine.py:48-58 digit '0' vs letter 'O' bug."""
+        from calculator.scientific_engine import KNOWN_SALTS_AND_SOLVENTS
+        for formula in ("H2O", "SO4", "NO3", "PO4", "CO3", "CLO4", "CH4O", "C2H6O", "CF3CO2H"):
+            self.assertIn(formula, KNOWN_SALTS_AND_SOLVENTS)
+        for typo in ("H20", "S04", "N03", "P04", "C03", "CL04", "CH40"):
+            self.assertNotIn(typo, KNOWN_SALTS_AND_SOLVENTS)
+
+    def test_non_string_json_payloads_return_400_not_500(self):
+        """Regression test for views.py:54, studio_views.py:141, docking_views.py:110."""
+        for bad_payload in ({"smiles": None}, {"smiles": 12345}, {"smiles": ["CCO"]}, [1, 2, 3]):
+            resp = self.client.post(
+                "/api/calculate/",
+                data=json.dumps(bad_payload),
+                content_type="application/json",
+            )
+            self.assertEqual(resp.status_code, 400)
+
+        resp_convert = self.client.post(
+            "/api/convert/",
+            data=json.dumps({"content": ["not-a-string"], "target_format": "xyz"}),
+            content_type="application/json",
+        )
+        self.assertEqual(resp_convert.status_code, 400)
+
+    def test_receptor_pdbqt_columns_and_vina_repulsion_weight(self):
+        """Regression test for docking_core.py:12 and 455-465 (79-col PDBQT alignment)."""
+        from calculator.docking_core import prepare_receptor_pdbqt, WEIGHT_REPULSION
+        self.assertAlmostEqual(WEIGHT_REPULSION, 0.840245, places=5)
+        sample_pdb = (
+            "ATOM      1  N   ALA A   1      11.104   6.134  -6.504  1.00  0.00           N\n"
+            "ATOM      2  CA  ALA A   1      11.639   6.071  -5.147  1.00  0.00           C\n"
+            "ATOM      3  C   ALA A   1      11.211   4.769  -4.479  1.00  0.00           C\n"
+            "ATOM      4  O   ALA A   1      10.742   3.843  -5.140  1.00  0.00           O\n"
+        )
+        pdbqt_str, _ = prepare_receptor_pdbqt(sample_pdb)
+        atom_lines = [l for l in pdbqt_str.splitlines() if l.startswith("ATOM")]
+        self.assertEqual(len(atom_lines), 4)
+        for line in atom_lines:
+            self.assertGreaterEqual(len(line), 79)
+        # Carbonyl oxygen (atom 4) must have AutoDock type 'OA' in columns 78-79 (slice 77:79)
+        self.assertEqual(atom_lines[3][77:79].strip(), "OA")
+
+    def test_benzene_ring_bonds_are_not_rotatable(self):
+        """Regression test for docking_core.py:118-145 ring-detection BFS."""
+        from calculator.docking_core import _identify_rotatable_bonds
+        angles = np.linspace(0, 2 * np.pi, 6, endpoint=False)
+        ring_coords = np.column_stack([1.4 * np.cos(angles), 1.4 * np.sin(angles), np.zeros(6)])
+        rotatable = _identify_rotatable_bonds(ring_coords, ["A"] * 6)
+        self.assertEqual(rotatable, [])
+
+    def test_prepare_ligand_populates_smiles_for_2d_svg(self):
+        """Regression test for docking_views.py:203 & docking_core.py:491-538."""
+        from calculator.docking_core import prepare_ligand_pdbqt
+        pdbqt_str, meta = prepare_ligand_pdbqt("CC(=O)OC1=CC=CC=C1C(=O)O", input_format="smiles")
+        self.assertTrue(meta.get("smiles"))
+        self.assertIn("TORSDOF", pdbqt_str)
+
+    def test_merge_receptor_and_pose_avoids_serial_1000_collision(self):
+        """Regression test for docking_views.py:242-268 atom serial collision."""
+        from calculator.docking_views import _merge_receptor_and_pose_to_pdb
+        receptor = "ATOM   1500  CA  ALA A 150      10.000  10.000  10.000  1.00  0.00           C\n"
+        pose = "HETATM    1  C1  LIG A   1      12.000  12.000  12.000  1.00  0.00    +0.000 C \n"
+        merged = _merge_receptor_and_pose_to_pdb(receptor, pose)
+        hetatm_lines = [l for l in merged.splitlines() if l.startswith("HETATM")]
+        self.assertEqual(int(hetatm_lines[0][6:11].strip()), 1501)
+
+    def test_pdb_sanitizer_splits_space_padded_nmr_models(self):
+        """Regression test for scientific_engine.py:472 space-padded MODEL records."""
+        from calculator.scientific_engine import PDBSanitizer
+        nmr_pdb = (
+            "MODEL        1\n"
+            "ATOM      1  CA  ALA A   1       1.000   2.000   3.000  1.00  0.00           C\n"
+            "ENDMDL\n"
+            "MODEL        2\n"
+            "ATOM      1  CA  ALA A   1       9.000   9.000   9.000  1.00  0.00           C\n"
+            "ENDMDL\n"
+        )
+        cleaned, _ = PDBSanitizer.sanitize_pdb_content(nmr_pdb)
+        atom_lines = [l for l in cleaned.splitlines() if l.startswith("ATOM")]
+        self.assertEqual(len(atom_lines), 1)

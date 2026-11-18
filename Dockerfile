@@ -28,4 +28,4 @@ RUN python manage.py migrate && python manage.py collectstatic --noinput
 
 EXPOSE 10000
 
-CMD ["sh", "-c", "gunicorn chemsite.wsgi:application --bind 0.0.0.0:${PORT:-10000} --workers ${WEB_CONCURRENCY:-1} --timeout 120"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn chemsite.wsgi:application --bind 0.0.0.0:${PORT:-10000} --workers ${WEB_CONCURRENCY:-1} --threads ${GUNICORN_THREADS:-4} --worker-class gthread --timeout 120"]

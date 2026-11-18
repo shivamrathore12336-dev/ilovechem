@@ -493,13 +493,19 @@ print("MedChem Properties:", data["medchem"])</pre>
 
         function copyBibTeXAbout() {
             const text = document.getElementById('bibtex-block').textContent;
-            navigator.clipboard.writeText(text).then(() => {
-                const btn = document.getElementById('copy-btn-text');
-                if (btn) btn.textContent = "Copied! ✓";
-                setTimeout(() => {
-                    if (btn) btn.textContent = "Copy BibTeX";
-                }, 2000);
-            });
+            const btn = document.getElementById('copy-btn-text');
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    if (btn) btn.textContent = "Copied! ✓";
+                    setTimeout(() => {
+                        if (btn) btn.textContent = "Copy BibTeX";
+                    }, 2000);
+                }).catch(() => {
+                    if (window.ilovechemUtils && window.ilovechemUtils.downloadBlob) {
+                        window.ilovechemUtils.downloadBlob(text, 'ilovechem.bib', 'application/x-bibtex');
+                    }
+                });
+            }
         }
     </script>
 </body>

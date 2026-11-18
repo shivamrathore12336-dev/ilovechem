@@ -51,8 +51,13 @@ def safe_int(val, default):
 
 @api_view(['POST'])
 def api_convert_file(request):
+    if not isinstance(request.data, dict):
+        return Response({"error": "Request body must be a JSON object or multipart form."}, status=status.HTTP_400_BAD_REQUEST)
+
     uploaded_file = request.FILES.get('file')
     raw_content = request.data.get('raw_content', '')
+    if raw_content is not None and not isinstance(raw_content, str):
+        return Response({"error": "Field 'raw_content' must be a string."}, status=status.HTTP_400_BAD_REQUEST)
     target_format = str(request.data.get('target_format', 'orca') or 'orca').lower()
     supported_formats = {fmt for group in COMPLETE_TARGET_FORMATS.values() for fmt, _, _ in group}
     supported_formats.update({"inp", "com", "gaussian", "in", "vina", "gromacs"})
@@ -95,10 +100,17 @@ def api_convert_file(request):
             if scan_res:
                 rev_coords, parser_label = scan_res
                 ob_mol = ob.OBMol()
+                ob_mol.BeginModify()
                 for sym, x, y, z in rev_coords:
+                    atomic_num = ob.GetAtomicNum(str(sym).strip())
+                    if atomic_num <= 0:
+                        continue
                     at = ob_mol.NewAtom()
-                    at.SetAtomicNum(ob.GetAtomicNum(sym))
-                    at.SetVector(x, y, z)
+                    at.SetAtomicNum(atomic_num)
+                    at.SetVector(float(x), float(y), float(z))
+                ob_mol.EndModify()
+                ob_mol.ConnectTheDots()
+                ob_mol.PerceiveBondOrders()
                 mol = pybel.Molecule(ob_mol)
                 meta = {
                     "is_2d": False,
@@ -183,7 +195,12 @@ def api_convert_file(request):
             return Response({"error": "Failed to generate the reaction-scheme archive."}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     # Special Case: Multi-Structure SDF batch export to ZIP (Loophole 5)
-    if (convert_mode == 'all_zip' or b'$$$$' in file_bytes) and file_bytes.count(b'$$$$') >= 2:
+    is_multi_sdf_batch = (
+        convert_mode == 'all_zip'
+        and file_bytes.count(b'$$$$') >= 2
+        and target_format not in ['sdf', 'xyz']
+    )
+    if is_multi_sdf_batch:
         try:
             sdf_str = file_bytes.decode('utf-8', errors='ignore')
             records = BatchSdfProcessor.split_sdf_records(sdf_str)
@@ -224,17 +241,24 @@ def api_convert_file(request):
     # Smart Spin & Charge: Default to detected electronic state if not explicitly specified
     user_charge = request.data.get('charge')
     user_mult = request.data.get('mult')
-    if user_charge is None or user_charge == '':
+    if user_charge is not None and str(user_charge).strip() != "":
+        try:
+            qm_options['charge'] = int(str(user_charge).strip())
+        except (ValueError, TypeError):
+            return Response({"error": "Charge must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
+    else:
         qm_options['charge'] = meta.get('detected_charge', 0)
-    else:
-        try: qm_options['charge'] = int(user_charge)
-        except ValueError: qm_options['charge'] = meta.get('detected_charge', 0)
 
-    if user_mult is None or user_mult == '':
-        qm_options['mult'] = meta.get('suggested_mult', 1)
+    if user_mult is not None and str(user_mult).strip() != "":
+        try:
+            mult = int(str(user_mult).strip())
+            if mult < 1:
+                return Response({"error": "Spin multiplicity must be >= 1."}, status=status.HTTP_400_BAD_REQUEST)
+            qm_options['mult'] = mult
+        except (ValueError, TypeError):
+            return Response({"error": "Multiplicity must be a positive integer."}, status=status.HTTP_400_BAD_REQUEST)
     else:
-        try: qm_options['mult'] = int(user_mult)
-        except ValueError: qm_options['mult'] = meta.get('suggested_mult', 1)
+        qm_options['mult'] = meta.get('suggested_mult', 1)
 
     qm_options['ghost_map'] = meta.get('ghost_map', {})
 
