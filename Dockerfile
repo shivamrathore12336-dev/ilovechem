@@ -24,7 +24,7 @@ RUN pip install --no-cache-dir --user -r requirements.txt
 COPY --chown=user:user . .
 
 # SQLite is only used by Django's admin/session tables; collect static assets for WhiteNoise.
-RUN python manage.py migrate && python manage.py collectstatic --noinput
+RUN python manage.py collectstatic --noinput
 
 EXPOSE 10000
 

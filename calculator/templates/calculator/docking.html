@@ -1114,7 +1114,7 @@
                     State.viewer.setStyle({}, { cartoon: { color: 'spectrum', opacity: ribbonOpacity } });
                 } else if (State.styleMode === "surface") {
                     State.viewer.setStyle({}, { cartoon: { color: 'cyan', opacity: 0.4 } });
-                    State.viewer.addSurface($3Dmol.SurfaceType.MS, { opacity: 0.3, color: 'white' });
+                    // Surface rendering deferred to optional toggle to avoid stalling 20k+ atom receptors
                 } else {
                     State.viewer.setStyle({}, { line: { color: 'spectrum' } });
                 }
