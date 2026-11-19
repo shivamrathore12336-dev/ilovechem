@@ -5,6 +5,7 @@ import logging
 from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -18,11 +19,13 @@ from .converter_core import (
 )
 from .phase1_engine import sanitize_and_extract_all_fragments, create_zip_archive_of_all_fragments
 from .scientific_engine import QuantumLogParser, DeepContentSniffer, BatchSdfProcessor
+from .ob_lock import OPENBABEL_LOCK
 from openbabel import openbabel as ob
 from openbabel import pybel
 
 logger = logging.getLogger(__name__)
 
+@ensure_csrf_cookie
 def studio_view(request):
     return render(request, "calculator/studio.html", {
         "target_registry": COMPLETE_TARGET_FORMATS,
@@ -48,6 +51,17 @@ def safe_int(val, default):
         return int(val)
     except (ValueError, TypeError):
         return default
+
+def _parse_optional_int(val, field_name: str, min_value=None):
+    if val is None or str(val).strip() == "":
+        return None, None
+    try:
+        parsed = int(str(val).strip())
+    except (ValueError, TypeError):
+        return None, f"Field '{field_name}' must be an integer."
+    if min_value is not None and parsed < min_value:
+        return None, f"Field '{field_name}' must be >= {min_value}."
+    return parsed, None
 
 @api_view(['POST'])
 def api_convert_file(request):
@@ -99,19 +113,20 @@ def api_convert_file(request):
             scan_res = QuantumLogParser.reverse_stream_extract_from_file(uploaded_file)
             if scan_res:
                 rev_coords, parser_label = scan_res
-                ob_mol = ob.OBMol()
-                ob_mol.BeginModify()
-                for sym, x, y, z in rev_coords:
-                    atomic_num = ob.GetAtomicNum(str(sym).strip())
-                    if atomic_num <= 0:
-                        continue
-                    at = ob_mol.NewAtom()
-                    at.SetAtomicNum(atomic_num)
-                    at.SetVector(float(x), float(y), float(z))
-                ob_mol.EndModify()
-                ob_mol.ConnectTheDots()
-                ob_mol.PerceiveBondOrders()
-                mol = pybel.Molecule(ob_mol)
+                with OPENBABEL_LOCK:
+                    ob_mol = ob.OBMol()
+                    ob_mol.BeginModify()
+                    for sym, x, y, z in rev_coords:
+                        atomic_num = ob.GetAtomicNum(str(sym).strip())
+                        if atomic_num <= 0:
+                            continue
+                        at = ob_mol.NewAtom()
+                        at.SetAtomicNum(atomic_num)
+                        at.SetVector(float(x), float(y), float(z))
+                    ob_mol.EndModify()
+                    ob_mol.ConnectTheDots()
+                    ob_mol.PerceiveBondOrders()
+                    mol = pybel.Molecule(ob_mol)
                 meta = {
                     "is_2d": False,
                     "is_periodic": False,
@@ -126,9 +141,19 @@ def api_convert_file(request):
                 mol = _apply_integrity_audit(mol, meta, strip_salts=strip_salts)
                 user_charge = request.data.get('charge')
                 user_mult = request.data.get('mult')
-                if user_charge in [None, '']:
+                parsed_c, err_c = _parse_optional_int(user_charge, 'charge')
+                if err_c:
+                    return Response({"error": err_c}, status=status.HTTP_400_BAD_REQUEST)
+                parsed_m, err_m = _parse_optional_int(user_mult, 'mult', min_value=1)
+                if err_m:
+                    return Response({"error": err_m}, status=status.HTTP_400_BAD_REQUEST)
+                if parsed_c is not None:
+                    qm_options['charge'] = parsed_c
+                else:
                     qm_options['charge'] = meta.get('suggested_charge', meta.get('charge', 0))
-                if user_mult in [None, '']:
+                if parsed_m is not None:
+                    qm_options['mult'] = parsed_m
+                else:
                     qm_options['mult'] = meta.get('suggested_mult', 1)
                 out_content, out_filename, export_warnings = export_to_target_format(mol, target_format, qm_options)
                 if export_warnings:
@@ -241,22 +266,20 @@ def api_convert_file(request):
     # Smart Spin & Charge: Default to detected electronic state if not explicitly specified
     user_charge = request.data.get('charge')
     user_mult = request.data.get('mult')
-    if user_charge is not None and str(user_charge).strip() != "":
-        try:
-            qm_options['charge'] = int(str(user_charge).strip())
-        except (ValueError, TypeError):
-            return Response({"error": "Charge must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
+    parsed_c, err_c = _parse_optional_int(user_charge, 'charge')
+    if err_c:
+        return Response({"error": err_c}, status=status.HTTP_400_BAD_REQUEST)
+    parsed_m, err_m = _parse_optional_int(user_mult, 'mult', min_value=1)
+    if err_m:
+        return Response({"error": err_m}, status=status.HTTP_400_BAD_REQUEST)
+
+    if parsed_c is not None:
+        qm_options['charge'] = parsed_c
     else:
         qm_options['charge'] = meta.get('detected_charge', 0)
 
-    if user_mult is not None and str(user_mult).strip() != "":
-        try:
-            mult = int(str(user_mult).strip())
-            if mult < 1:
-                return Response({"error": "Spin multiplicity must be >= 1."}, status=status.HTTP_400_BAD_REQUEST)
-            qm_options['mult'] = mult
-        except (ValueError, TypeError):
-            return Response({"error": "Multiplicity must be a positive integer."}, status=status.HTTP_400_BAD_REQUEST)
+    if parsed_m is not None:
+        qm_options['mult'] = parsed_m
     else:
         qm_options['mult'] = meta.get('suggested_mult', 1)
 

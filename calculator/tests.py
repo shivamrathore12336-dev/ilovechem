@@ -418,3 +418,43 @@ class RegressionBugFixTests(TestCase):
         cleaned, _ = PDBSanitizer.sanitize_pdb_content(nmr_pdb)
         atom_lines = [l for l in cleaned.splitlines() if l.startswith("ATOM")]
         self.assertEqual(len(atom_lines), 1)
+
+
+class DeepDebugRegressionTests(TestCase):
+    def test_salt_stripper_contains_oxygen_letter_O(self):
+        from calculator.scientific_engine import KNOWN_SALTS_AND_SOLVENTS
+        for formula in ("H2O", "SO4", "NO3", "PO4", "CO3", "CLO4", "H2SO4", "CH4O", "C2H6OS"):
+            self.assertIn(formula, KNOWN_SALTS_AND_SOLVENTS)
+        for typo in ("H20", "S04", "N03", "P04", "C03", "CL04", "H2S04", "CH40", "C2H60S"):
+            self.assertNotIn(typo, KNOWN_SALTS_AND_SOLVENTS)
+
+    def test_pdbqt_nan_sanitizer_preserves_79_column_width(self):
+        from calculator.converter_core import _sanitize_pdbqt_output
+        bad_line = "ATOM      1  O   ALA A   1      10.000  10.000  10.000  1.00  0.00       nan OA"
+        fixed = _sanitize_pdbqt_output(bad_line)
+        self.assertEqual(len(fixed), len(bad_line))
+        self.assertEqual(fixed[77:79].strip(), "OA")
+
+    def test_studio_view_sets_csrf_cookie_on_first_get(self):
+        resp = Client().get("/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("csrftoken", resp.cookies)
+
+    def test_interaction_svg_escapes_xss_and_dark_mode_fills(self):
+        from calculator.interaction_diagram import generate_2d_interaction_svg
+        interactions = [{
+            "resn": "ASP');alert(1);//",
+            "resi": 102,
+            "chain": "A",
+            "res_label": "ASP102",
+            "dist": 2.85,
+            "type": "hbond",
+        }]
+        svg = generate_2d_interaction_svg("CC(=O)O", interactions, pose_number=1, affinity=-5.2)
+        self.assertNotIn("onclick=", svg)
+        self.assertNotIn("fill:#000000", svg)
+
+    def test_pymol_script_sanitizes_filename(self):
+        from calculator.interaction_diagram import generate_pymol_script
+        script = generate_pymol_script("complex.pdb\nsystem rm -rf /", [])
+        self.assertNotIn("system rm -rf", script)

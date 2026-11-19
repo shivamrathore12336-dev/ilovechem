@@ -5,6 +5,7 @@ from collections import deque
 import numpy as np
 import openbabel.openbabel as ob
 import openbabel.pybel as pybel
+from .ob_lock import OPENBABEL_LOCK
 
 # Empirical AutoDock Vina Scoring Weights (Trott & Olson, J. Comput. Chem. 2010)
 WEIGHT_GAUSS1 = -0.035579
@@ -24,6 +25,10 @@ AUTODOCK_VDW_RADII: Dict[str, float] = {
 HYDROPHOBIC_ATOMS = {"C", "A", "F", "CL", "BR", "I"}
 HBOND_ACCEPTORS = {"NA", "OA", "SA"}
 HBOND_DONORS = {"HD"}
+POLAR_H_NAMES = {
+    "H", "HN", "H1", "H2", "H3", "HG", "HG1", "HH", "HH11", "HH12", "HH21", "HH22",
+    "HE", "HE1", "HE2", "HE21", "HE22", "HD1", "HD2", "HD21", "HD22", "HZ", "HZ1", "HZ2", "HZ3"
+}
 
 SOLVENT_AND_BUFFER_RESIDUES = {
     "HOH", "WAT", "TIP", "TIP3", "TIP4", "SOL",
@@ -467,15 +472,17 @@ class ChemDockEngine:
                         elif elem in ["ZN", "MG", "CA", "FE", "MN", "CU", "CL", "BR", "NA"]:
                             ad_type = elem
                         elif elem == "H":
-                            ad_type = "HD" if atom_name.startswith("H") and ("N" in atom_name or "O" in atom_name or "N" in line[17:20]) else "H"
+                            ad_type = "HD" if atom_name.strip().upper() in POLAR_H_NAMES else "H"
                         else:
                             ad_type = elem[:2]
 
                     charge = 0.000
                     if (res_name, atom_name) in [("ASP", "OD1"), ("ASP", "OD2"), ("GLU", "OE1"), ("GLU", "OE2")]:
                         charge = -0.500
-                    elif (res_name, atom_name) in [("ARG", "NH1"), ("ARG", "NH2"), ("LYS", "NZ")]:
+                    elif (res_name, atom_name) in [("ARG", "NH1"), ("ARG", "NH2")]:
                         charge = 0.500
+                    elif (res_name, atom_name) == ("LYS", "NZ"):
+                        charge = 1.000
 
                     base = line[:54].ljust(54) + "  1.00  0.00"
                     pdbqt_line = f"{base}{charge:10.3f} {ad_type:<2s}"
@@ -503,7 +510,15 @@ class ChemDockEngine:
             raise ValueError("Empty ligand input provided.")
 
         fmt_lower = input_format.lower().strip()
-        if "\n" not in s and ("=" in s or "#" in s or "(" in s or "@" in s or (len(s) < 80 and not s.startswith("ATOM"))):
+        if fmt_lower in ["mol2", "tripos"]:
+            fmt = "mol2"
+        elif fmt_lower in ["xyz"]:
+            fmt = "xyz"
+        elif fmt_lower in ["pdbqt"]:
+            fmt = "pdbqt"
+        elif fmt_lower in ["inchi"]:
+            fmt = "inchi"
+        elif "\n" not in s and ("=" in s or "#" in s or "(" in s or "@" in s or (len(s) < 80 and not s.startswith("ATOM"))):
             fmt = "smi"
         elif "ATOM" in s or "HETATM" in s or fmt_lower in ["pdb", "ent"]:
             fmt = "pdb"
@@ -512,16 +527,17 @@ class ChemDockEngine:
         else:
             fmt = "smi"
 
-        ob_mol = pybel.readstring(fmt, s)
-        if not ob_mol.OBMol.Has3D():
-            try:
-                ob_mol.make3D(forcefield='mmff94', steps=300)
-            except Exception:
+        with OPENBABEL_LOCK:
+            ob_mol = pybel.readstring(fmt, s)
+            if not ob_mol.OBMol.Has3D():
                 try:
-                    ob_mol.make3D(forcefield='uff', steps=200)
+                    ob_mol.make3D(forcefield='mmff94', steps=300)
                 except Exception:
-                    pass
-        ob_mol.addh()
+                    try:
+                        ob_mol.make3D(forcefield='uff', steps=200)
+                    except Exception:
+                        pass
+            ob_mol.addh()
 
         for a in ob_mol.atoms:
             try:
@@ -529,7 +545,8 @@ class ChemDockEngine:
             except Exception:
                 pass
 
-        pdbqt_raw = ob_mol.write("pdbqt")
+        with OPENBABEL_LOCK:
+            pdbqt_raw = ob_mol.write("pdbqt")
         if not pdbqt_raw or len(pdbqt_raw.strip()) < 10:
             raise ValueError(f"OpenBabel produced empty PDBQT for ligand format '{fmt}'.")
 
@@ -666,7 +683,7 @@ class ChemDockEngine:
                 x = float(line[30:38].strip())
                 y = float(line[38:46].strip())
                 z = float(line[46:54].strip())
-                atype = line[77:79].strip().upper() if len(line) >= 79 else aname[:1]
+                atype = line[77:79].strip().upper() if len(line) >= 78 else aname[:1]
                 rec_atoms.append({
                     'atom_name': aname,
                     'res_name': rname,
@@ -684,7 +701,7 @@ class ChemDockEngine:
             if i >= len(pose_coords):
                 break
             aname = line[12:16].strip()
-            atype = line[77:79].strip().upper() if len(line) >= 79 else aname[:1]
+            atype = line[77:79].strip().upper() if len(line) >= 78 else aname[:1]
             coord = np.array(pose_coords[i])
             lig_atoms.append({
                 'index': i,

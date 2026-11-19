@@ -61,7 +61,10 @@ def sanitize_and_extract_all_fragments(raw_text: str) -> Tuple[List[Dict[str, An
     clean_xml = re.sub(r'<!DOCTYPE\s+[^\[>]*(\[[^\]]*\])?\s*>', '', raw_text, flags=re.DOTALL | re.IGNORECASE)
     clean_xml = re.sub(r'<!ENTITY[^>]*>', '', clean_xml, flags=re.IGNORECASE)
     clean_xml = re.sub(r'<!DOCTYPE[^>]*>', '', clean_xml, flags=re.IGNORECASE)
-    root = ET.fromstring(clean_xml)  # nosec: B314
+    try:
+        root = ET.fromstring(clean_xml)  # nosec: B314
+    except Exception as e:
+        raise ValueError(f"Invalid or corrupted CDXML structure: {e}") from e
 
     stats = {
         "text_labels_filtered": 0,
@@ -78,7 +81,8 @@ def sanitize_and_extract_all_fragments(raw_text: str) -> Tuple[List[Dict[str, An
 
     fragments_data = []
 
-    for frag_idx, frag in enumerate(root.iter('fragment')):
+    top_fragments = root.findall('./page/fragment') or root.findall('./fragment') or list(root.iter('fragment'))
+    for frag_idx, frag in enumerate(top_fragments):
         nodes = {}
         bonds = []
 
@@ -283,7 +287,7 @@ def build_3d_mol_from_fragment(frag_data: Dict[str, Any]) -> Optional[pybel.Mole
 
         try:
             Chem.AssignChiralTypesFromBondDirs(mol, confId=0)
-            Chem.SetDoubleBondNeighborDirections(mol, conf)
+            Chem.SetDoubleBondNeighborDirections(mol, 0)
         except Exception:
             pass
 

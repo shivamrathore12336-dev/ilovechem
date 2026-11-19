@@ -1304,6 +1304,17 @@
             }
         }
 
+        document.addEventListener('click', function (e) {
+            const badge = e.target.closest('.interaction-residue-badge');
+            if (!badge) return;
+            const resn = badge.getAttribute('data-resn');
+            const resi = parseInt(badge.getAttribute('data-resi'), 10);
+            const chain = badge.getAttribute('data-chain');
+            if (typeof highlightResidueIn3D === 'function' && !isNaN(resi)) {
+                highlightResidueIn3D(resn, resi, chain);
+            }
+        });
+
         function toggleResidueLabels() {
             State.showResidueLabels = !State.showResidueLabels;
             const btn = document.getElementById("btn-toggle-labels");

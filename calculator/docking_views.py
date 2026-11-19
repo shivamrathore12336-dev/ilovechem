@@ -33,6 +33,8 @@ def docking_studio_view(request):
     return render(request, "calculator/docking.html")
 
 
+MAX_RCSB_BYTES = 25 * 1024 * 1024
+
 @functools.lru_cache(maxsize=2)
 def _fetch_rcsb_cached(clean_id: str) -> str:
     """In-memory LRU cache for RCSB PDB structures. Prevents redundant remote downloads and caps buffer to 25 MB."""
@@ -41,7 +43,9 @@ def _fetch_rcsb_cached(clean_id: str) -> str:
     req = urllib.request.Request(rcsb_url, headers={'User-Agent': 'iLoveChem-Docking-Engine/1.0'})
     try:
         with urllib.request.urlopen(req, context=ctx, timeout=15) as resp:  # nosec: B310
-            raw_bytes = resp.read(26214400)  # Bounded to 25 MB maximum to avoid memory bloat
+            raw_bytes = resp.read(MAX_RCSB_BYTES + 1)
+            if len(raw_bytes) > MAX_RCSB_BYTES:
+                raise ValueError(f"PDB entry '{clean_id}' exceeds the 25 MB in-memory safety limit.")
     except urllib.error.HTTPError as exc:
         # urlopen raises on 4xx/5xx; it never returns a non-200 response object.
         if exc.code == 404:
@@ -142,7 +146,7 @@ def api_run_docking(request):
         size_x = float(data.get("size_x", 20.0))
         size_y = float(data.get("size_y", 20.0))
         size_z = float(data.get("size_z", 20.0))
-        exhaustiveness = max(1, min(64, int(data.get("exhaustiveness", 8))))
+        exhaustiveness = max(1, min(8, int(data.get("exhaustiveness", 8))))
         num_modes = max(1, min(15, int(data.get("num_modes", 9))))
     except (ValueError, TypeError):
         return Response(

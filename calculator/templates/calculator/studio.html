@@ -1064,7 +1064,7 @@
     <!-- Presets Detailed Catalog Modal -->
     <div id="presets-catalog-modal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-6 max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="sticky -top-6 -mx-6 sm:-top-8 sm:-mx-8 px-6 sm:px-8 py-4 bg-white/95 backdrop-blur-sm border-b border-slate-200 flex items-center justify-between z-10 rounded-t-2xl">
                 <div class="flex items-center space-x-2.5">
                     <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold">
                         <i data-lucide="flask-conical" class="w-5 h-5"></i>
@@ -1491,7 +1491,13 @@
             selectedFragmentIdx = 0;
             currentConvertMode = 'single';
 
-            if (type === 'reaction_scheme') {
+            if (type === 'imatinib') {
+                activeRawContent = 'CC1=C(C=C(C=C1)NC(=O)C2=CC=C(C=C2)CN3CCN(CC3)C)NC4=NC=CC(=N4)C5=CN=CC=C5';
+                document.getElementById('detected-format-label').textContent = "Imatinib SMILES (.smi)";
+                document.getElementById('detected-sub-label').textContent = "Kinase inhibitor / target AutoDock Vina (.pdbqt) ready.";
+                document.getElementById('multi-frag-panel').classList.add('hidden');
+                if (typeof showToast === 'function') showToast('Loaded Imatinib sample (target: ' + (target || 'PDBQT').toUpperCase() + '). Click Convert Now.', 'info');
+            } else if (type === 'reaction_scheme') {
                 activeRawContent = `<?xml version="1.0" encoding="UTF-8" ?>\n<CDXML>\n<page id="1">\n<t id="99" p="50 50"><s>Reflux 4h, 85% yield</s></t>\n<arrow id="100" p="80 50"/>\n<fragment id="1">\n  <n id="3" p="100 100" Element="6"/>\n  <n id="4" p="120 100" Element="8" Charge="-1"/>\n  <b id="5" B="3" E="4" Order="1"/>\n</fragment>\n<fragment id="2">\n  <n id="10" p="200 200" Element="6"/>\n  <n id="11" p="220 200" Element="6"/>\n  <n id="12" p="240 220" Element="7" Charge="1"/>\n  <b id="13" B="10" E="11" Order="2"/>\n  <b id="14" B="11" E="12" Order="1" Display="WedgeBegin"/>\n</fragment>\n</page>\n</CDXML>`;
                 document.getElementById('detected-format-label').textContent = "Full Reaction Scheme (.cdxml)";
                 document.getElementById('detected-sub-label').textContent = "Text annotations & reaction arrow automatically filtered out.";

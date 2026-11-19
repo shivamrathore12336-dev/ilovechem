@@ -7,6 +7,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors, Crippen, QED, rdMolDescriptors
 from rdkit.Chem import Draw
 from openbabel import pybel
+from .ob_lock import OPENBABEL_LOCK
 import io
 import base64
 
@@ -167,6 +168,8 @@ def generate_3d_molblock(smiles: str) -> dict:
     Falls back to OpenBabel UFF for organometallics and complex coordination cages.
     Returns standard MolBlock string for 3Dmol.js rendering.
     """
+    if not smiles or not isinstance(smiles, str) or not smiles.strip():
+        return {"error": "Empty SMILES string."}
     s = smiles.strip()
     mol = None
     try:
@@ -197,10 +200,11 @@ def generate_3d_molblock(smiles: str) -> dict:
 
     # OpenBabel fallback for organometallics, macrocycles, and complex structures
     try:
-        ob_mol = pybel.readstring("smi", s)
-        if len(ob_mol.atoms) > 0:
-            ob_mol.make3D(forcefield='uff', steps=200)
-            return {"mol_block": ob_mol.write("mol")}
+        with OPENBABEL_LOCK:
+            ob_mol = pybel.readstring("smi", s)
+            if len(ob_mol.atoms) > 0:
+                ob_mol.make3D(forcefield='uff', steps=200)
+                return {"mol_block": ob_mol.write("mol")}
     except Exception:
         pass
 
@@ -211,6 +215,8 @@ def generate_2d_base64_image(smiles: str, width: int = 360, height: int = 280) -
     Generates 2D structure diagram and returns base64 PNG data URL.
     Falls back to OpenBabel SVG if RDKit kekulization fails.
     """
+    if not smiles or not isinstance(smiles, str) or not smiles.strip():
+        return ""
     s = smiles.strip()
     mol = None
     try:

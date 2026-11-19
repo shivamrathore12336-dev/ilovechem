@@ -11,6 +11,7 @@ from typing import Dict, Any, Tuple, Optional, List
 
 from openbabel import openbabel as ob
 from openbabel import pybel
+from .ob_lock import OPENBABEL_LOCK
 import cclib
 from ase import io as ase_io
 from ase.atoms import Atoms
@@ -583,7 +584,7 @@ def _apply_integrity_audit(mol: pybel.Molecule, meta_info: dict, strip_salts: bo
 
     # 3. Valence Electron, Formal Charge & Spin Multiplicity Calculation
     detected_charge = mol.charge
-    total_z = sum(a.OBAtom.GetAtomicNum() for a in mol.atoms)
+    total_z = sum(a.OBAtom.GetAtomicNum() + a.OBAtom.GetImplicitHCount() for a in mol.atoms)
     n_electrons = total_z - detected_charge
     suggested_mult = 2 if (n_electrons % 2 == 1) else 1
 
@@ -613,6 +614,22 @@ def _apply_integrity_audit(mol: pybel.Molecule, meta_info: dict, strip_salts: bo
     return mol
 
 
+def _sanitize_pdbqt_output(pdbqt_str: str) -> str:
+    """
+    Sanitize PDBQT output coordinates and partial charges.
+    Replaces NaN/Inf partial charges in cols 67-76 with a precise 10-char representation
+    '    +0.000' so cols 77-79 (AutoDock atom types) never shift.
+    """
+    clean_lines = []
+    for line in pdbqt_str.splitlines():
+        if line.startswith(("ATOM  ", "HETATM")) and len(line) >= 76:
+            charge_slice = line[66:76].lower()
+            if "nan" in charge_slice or "inf" in charge_slice:
+                line = line[:66] + "    +0.000" + line[76:]
+        clean_lines.append(line)
+    return "\n".join(clean_lines) + ("\n" if pdbqt_str.endswith("\n") else "")
+
+
 def export_to_target_format(
     mol: pybel.Molecule,
     target_format: str,
@@ -634,9 +651,9 @@ def export_to_target_format(
         s = str(val if val is not None else default).strip()
         # Security Guard: Strip all newlines, carriage returns, null bytes to prevent QM header injection
         s = re.sub(r'[\r\n\0]', '', s)
-        # Allow only safe alphanumeric and standard chemical basis/method characters
-        cleaned = re.sub(r'[^\w\s\.\-\/\+\*\(\)\,]', '', s).strip()
-        return cleaned[:60] if cleaned else default
+        # Allow safe alphanumeric, standard chemical symbols and '=' for keyword options (e.g. opt=calcall)
+        cleaned = re.sub(r'[^A-Za-z0-9_\-\+\(\)\*\/=,\. ]', '', s).strip()
+        return cleaned[:100] if cleaned else default
 
     method = _clean_param(qm_options.get("method"), "B3LYP")
     basis = _clean_param(qm_options.get("basis"), "def2-SVP")
@@ -814,15 +831,9 @@ def export_to_target_format(
                         a.OBAtom.SetPartialCharge(0.0)
                 except Exception:
                     a.OBAtom.SetPartialCharge(0.0)
-            pdbqt_str = mol.write("pdbqt")
-            clean_lines = []
-            for line in pdbqt_str.splitlines():
-                if line.startswith(("ATOM  ", "HETATM")) and len(line) >= 76:
-                    charge_slice = line[66:76].lower()
-                    if "nan" in charge_slice or "inf" in charge_slice:
-                        line = line[:66] + "  +0.000" + line[76:]
-                clean_lines.append(line)
-            pdbqt_str = "\n".join(clean_lines) + "\n"
+            with OPENBABEL_LOCK:
+                pdbqt_str = mol.write("pdbqt")
+            pdbqt_str = _sanitize_pdbqt_output(pdbqt_str)
             return _finalize(pdbqt_str, "docking_ligand.pdbqt")
         except Exception:
             pass

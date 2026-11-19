@@ -4,10 +4,11 @@ PoseView / Maestro / LigPlot / PyMOL / ChimeraX Standard
 100% Volatile in-memory execution (no files written to disk)
 """
 
+import os
 import math
 import re
 import html
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem.Draw import rdMolDraw2D
@@ -16,12 +17,13 @@ from rdkit.Geometry import Point2D
 
 def generate_2d_interaction_svg(
     smiles_or_mol: Any,
-    hbonds: List[Dict[str, Any]],
-    hydrophobics: List[Dict[str, Any]],
-    salt_bridges: List[Dict[str, Any]],
+    hbonds: Optional[List[Dict[str, Any]]] = None,
+    hydrophobics: Optional[List[Dict[str, Any]]] = None,
+    salt_bridges: Optional[List[Dict[str, Any]]] = None,
     width: int = 700,
     height: int = 540,
-    theme: str = "dark"
+    theme: str = "dark",
+    **kwargs
 ) -> str:
     """
     Generates a publication-grade 2D Protein-Ligand Interaction Diagram (PoseView / Maestro style).
@@ -29,9 +31,15 @@ def generate_2d_interaction_svg(
     dashed hydrogen bond vectors with distance readouts, and hydrophobic contact indicators.
     Includes bi-directional interactive attributes for clicking residues to highlight in 3D viewport.
     """
+    if hbonds is None:
+        hbonds = []
+    if hydrophobics is None:
+        hydrophobics = []
+    if salt_bridges is None:
+        salt_bridges = []
     if isinstance(smiles_or_mol, str):
-        s = smiles_or_mol.strip()
-        if "\n" in s or "M  END" in s:
+        s = smiles_or_mol
+        if "\n" in s or "V2000" in s or "V3000" in s or "M  END" in s:
             try:
                 mol = Chem.MolFromMolBlock(s, sanitize=False)
             except Exception:
@@ -42,10 +50,10 @@ def generate_2d_interaction_svg(
                 except Exception:
                     mol = None
         else:
-            mol = Chem.MolFromSmiles(s)
+            mol = Chem.MolFromSmiles(s.strip())
             if not mol:
                 try:
-                    mol = Chem.MolFromSmiles(s, sanitize=False)
+                    mol = Chem.MolFromSmiles(s.strip(), sanitize=False)
                 except Exception:
                     mol = None
     else:
@@ -118,14 +126,18 @@ def generate_2d_interaction_svg(
         else:
             color = "#F59E0B"  # Hydrophobic Amber
 
+        if "color" in hb:
+            color = hb["color"]
+        dist_val = hb.get("dist", hb.get("distance_angstrom", 2.8))
+
         if r_name not in residues or residues[r_name]["type"] != "hbond":
             residues[r_name] = {
-                "type": "hbond",
-                "res_label": r_name,
+                "type": hb.get("type", "hbond"),
+                "res_label": hb.get("res_label") or r_name,
                 "resn": resn,
                 "resi": resi,
                 "chain": chain,
-                "dist": hb.get("distance_angstrom", 2.8),
+                "dist": dist_val,
                 "ligand_atom_idx": l_idx,
                 "color": color
             }
@@ -194,9 +206,10 @@ def generate_2d_interaction_svg(
                 f'<rect x="{mx-19:.1f}" y="{my-9:.1f}" width="38" height="18" rx="5" '
                 f'fill="{badge_bg}" stroke="{r_data["color"]}" stroke-width="1.2" />'
             )
+            safe_dist = html.escape(f"{float(r_data['dist']):.2f}Å", quote=True)
             svg_elements.append(
                 f'<text x="{mx:.1f}" y="{my+4:.1f}" fill="{text_color}" font-size="9.5" '
-                f'font-family="monospace" font-weight="bold" text-anchor="middle">{r_data["dist"]}Å</text>'
+                f'font-family="monospace" font-weight="bold" text-anchor="middle">{safe_dist}</text>'
             )
         elif r_data["type"] == "salt_bridge":
             svg_elements.append(
@@ -219,17 +232,16 @@ def generate_2d_interaction_svg(
                 f'stroke="#F59E0B" stroke-width="1.8" stroke-dasharray="2,3" opacity="0.75" />'
             )
 
-        # 2. Residue Node Badge with hover & click handler
+        # 2. Residue Node Badge with hover & click handler (XSS safe data-* attributes)
         badge_w, badge_h = 72, 28
         bx = rx - badge_w / 2.0
         by = ry - badge_h / 2.0
-        safe_resn = html.escape(str(r_data["resn"]))
-        safe_resi = html.escape(str(r_data["resi"]))
-        safe_chain = html.escape(str(r_data["chain"]))
-        safe_label = html.escape(str(r_data["res_label"]))
+        safe_resn = html.escape(str(r_data["resn"]), quote=True)
+        safe_resi = html.escape(str(r_data["resi"]), quote=True)
+        safe_chain = html.escape(str(r_data["chain"]), quote=True)
+        safe_label = html.escape(str(r_data["res_label"]), quote=True)
         svg_elements.append(
-            f'<g class="residue-interactive cursor-pointer group" '
-            f'onclick="highlightResidueIn3D(\'{safe_resn}\', {safe_resi}, \'{safe_chain}\')" '
+            f'<g class="residue-interactive interaction-residue-badge cursor-pointer group" '
             f'data-resn="{safe_resn}" data-resi="{safe_resi}" data-chain="{safe_chain}">'
             f'<rect x="{bx:.1f}" y="{by:.1f}" width="{badge_w}" height="{badge_h}" rx="8" '
             f'fill="{node_bg}" stroke="{r_data["color"]}" stroke-width="2" '
@@ -244,9 +256,11 @@ def generate_2d_interaction_svg(
     svg_body_match = re.search(r'<svg[^>]*>(.*?)</svg>', lig_svg, re.DOTALL)
     svg_inner = svg_body_match.group(1) if svg_body_match else lig_svg
 
-    # Invert black strokes to high-contrast white in dark mode
+    # Invert black strokes and fills to high-contrast white in dark mode
     if is_dark:
         svg_inner = svg_inner.replace('stroke:#000000', 'stroke:#E2E8F0').replace('stroke:black', 'stroke:#E2E8F0')
+        svg_inner = svg_inner.replace('fill:#000000', 'fill:#F1F5F9').replace('fill:black', 'fill:#F1F5F9')
+        svg_inner = re.sub(r'rgb\(\s*0\s*,\s*0\s*,\s*0\s*\)', '#E2E8F0', svg_inner)
 
     final_svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="100%" height="100%" class="select-none font-sans">
     <rect width="{width}" height="{height}" fill="{bg_color}" rx="14" stroke="{border_color}" stroke-width="1" />
@@ -276,18 +290,24 @@ def generate_2d_interaction_svg(
     return final_svg
 
 
-def generate_pymol_script(complex_filename: str = "docked_complex.pdb", title: str = "iLoveChem ChemDock Complex") -> str:
+def generate_pymol_script(complex_filename: str = "docked_complex.pdb", title: Any = "iLoveChem ChemDock Complex", interactions: Any = None) -> str:
     """
     Generates a publication-grade PyMOL (.pml) macro script.
     Allows researchers to load the docked complex directly into PyMOL with
     active-site sticks, ribbon transparency, H-bond dashed vectors, and residue labels.
     """
+    first_line = str(complex_filename or "docked_complex.pdb").splitlines()[0]
+    safe_filename = re.sub(r"[^A-Za-z0-9_.\-]", "_", os.path.basename(first_line)) or "docked_complex.pdb"
+    if not isinstance(title, str):
+        title = "iLoveChem ChemDock Complex"
+    safe_title = re.sub(r"[^A-Za-z0-9_.\- ]", "_", str(title).splitlines()[0]) or "iLoveChem ChemDock Complex"
+
     script = f"""# ==============================================================================
 # iLoveChem ChemDock v3.2 - PyMOL Publication Macro Script
-# Scientific Macromolecular Visualization Session
+# Scientific Macromolecular Visualization Session: {safe_title}
 # ==============================================================================
 # Instructions:
-# 1. Save docked complex PDB as '{complex_filename}' in your working directory.
+# 1. Save docked complex PDB as '{safe_filename}' in your working directory.
 # 2. Open PyMOL and run: @docking_session.pml
 # ==============================================================================
 
@@ -300,7 +320,7 @@ set ray_trace_fog, 0
 bg_color white
 
 # 2. Load Complex
-load {complex_filename}, docked_complex
+load {safe_filename}, docked_complex
 hide everything, docked_complex
 
 # 3. Receptor Macromolecule Representation

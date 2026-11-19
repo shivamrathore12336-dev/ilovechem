@@ -16,6 +16,7 @@ import numpy as np
 
 from openbabel import openbabel as ob
 from openbabel import pybel
+from .ob_lock import OPENBABEL_LOCK
 from ase.atoms import Atoms
 from rdkit import Chem
 from rdkit.Chem import AllChem
@@ -194,20 +195,13 @@ class SpinChargeParityValidator:
         is_even_electrons = (n_elec % 2 == 0)
         is_odd_mult = (mult % 2 == 1)
 
-        if is_even_electrons and not is_odd_mult:
-            fixed_mult = 1
+        if mult is None or mult < 1 or mult > n_elec + 1 or (is_even_electrons and not is_odd_mult) or ((not is_even_electrons) and is_odd_mult):
+            fixed_mult = 1 if is_even_electrons else 2
+            state_label = "Singlet (multiplicity = 1)" if is_even_electrons else "Doublet (multiplicity = 2)"
             warnings.append(
-                f"Spin Multiplicity Parity Error: Molecule has {n_elec} electrons (even). "
+                f"Spin Multiplicity Parity Error: Molecule has {n_elec} electrons ({'even' if is_even_electrons else 'odd, open-shell'}). "
                 f"Multiplicity {mult} is physically impossible (leads to Gaussian/ORCA QPErr). "
-                f"Auto-corrected to Singlet (multiplicity = 1)."
-            )
-            return fixed_mult, warnings
-        elif (not is_even_electrons) and is_odd_mult:
-            fixed_mult = 2
-            warnings.append(
-                f"Spin Multiplicity Parity Error: Molecule has {n_elec} electrons (odd, radical/open-shell). "
-                f"Multiplicity {mult} is physically impossible (leads to Gaussian/ORCA QPErr). "
-                f"Auto-corrected to Doublet (multiplicity = 2)."
+                f"Auto-corrected to {state_label}."
             )
             return fixed_mult, warnings
 
@@ -925,6 +919,7 @@ class ZeroCoordinateGuard:
                         has_micro_clash = True
                         cur_v = mol.atoms[j].OBAtom.GetVector()
                         mol.atoms[j].OBAtom.SetVector(cur_v.GetX() + 0.12, cur_v.GetY() + 0.12, cur_v.GetZ() + 0.08)
+                        coords[j] = coords[j] + np.array([0.12, 0.12, 0.08])
             if has_micro_clash:
                 warnings.append(
                     "Atomic Collision Jitter: Detected atoms sharing nearly identical 3D positions (< 0.35 Å). "
@@ -1003,8 +998,8 @@ class BatchSdfProcessor:
         raw_blocks = sdf_str.split("$$$$")
         valid_records = []
         for blk in raw_blocks:
-            cleaned = blk.strip()
-            if cleaned and ("M  END" in cleaned or "V2000" in cleaned or "V3000" in cleaned or len(cleaned.splitlines()) >= 4):
+            cleaned = blk.rstrip()
+            if cleaned.strip() and ("M  END" in cleaned or "V2000" in cleaned or "V3000" in cleaned or len(cleaned.splitlines()) >= 4):
                 if not cleaned.endswith("M  END"):
                     if "M  END" in cleaned:
                         cleaned = cleaned[:cleaned.rfind("M  END") + 6]
@@ -1020,14 +1015,16 @@ class BatchSdfProcessor:
         with zipfile.ZipFile(mem_zip, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
             for idx, rec in enumerate(records):
                 try:
-                    mol = pybel.readstring("mol", rec)
+                    with OPENBABEL_LOCK:
+                        mol = pybel.readstring("mol", rec)
                     if mol and len(mol.atoms) > 0:
                         out_content, fname, _ = export_fn(mol, target_format, qm_options)
                         base_name, ext = os.path.splitext(fname)
                         safe_formula = re.sub(r'[^a-zA-Z0-9_]', '', mol.formula or f"compound_{idx+1}")
                         clean_ext = re.sub(r'[^a-zA-Z0-9\.]', '', ext)
                         zip_entry_name = f"molecule_{idx+1:03d}_{safe_formula}{clean_ext}"
-                        zf.writestr(zip_entry_name, out_content.encode('utf-8'))
+                        payload = out_content if isinstance(out_content, bytes) else out_content.encode('utf-8')
+                        zf.writestr(zip_entry_name, payload)
                         converted_count += 1
                 except Exception:
                     continue
