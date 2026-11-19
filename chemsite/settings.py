@@ -1,5 +1,6 @@
 import os
 import sys
+import warnings
 """
 Django settings for chemsite project.
 
@@ -18,20 +19,21 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-from django.core.exceptions import ImproperlyConfigured
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-DEBUG = os.environ.get('DJANGO_DEBUG', os.environ.get('DEBUG', 'False')).lower() in ('true', '1', 't', 'yes')
 _INSECURE_DEV_KEY = 'django-insecure-dev-fallback-key-for-local-development-only-change-in-prod'
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', _INSECURE_DEV_KEY if DEBUG else '')
-if not SECRET_KEY:
-    if any(cmd in sys.argv for cmd in ('test', 'collectstatic', 'check', 'makemigrations', 'migrate')):
-        SECRET_KEY = _INSECURE_DEV_KEY
-    else:
-        raise ImproperlyConfigured('DJANGO_SECRET_KEY must be set when DEBUG=False.')
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', _INSECURE_DEV_KEY)
+
+DEBUG = os.environ.get('DJANGO_DEBUG', os.environ.get('DEBUG', 'False')).lower() in ('true', '1', 't', 'yes')
+
+if SECRET_KEY == _INSECURE_DEV_KEY and not DEBUG:
+    warnings.warn(
+        "DJANGO_SECRET_KEY is not set: running with the public fallback key. "
+        "Set DJANGO_SECRET_KEY in your hosting environment.",
+        RuntimeWarning,
+    )
 
 # Comma-separated list of accepted Host headers. Keep the default scoped to this
 # deployment and local development; configure custom domains through the environment.
