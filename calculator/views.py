@@ -8,6 +8,7 @@ from .chem_utils import (
     generate_3d_molblock,
     generate_2d_base64_image
 )
+from .medchem_engine import analyze_medchem_profile
 
 MAX_SMILES_LEN = 2000
 
@@ -43,6 +44,10 @@ def home_view(request):
                     context["mol_block"] = structure_res["mol_block"]
                 else:
                     context["structure_warning"] = structure_res.get("error", "3D generation unavailable")
+
+                medchem = analyze_medchem_profile(selected_smiles)
+                if medchem:
+                    context["medchem"] = medchem
 
                 # Pharma Zero-Storage Invariant: Never persist user SMILES to disk or SQLite database.
 
@@ -97,6 +102,9 @@ def api_calculate_properties(request):
         "mol_block": mol_block,
         "image_2d": img_2d
     }
+    medchem = analyze_medchem_profile(smiles)
+    if medchem:
+        resp_data["medchem"] = medchem
     if warn_3d:
         resp_data["warning_3d"] = warn_3d
 

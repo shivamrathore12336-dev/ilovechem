@@ -284,6 +284,102 @@
 
             </div>
         </div>
+
+        {% if medchem %}
+        <!-- SwissADME-Grade Medicinal Chemistry & BOILED-Egg Section -->
+        <section class="mt-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <i data-lucide="shield-check" class="w-5 h-5 text-teal-600"></i>
+                        <span>Medicinal Chemistry Alerts &amp; BOILED-Egg Permeability</span>
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-0.5">SwissADME-parity structural alert screening (PAINS, Brenk, NIH) and Gastrointestinal / Blood-Brain Barrier model.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    {% if medchem.alerts.clean %}
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-300">
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i> Zero Structural Alerts
+                    </span>
+                    {% else %}
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold border border-amber-300">
+                        <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Alerts Flagged
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left: BOILED-Egg SVG Plot -->
+                <div class="lg:col-span-6 flex flex-col justify-between bg-slate-50 border border-slate-200/80 rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                            <i data-lucide="egg" class="w-4 h-4 text-amber-600"></i> BOILED-Egg Absorption Model
+                        </span>
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full {% if medchem.boiled_egg.bbb_permeant %}bg-yellow-100 text-yellow-800 border border-yellow-300{% elif medchem.boiled_egg.gi_absorption == 'High' %}bg-slate-200 text-slate-800{% else %}bg-rose-100 text-rose-800{% endif %}">
+                            {{ medchem.boiled_egg.region }}
+                        </span>
+                    </div>
+                    <div class="w-full flex items-center justify-center py-2">
+                        {{ medchem.boiled_egg_svg|safe }}
+                    </div>
+                    <div class="flex items-center justify-around text-xs text-slate-600 pt-3 border-t border-slate-200/70 font-mono">
+                        <div>TPSA: <strong class="text-slate-900">{{ medchem.tpsa }} Å²</strong></div>
+                        <div>WLogP: <strong class="text-slate-900">{{ medchem.logp }}</strong></div>
+                        <div>HIA: <strong class="text-slate-900">{{ medchem.boiled_egg.gi_absorption }}</strong></div>
+                    </div>
+                </div>
+
+                <!-- Right: PAINS, Brenk, Pfizer 3/75, GSK 4/400 Rules -->
+                <div class="lg:col-span-6 space-y-3">
+                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Drug-Discovery Filters &amp; Heuristics</h3>
+                    
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div class="p-3 rounded-xl border {% if medchem.alerts.pains_count == 0 %}bg-emerald-50/60 border-emerald-200 text-emerald-900{% else %}bg-rose-50/60 border-rose-200 text-rose-900{% endif %}">
+                            <div class="text-xs font-semibold">PAINS Filter</div>
+                            <div class="text-lg font-bold font-mono mt-0.5">
+                                {% if medchem.alerts.pains_count == 0 %}0 Alerts (Passed){% else %}{{ medchem.alerts.pains_count }} Alerts{% endif %}
+                            </div>
+                            {% if medchem.alerts.pains %}
+                            <div class="text-xs text-rose-700 mt-1 font-mono truncate" title="{{ medchem.alerts.pains|join:', ' }}">{{ medchem.alerts.pains.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="p-3 rounded-xl border {% if medchem.alerts.brenk_count == 0 %}bg-emerald-50/60 border-emerald-200 text-emerald-900{% else %}bg-amber-50/60 border-amber-200 text-amber-900{% endif %}">
+                            <div class="text-xs font-semibold">Brenk Filter</div>
+                            <div class="text-lg font-bold font-mono mt-0.5">
+                                {% if medchem.alerts.brenk_count == 0 %}0 Alerts (Passed){% else %}{{ medchem.alerts.brenk_count }} Alerts{% endif %}
+                            </div>
+                            {% if medchem.alerts.brenk %}
+                            <div class="text-xs text-amber-700 mt-1 font-mono truncate" title="{{ medchem.alerts.brenk|join:', ' }}">{{ medchem.alerts.brenk.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="p-3 rounded-xl border {% if medchem.pfizer_3_75_pass %}bg-emerald-50/60 border-emerald-200 text-emerald-900{% else %}bg-rose-50/60 border-rose-200 text-rose-900{% endif %}">
+                            <div class="text-xs font-semibold">Pfizer 3/75 Toxicity Rule</div>
+                            <div class="text-sm font-bold mt-0.5">
+                                {% if medchem.pfizer_3_75_pass %}Passed (Low Promiscuity Risk){% else %}High Toxicity Risk (LogP&gt;3, TPSA&lt;75){% endif %}
+                            </div>
+                        </div>
+
+                        <div class="p-3 rounded-xl border {% if medchem.gsk_4_400_pass %}bg-emerald-50/60 border-emerald-200 text-emerald-900{% else %}bg-amber-50/60 border-amber-200 text-amber-900{% endif %}">
+                            <div class="text-xs font-semibold">GSK 4/400 Rule</div>
+                            <div class="text-sm font-bold mt-0.5">
+                                {% if medchem.gsk_4_400_pass %}Passed (MW&le;400, LogP&le;4){% else %}MW&gt;400 or LogP&gt;4{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if medchem.alerts.nih %}
+                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                        <span class="font-bold text-slate-700">NIH Alerts:</span>
+                        <span class="font-mono text-slate-600">{{ medchem.alerts.nih|join:", " }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
         {% endif %}
 
         <!-- Recent Search History / Quick Access -->

@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from . import studio_views
 from . import docking_views
+from . import health_views
 
 urlpatterns = [
     # Universal Converter Studio (Main Hub)
@@ -21,4 +22,8 @@ urlpatterns = [
     path('api/dock/fetch-pdb/<str:pdb_id>/', docking_views.api_fetch_rcsb_pdb, name='api_fetch_pdb'),
     path('api/dock/rcsb/<str:pdb_id>/', docking_views.api_fetch_rcsb_pdb, name='api_fetch_rcsb_pdb_alias'),
     path('api/dock/run/', docking_views.api_run_docking, name='api_run_docking'),
+    # v3.0: Health Check, MedChem Screening & QM Linter APIs
+    path('healthz/', health_views.healthz_view, name='healthz'),
+    path('api/medchem/screen/', health_views.api_medchem_screen, name='api_medchem_screen'),
+    path('api/qm/lint/', health_views.api_qm_lint, name='api_qm_lint'),
 ]
