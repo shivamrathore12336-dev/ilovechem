@@ -1,6 +1,7 @@
 import os
 import sys
 import warnings
+import dj_database_url
 """
 Django settings for chemsite project.
 
@@ -61,6 +62,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
     'calculator',
 ]
 
@@ -74,6 +80,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 ROOT_URLCONF = 'chemsite.urls'
@@ -100,10 +112,11 @@ WSGI_APPLICATION = 'chemsite.wsgi.application'
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        conn_max_age=600 if os.environ.get('DATABASE_URL') else 0,
+        conn_health_checks=True if os.environ.get('DATABASE_URL') else False,
+    )
 }
 
 
@@ -210,4 +223,40 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 if SITE_URL and SITE_URL.startswith(('http://', 'https://')) and SITE_URL not in CSRF_TRUSTED_ORIGINS:
     CSRF_TRUSTED_ORIGINS.append(SITE_URL.rstrip('/'))
+
+# ==============================================================================
+# django-allauth & OAuth Configuration (Google & GitHub)
+# ==============================================================================
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_SIGNUP_FIELDS = ['email*']
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+_GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '').strip()
+_GOOGLE_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '').strip()
+_GITHUB_CLIENT_ID = os.environ.get('GITHUB_CLIENT_ID', '').strip()
+_GITHUB_SECRET = os.environ.get('GITHUB_CLIENT_SECRET', '').strip()
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': _GOOGLE_CLIENT_ID or 'google-client-id-placeholder',
+            'secret': _GOOGLE_SECRET or 'google-secret-placeholder',
+            'key': '',
+        },
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+    },
+    'github': {
+        'APP': {
+            'client_id': _GITHUB_CLIENT_ID or 'github-client-id-placeholder',
+            'secret': _GITHUB_SECRET or 'github-secret-placeholder',
+            'key': '',
+        },
+        'SCOPE': ['user:email', 'read:user'],
+    }
+}
 
