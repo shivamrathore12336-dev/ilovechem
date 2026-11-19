@@ -382,6 +382,46 @@
         {% endif %}
         {% endif %}
 
+        <!-- Batch Library ADMET & PAINS Screener -->
+        <section class="mt-8 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <i data-lucide="layers" class="w-5 h-5 text-blue-600"></i>
+                        <span>Batch Library ADMET &amp; PAINS Screener</span>
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Paste up to 100 SMILES (one per line, optional compound name after space). Evaluated 100% in volatile RAM.</p>
+                </div>
+                <button type="button" onclick="runBatchMedchemScreen()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-2 transition cursor-pointer">
+                    <i data-lucide="play" class="w-4 h-4"></i>
+                    <span>Screen Library</span>
+                </button>
+            </div>
+            <textarea id="batch-smiles-input" rows="4"
+                      placeholder="CC(=O)OC1=CC=CC=C1C(=O)O Aspirin&#10;CN1C=NC2=C1C(=O)N(C(=O)N2C)C Caffeine&#10;O=C1NC(=S)SC1=Cc2ccccc2 Rhodanine_Sample"
+                      class="w-full font-mono text-xs p-3.5 border border-slate-300 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition shadow-2xs"></textarea>
+            
+            <div id="batch-screen-summary" class="hidden text-xs font-mono text-teal-900 bg-teal-50 border border-teal-200 rounded-xl px-4 py-2.5"></div>
+            
+            <div class="overflow-x-auto">
+                <table id="batch-screen-table" class="hidden w-full text-left text-xs">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-slate-500 font-semibold">
+                            <th class="py-2.5 px-3">Compound</th>
+                            <th class="py-2.5 px-3">Formula</th>
+                            <th class="py-2.5 px-3 font-mono">MW</th>
+                            <th class="py-2.5 px-3 font-mono">LogP</th>
+                            <th class="py-2.5 px-3 font-mono">TPSA</th>
+                            <th class="py-2.5 px-3 font-mono">QED</th>
+                            <th class="py-2.5 px-3">BOILED-Egg</th>
+                            <th class="py-2.5 px-3">PAINS / Ro5 Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="batch-screen-tbody" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </section>
+
         <!-- Recent Search History / Quick Access -->
         {% if recent_queries %}
         <section class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
@@ -573,6 +613,56 @@
 
         
 
+
+        async function runBatchMedchemScreen() {
+            const raw = (document.getElementById('batch-smiles-input').value || '').trim();
+            if (!raw) return;
+            const summary = document.getElementById('batch-screen-summary');
+            summary.classList.remove('hidden');
+            summary.textContent = 'Screening molecular library in RAM...';
+            try {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+                const resp = await fetch('/api/medchem/screen/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ smiles_list: raw })
+                });
+                const data = await resp.json();
+                if (!resp.ok) {
+                    summary.textContent = data.error || 'Batch screening failed.';
+                    summary.className = 'mt-3 text-xs font-mono text-rose-800 bg-rose-50 border border-rose-200 rounded-xl px-4 py-2.5';
+                    return;
+                }
+                summary.className = 'mt-3 text-xs font-mono text-teal-900 bg-teal-50 border border-teal-200 rounded-xl px-4 py-2.5';
+                summary.textContent = `Screened ${data.total_processed} compounds · ${data.passed_lipinski_and_pains} clean (Ro5 + 0 PAINS) · ${data.failed_count} invalid`;
+                const tbody = document.getElementById('batch-screen-tbody');
+                tbody.innerHTML = '';
+                (data.compounds || []).forEach(c => {
+                    const tr = document.createElement('tr');
+                    const isClean = c.lipinski_pass && c.alerts.pains_count === 0;
+                    const badgeClass = isClean ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-amber-100 text-amber-800 border-amber-300';
+                    tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+                    tr.innerHTML =
+                        `<td class="py-2.5 px-3 font-semibold text-slate-900">${c.name}</td>` +
+                        `<td class="py-2.5 px-3 font-mono text-slate-600">${c.formula}</td>` +
+                        `<td class="py-2.5 px-3 font-mono">${c.molecular_weight}</td>` +
+                        `<td class="py-2.5 px-3 font-mono">${c.logp}</td>` +
+                        `<td class="py-2.5 px-3 font-mono">${c.tpsa}</td>` +
+                        `<td class="py-2.5 px-3 font-mono">${c.qed_score}</td>` +
+                        `<td class="py-2.5 px-3 text-slate-700">${c.boiled_egg.region}</td>` +
+                        `<td class="py-2.5 px-3 font-mono"><span class="px-2 py-0.5 rounded-full text-xs font-bold border ${badgeClass}">${isClean ? 'PASS' : 'FLAG'} (PAINS:${c.alerts.pains_count})</span></td>`;
+                    tbody.appendChild(tr);
+                });
+                document.getElementById('batch-screen-table').classList.remove('hidden');
+                if (window.lucide) lucide.createIcons();
+            } catch (err) {
+                console.error(err);
+                summary.textContent = 'Network or processing error during screening.';
+            }
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
             init3D();

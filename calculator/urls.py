@@ -26,4 +26,7 @@ urlpatterns = [
     path('healthz/', health_views.healthz_view, name='healthz'),
     path('api/medchem/screen/', health_views.api_medchem_screen, name='api_medchem_screen'),
     path('api/qm/lint/', health_views.api_qm_lint, name='api_qm_lint'),
+    path('api/medchem/optimize/', health_views.api_lead_optimize, name='api_lead_optimize'),
+    path('api/pubchem/resolve/', health_views.api_pubchem_resolve, name='api_pubchem_resolve'),
+    path('api/medchem/similarity/', health_views.api_similarity_compare, name='api_similarity_compare'),
 ]

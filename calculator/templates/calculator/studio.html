@@ -2083,8 +2083,8 @@
                     sel.value = targetParam;
                 }
             }
-            if (presetParam) {
-                setPresetShortcut(presetParam, targetParam || 'orca');
+            if (presetParam && typeof setPresetShortcut === 'function') {
+                setPresetShortcut(presetParam, targetParam || 'pdbqt');
             }
         });
 

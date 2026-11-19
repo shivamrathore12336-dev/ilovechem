@@ -54,3 +54,44 @@ def api_qm_lint(request):
 
     engine = str(request.data.get("engine", "orca")).strip().lower()
     return Response(lint_qm_geometry(parsed_atoms, charge=charge, multiplicity=mult, engine=engine, nprocs=nprocs))
+
+
+@api_view(["POST"])
+def api_lead_optimize(request):
+    """Propose high-QED, metabolically stabilized bioisosteric analogs."""
+    if not isinstance(request.data, dict):
+        return Response({"error": "JSON object required."}, status=status.HTTP_400_BAD_REQUEST)
+    from calculator.lead_optimizer import generate_bioisostere_analogs
+    smiles = str(request.data.get("smiles", "")).strip()
+    res = generate_bioisostere_analogs(smiles)
+    if res is None:
+        return Response({"error": "Invalid SMILES string or could not parse molecule."}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(res, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def api_pubchem_resolve(request):
+    """Resolve drug common name, CID, or InChIKey to verified SMILES via PubChem PUG-REST."""
+    from calculator.pubchem_resolver import resolve_compound_identifier
+    q = (request.GET.get("q") or "").strip()
+    if not q:
+        return Response({"error": "Provide a 'q' query parameter."}, status=status.HTTP_400_BAD_REQUEST)
+    res = resolve_compound_identifier(q)
+    if res is None:
+        return Response({"error": f"Could not resolve '{q}' from PubChem."}, status=status.HTTP_404_NOT_FOUND)
+    return Response(res, status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+def api_similarity_compare(request):
+    """Compare a library of SMILES to a reference drug using Morgan ECFP4 Tanimoto & Murcko scaffolds."""
+    if not isinstance(request.data, dict):
+        return Response({"error": "JSON object required."}, status=status.HTTP_400_BAD_REQUEST)
+    from calculator.similarity_engine import compare_library_to_reference
+    ref = str(request.data.get("reference_smiles", "")).strip()
+    raw_cands = request.data.get("candidates", "")
+    lines = raw_cands.splitlines() if isinstance(raw_cands, str) else list(raw_cands or [])
+    res = compare_library_to_reference(ref, lines)
+    if res is None:
+        return Response({"error": "Invalid reference SMILES string."}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(res, status=status.HTTP_200_OK)

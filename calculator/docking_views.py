@@ -211,7 +211,17 @@ def api_run_docking(request):
 
     lig_smiles = lig_meta.get("smiles", "") or ligand_input
     poses = dock_results.get("poses", [])
+
+    # Wire Ligand Efficiency (LE & LLE) into docking poses
+    from calculator.medchem_engine import analyze_medchem_profile, compute_ligand_efficiency
+    lig_profile = analyze_medchem_profile(lig_smiles) if lig_smiles else None
+    heavy_atoms = lig_profile.get("heavy_atoms", 0) if lig_profile else 0
+    lig_logp = lig_profile.get("logp", None) if lig_profile else None
+
     for idx, p in enumerate(poses):
+        aff = p.get("affinity")
+        if isinstance(aff, (int, float)) and heavy_atoms > 0:
+            p["efficiency"] = compute_ligand_efficiency(aff, heavy_atoms, lig_logp)
         p["rmsd_lower_bound"] = p.get("rmsd_lb", 0.0)
         p["rmsd_upper_bound"] = p.get("rmsd_ub", 0.0)
         p_hb = p.get("hbond_contacts", [])
@@ -234,6 +244,9 @@ def api_run_docking(request):
     top_svg_dark = generate_2d_interaction_svg(lig_smiles, top_hb, top_hp, top_sb, width=700, height=540, theme="dark")
     top_svg_white = generate_2d_interaction_svg(lig_smiles, top_hb, top_hp, top_sb, width=700, height=540, theme="white")
     pymol_script = generate_pymol_script("docked_complex.pdb")
+
+    if poses and "efficiency" in poses[0]:
+        dock_results["top_efficiency"] = poses[0]["efficiency"]
 
     dock_results["num_poses"] = dock_results.get("poses_count", len(poses))
     dock_results["exhaustiveness"] = exhaustiveness
