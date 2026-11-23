@@ -29,6 +29,52 @@
     <meta name="twitter:title" content="Inbuilt Molecular Docking Studio | iLoveChem">
     <meta name="twitter:description" content="Molecular docking studio. Real-time binding affinities, RCSB PDB fetch, active site cavity, and 3D H-bonds.">
     <meta name="twitter:image" content="https://ilovechem.onrender.com/og-image.png">
+    <link rel="canonical" href="https://ilovechem.onrender.com/docking/">
+
+    <!-- Schema.org HowTo & SoftwareApplication JSON-LD (Rich Results for Google Search) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "iLoveChem Molecular Docking Studio",
+          "url": "https://ilovechem.onrender.com/docking/",
+          "applicationCategory": "ScienceApplication",
+          "operatingSystem": "All",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "author": { "@type": "Person", "name": "Shivam Rathore" }
+        },
+        {
+          "@type": "HowTo",
+          "name": "How to Run Molecular Docking Online with iLoveChem",
+          "description": "Step-by-step guide to fetching protein structures from RCSB PDB, specifying a ligand SMILES, defining a grid box, and calculating binding affinity in volatile RAM.",
+          "step": [
+            {
+              "@type": "HowToStep",
+              "name": "Fetch or Upload Target Receptor",
+              "text": "Enter an RCSB PDB accession code (e.g., 1IEP for BCR-ABL kinase) or upload a custom PDB file to load the 3D macromolecule."
+            },
+            {
+              "@type": "HowToStep",
+              "name": "Specify the Ligand Molecule",
+              "text": "Paste a SMILES string or choose a clinical preset (e.g. Imatinib, Aspirin, Paxlovid) to generate the 3D conformer and Gasteiger charges in PDBQT format."
+            },
+            {
+              "@type": "HowToStep",
+              "name": "Define Binding Site Search Box",
+              "text": "Use the interactive 3D box controls or auto-pocket detection to set grid box center coordinates (X, Y, Z) and size dimensions."
+            },
+            {
+              "@type": "HowToStep",
+              "name": "Execute Docking Simulation",
+              "text": "Run the in-memory AutoDock Vina-grade search to compute binding energy (kcal/mol), ligand efficiency, and inspect active site hydrogen bonding."
+            }
+          ]
+        }
+      ]
+    }
+    </script>
     {% include "calculator/partials/head_assets.html" %}
     {% include "calculator/partials/viewer_assets.html" %}
 </head>

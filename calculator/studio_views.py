@@ -360,21 +360,23 @@ def robots_txt_view(request):
         "Disallow: /admin/",
         f"Sitemap: {_site_url()}/sitemap.xml"
     ]
-    return HttpResponse("\n".join(lines), content_type="text/plain; charset=utf-8")
+    resp = HttpResponse("\n".join(lines), content_type="text/plain; charset=utf-8")
+    resp["Cache-Control"] = "public, max-age=86400"
+    return resp
 
 
 def sitemap_xml_view(request):
     base = _site_url()
     pages = [
-        ("/", "weekly", "1.0"),
-        ("/docking/", "weekly", "1.0"),
-        ("/properties/", "monthly", "0.8"),
-        ("/downloads/", "weekly", "0.8"),
-        ("/about/", "monthly", "0.8"),
+        ("/", "weekly", "1.0", "2026-11-23"),
+        ("/docking/", "weekly", "1.0", "2026-11-23"),
+        ("/properties/", "weekly", "0.9", "2026-11-23"),
+        ("/downloads/", "weekly", "0.8", "2026-11-23"),
+        ("/about/", "monthly", "0.8", "2026-11-23"),
     ]
     entries = "\n".join(
-        f"  <url>\n    <loc>{base}{path}</loc>\n    <changefreq>{freq}</changefreq>\n    <priority>{prio}</priority>\n  </url>"
-        for path, freq, prio in pages
+        f"  <url>\n    <loc>{base}{path}</loc>\n    <lastmod>{lastmod}</lastmod>\n    <changefreq>{freq}</changefreq>\n    <priority>{prio}</priority>\n  </url>"
+        for path, freq, prio, lastmod in pages
     )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -382,7 +384,9 @@ def sitemap_xml_view(request):
         f"{entries}\n"
         "</urlset>"
     )
-    return HttpResponse(xml, content_type="application/xml; charset=utf-8")
+    resp = HttpResponse(xml, content_type="application/xml; charset=utf-8")
+    resp["Cache-Control"] = "public, max-age=86400"
+    return resp
 
 
 def og_image_view(request):

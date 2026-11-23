@@ -29,6 +29,54 @@
     <meta name="twitter:title" content="Molecular Properties Calculator | iLoveChem">
     <meta name="twitter:description" content="Real-time Lipinski Rule of 5 properties, physicochemical descriptors, and drug-likeness profiling.">
     <meta name="twitter:image" content="https://ilovechem.onrender.com/og-image.png">
+    <link rel="canonical" href="https://ilovechem.onrender.com/properties/">
+
+    <!-- Schema.org FAQPage & WebApplication JSON-LD (Rich Results for Google Search) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "iLoveChem Molecular Properties & Drug-Likeness Calculator",
+          "url": "https://ilovechem.onrender.com/properties/",
+          "applicationCategory": "ScienceApplication",
+          "operatingSystem": "All",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "author": { "@type": "Person", "name": "Shivam Rathore" }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is Lipinski's Rule of 5 and how is it evaluated?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Lipinski's Rule of 5 evaluates oral drug-likeness based on 4 criteria: Molecular Weight <= 500 Da, LogP <= 5.0, Hydrogen Bond Donors <= 5, and Hydrogen Bond Acceptors <= 10. Candidates with 0 or 1 violation are classified as drug-like."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does the BOILED-Egg model predict GI absorption and blood-brain barrier permeability?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The BOILED-Egg model uses Topological Polar Surface Area (TPSA) and WLogP to define two elliptical regions: the White region predicts high gastrointestinal absorption (HIA), while the yellow Yolk region predicts blood-brain barrier (BBB) penetration."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What is a bioisosteric replacement in lead optimization?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Bioisosteres are chemical groups with similar physical or chemical properties that produce broadly similar biological properties to another chemical compound, used in medicinal chemistry to improve potency, membrane permeability, or metabolic stability."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
     {% include "calculator/partials/head_assets.html" %}
     {% include "calculator/partials/viewer_assets.html" %}
 </head>
@@ -85,12 +133,20 @@
                         class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Caffeine</button>
                     <button type="button" onclick="setSmiles('CC(C)CC1=CC=C(C=C1)C(C)C(=O)O')" 
                         class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Ibuprofen</button>
-                    <button type="button" onclick="setSmiles('CC12CCC3C(C1CCC2O)CCC4=CC(=O)CCC34C')" 
-                        class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Testosterone</button>
-                    <button type="button" onclick="setSmiles('CN(C)CCOC(C1=CC=CC=C1)C2=CC=CC=C2')" 
-                        class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Diphenhydramine</button>
-                    <button type="button" onclick="setSmiles('C1=CC=C(C=C1)C2=CC(=NO2)C3=CC=CC=C3')" 
-                        class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Isoxazole</button>
+                    <button type="button" onclick="setSmiles('Cc1ccc(NC(=O)c2ccc(CN3CCN(C)CC3)cc2)cc1Nc4nccc(n4)c5cccnc5')" 
+                        class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Imatinib</button>
+                    <button type="button" onclick="setSmiles('CC1(C2C1C(N(C2)C(=O)C(C(C)(C)C)NC(=O)C(F)(F)F)C(=O)NC(CC3CCNC3=O)C#N)C')" 
+                        class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Paxlovid</button>
+                    <button type="button" onclick="setSmiles('CCC(CC)COC(=O)C(C)NP(=O)(OCC1C(C(C(O1)(C#N)C2=CC=C3N2N=CN=C3N)O)O)OC4=CC=CC=C4')" 
+                        class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Remdesivir</button>
+                    <button type="button" onclick="setSmiles('CC(C)c1c(C(=O)Nc2ccccc2)c(-c3ccccc3)c(-c4ccc(F)cc4)n1CCC(O)CC(O)CC(=O)O')" 
+                        class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Atorvastatin</button>
+                    <button type="button" onclick="setSmiles('CN1C(=O)CN=C(c2ccccc2)c3cc(Cl)ccc13')" 
+                        class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Diazepam</button>
+                    <button type="button" onclick="setSmiles('CC1(C(N2C(S1)C(C2=O)NC(=O)C(c3ccc(O)cc3)N)C(=O)O)C')" 
+                        class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Amoxicillin</button>
+                    <button type="button" onclick="setSmiles('CN(C)C(=N)NC(=N)N')" 
+                        class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition font-medium cursor-pointer">Metformin</button>
                 </div>
             </form>
         </section>
@@ -330,53 +386,142 @@
                     </div>
                 </div>
 
-                <!-- Right: PAINS, Brenk, Pfizer 3/75, GSK 4/400 Rules -->
-                <div class="lg:col-span-6 space-y-3">
-                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Drug-Discovery Filters &amp; Heuristics</h3>
-                    
-                    <div class="grid grid-cols-2 gap-2.5">
-                        <div class="p-3 rounded-xl border {% if medchem.alerts.pains_count == 0 %}bg-emerald-50/60 border-emerald-200 text-emerald-900{% else %}bg-rose-50/60 border-rose-200 text-rose-900{% endif %}">
-                            <div class="text-xs font-semibold">PAINS Filter</div>
-                            <div class="text-lg font-bold font-mono mt-0.5">
-                                {% if medchem.alerts.pains_count == 0 %}0 Alerts (Passed){% else %}{{ medchem.alerts.pains_count }} Alerts{% endif %}
-                            </div>
-                            {% if medchem.alerts.pains %}
-                            <div class="text-xs text-rose-700 mt-1 font-mono truncate" title="{{ medchem.alerts.pains|join:', ' }}">{{ medchem.alerts.pains.0 }}</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="p-3 rounded-xl border {% if medchem.alerts.brenk_count == 0 %}bg-emerald-50/60 border-emerald-200 text-emerald-900{% else %}bg-amber-50/60 border-amber-200 text-amber-900{% endif %}">
-                            <div class="text-xs font-semibold">Brenk Filter</div>
-                            <div class="text-lg font-bold font-mono mt-0.5">
-                                {% if medchem.alerts.brenk_count == 0 %}0 Alerts (Passed){% else %}{{ medchem.alerts.brenk_count }} Alerts{% endif %}
-                            </div>
-                            {% if medchem.alerts.brenk %}
-                            <div class="text-xs text-amber-700 mt-1 font-mono truncate" title="{{ medchem.alerts.brenk|join:', ' }}">{{ medchem.alerts.brenk.0 }}</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="p-3 rounded-xl border {% if medchem.pfizer_3_75_pass %}bg-emerald-50/60 border-emerald-200 text-emerald-900{% else %}bg-rose-50/60 border-rose-200 text-rose-900{% endif %}">
-                            <div class="text-xs font-semibold">Pfizer 3/75 Toxicity Rule</div>
-                            <div class="text-sm font-bold mt-0.5">
-                                {% if medchem.pfizer_3_75_pass %}Passed (Low Promiscuity Risk){% else %}High Toxicity Risk (LogP&gt;3, TPSA&lt;75){% endif %}
-                            </div>
-                        </div>
-
-                        <div class="p-3 rounded-xl border {% if medchem.gsk_4_400_pass %}bg-emerald-50/60 border-emerald-200 text-emerald-900{% else %}bg-amber-50/60 border-amber-200 text-amber-900{% endif %}">
-                            <div class="text-xs font-semibold">GSK 4/400 Rule</div>
-                            <div class="text-sm font-bold mt-0.5">
-                                {% if medchem.gsk_4_400_pass %}Passed (MW&le;400, LogP&le;4){% else %}MW&gt;400 or LogP&gt;4{% endif %}
-                            </div>
-                        </div>
+                <!-- Right: Bioavailability Radar Chart -->
+                <div class="lg:col-span-6 flex flex-col justify-between bg-slate-50 border border-slate-200/80 rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                            <i data-lucide="radar" class="w-4 h-4 text-indigo-600"></i> SwissADME Bioavailability Radar
+                        </span>
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-200 text-slate-800 font-mono">
+                            Delaney LogS: {{ medchem.esol_logs }}
+                        </span>
                     </div>
-
-                    {% if medchem.alerts.nih %}
-                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
-                        <span class="font-bold text-slate-700">NIH Alerts:</span>
-                        <span class="font-mono text-slate-600">{{ medchem.alerts.nih|join:", " }}</span>
+                    <div class="w-full flex items-center justify-center py-1">
+                        {{ medchem.bioavailability_radar_svg|safe }}
                     </div>
-                    {% endif %}
+                    <div class="flex items-center justify-around text-xs text-slate-600 pt-3 border-t border-slate-200/70 font-mono">
+                        <div>MW: <strong class="text-slate-900">{{ medchem.molecular_weight }}</strong></div>
+                        <div>Fsp3: <strong class="text-slate-900">{{ medchem.fraction_csp3 }}</strong></div>
+                        <div>RotB: <strong class="text-slate-900">{{ medchem.rotatable_bonds }}</strong></div>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Drug-Discovery Filters & Heuristics Bar -->
+            <div class="pt-2 space-y-3">
+                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Medicinal Chemistry Filters &amp; Alerts</h3>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="p-3.5 rounded-xl border {% if medchem.alerts.pains_count == 0 %}bg-emerald-50/60 border-emerald-200 text-emerald-900{% else %}bg-rose-50/60 border-rose-200 text-rose-900{% endif %}">
+                        <div class="text-xs font-semibold">PAINS Filter</div>
+                        <div class="text-base font-bold font-mono mt-0.5">
+                            {% if medchem.alerts.pains_count == 0 %}0 Alerts (Passed){% else %}{{ medchem.alerts.pains_count }} Alerts{% endif %}
+                        </div>
+                        {% if medchem.alerts.pains %}
+                        <div class="text-[11px] text-rose-700 mt-1 font-mono truncate" title="{{ medchem.alerts.pains|join:', ' }}">{{ medchem.alerts.pains.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="p-3.5 rounded-xl border {% if medchem.alerts.brenk_count == 0 %}bg-emerald-50/60 border-emerald-200 text-emerald-900{% else %}bg-amber-50/60 border-amber-200 text-amber-900{% endif %}">
+                        <div class="text-xs font-semibold">Brenk Filter</div>
+                        <div class="text-base font-bold font-mono mt-0.5">
+                            {% if medchem.alerts.brenk_count == 0 %}0 Alerts (Passed){% else %}{{ medchem.alerts.brenk_count }} Alerts{% endif %}
+                        </div>
+                        {% if medchem.alerts.brenk %}
+                        <div class="text-[11px] text-amber-700 mt-1 font-mono truncate" title="{{ medchem.alerts.brenk|join:', ' }}">{{ medchem.alerts.brenk.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="p-3.5 rounded-xl border {% if medchem.pfizer_3_75_pass %}bg-emerald-50/60 border-emerald-200 text-emerald-900{% else %}bg-rose-50/60 border-rose-200 text-rose-900{% endif %}">
+                        <div class="text-xs font-semibold">Pfizer 3/75 Toxicity Rule</div>
+                        <div class="text-xs font-bold mt-1">
+                            {% if medchem.pfizer_3_75_pass %}Passed (Low Promiscuity){% else %}High Toxicity Risk{% endif %}
+                        </div>
+                        <div class="text-[10px] text-slate-500 mt-0.5">LogP &le; 3 &amp; TPSA &ge; 75</div>
+                    </div>
+
+                    <div class="p-3.5 rounded-xl border {% if medchem.gsk_4_400_pass %}bg-emerald-50/60 border-emerald-200 text-emerald-900{% else %}bg-amber-50/60 border-amber-200 text-amber-900{% endif %}">
+                        <div class="text-xs font-semibold">GSK 4/400 Rule</div>
+                        <div class="text-xs font-bold mt-1">
+                            {% if medchem.gsk_4_400_pass %}Passed (Good Developability){% else %}MW &gt; 400 or LogP &gt; 4{% endif %}
+                        </div>
+                        <div class="text-[10px] text-slate-500 mt-0.5">MW &le; 400 &amp; LogP &le; 4</div>
+                    </div>
+                </div>
+
+                {% if medchem.alerts.nih %}
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                    <span class="font-bold text-slate-700">NIH Structural Alerts:</span>
+                    <span class="font-mono text-slate-600">{{ medchem.alerts.nih|join:", " }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+        {% endif %}
+
+        {% if bioisosteres %}
+        <!-- Lead Optimization & Bioisostere Studio (Anti-Slop High Agency Interactive Studio) -->
+        <section class="mt-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-5 h-5 text-indigo-600"></i>
+                        <span>Lead Optimization &amp; Bioisosteric Replacements</span>
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Rational RDKit AllChem SMARTS reaction transforms for permeability, metabolic shielding, and QED optimization.</p>
+                </div>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-200">
+                    {{ bioisosteres|length }} Rational Analogs Generated
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for a in bioisosteres %}
+                <div class="bg-slate-50/80 hover:bg-white border border-slate-200 hover:border-indigo-300 rounded-xl p-4 transition-all shadow-2xs hover:shadow-md space-y-3 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="text-xs font-bold text-indigo-900 bg-indigo-100/70 border border-indigo-200 px-2 py-0.5 rounded-md truncate" title="{{ a.rule }}">
+                                {{ a.rule }}
+                            </span>
+                            <span class="text-[11px] font-mono font-bold {% if a.delta_qed >= 0 %}text-emerald-700{% else %}text-amber-700{% endif %}">
+                                &Delta;QED: {% if a.delta_qed >= 0 %}+{% endif %}{{ a.delta_qed }}
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                            {{ a.rationale }}
+                        </p>
+                    </div>
+
+                    <div class="space-y-2.5 pt-2 border-t border-slate-200/70">
+                        <div class="grid grid-cols-3 gap-1 text-[11px] font-mono text-center">
+                            <div class="bg-white rounded-lg p-1.5 border border-slate-200">
+                                <span class="text-slate-400 block text-[9px]">MW</span>
+                                <span class="font-bold text-slate-800">{{ a.mw }}</span>
+                            </div>
+                            <div class="bg-white rounded-lg p-1.5 border border-slate-200">
+                                <span class="text-slate-400 block text-[9px]">LogP</span>
+                                <span class="font-bold text-slate-800">{{ a.logp }}</span>
+                            </div>
+                            <div class="bg-white rounded-lg p-1.5 border border-slate-200">
+                                <span class="text-slate-400 block text-[9px]">TPSA</span>
+                                <span class="font-bold text-slate-800">{{ a.tpsa }}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="setSmiles('{{ a.smiles|escapejs }}'); document.forms[0].submit();"
+                                    class="flex-1 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition shadow-2xs cursor-pointer">
+                                <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+                                <span>Analyze Analog</span>
+                            </button>
+                            <a href="/docking/?smiles={{ a.smiles|urlencode }}" target="_blank"
+                               class="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-semibold flex items-center justify-center transition cursor-pointer" title="Dock analog directly">
+                                <i data-lucide="crosshair" class="w-3.5 h-3.5"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         </section>
         {% endif %}

@@ -9,6 +9,7 @@ from .chem_utils import (
     generate_2d_base64_image
 )
 from .medchem_engine import analyze_medchem_profile
+from .lead_optimizer import generate_bioisostere_analogs
 
 MAX_SMILES_LEN = 2000
 
@@ -48,6 +49,10 @@ def home_view(request):
                 medchem = analyze_medchem_profile(selected_smiles)
                 if medchem:
                     context["medchem"] = medchem
+
+                lead_opt = generate_bioisostere_analogs(selected_smiles)
+                if lead_opt and lead_opt.get("analogs"):
+                    context["bioisosteres"] = lead_opt["analogs"]
 
                 # Pharma Zero-Storage Invariant: Never persist user SMILES to disk or SQLite database.
 

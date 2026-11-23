@@ -106,15 +106,18 @@ def analyze_medchem_profile(smiles: str) -> Optional[Dict[str, Any]]:
     pfizer_3_75_risk = (logp > 3.0) and (tpsa < 75.0)  # High promiscuity / toxicity risk
     gsk_4_400_pass = (mw <= 400.0) and (logp <= 4.0)
     boiled_egg = classify_boiled_egg(tpsa, logp)
+    esol_logs = compute_esol_logs(mol, mw, logp, rot_bonds)
+    formula_label = rdMolDescriptors.CalcMolFormula(mol)
 
     return {
         "smiles": clean_smi,
         "canonical_smiles": Chem.MolToSmiles(mol, canonical=True),
-        "formula": rdMolDescriptors.CalcMolFormula(mol),
+        "formula": formula_label,
         "molecular_weight": round(mw, 2),
         "exact_mass": round(exact_mass, 4),
         "logp": round(logp, 2),
         "tpsa": round(tpsa, 2),
+        "esol_logs": esol_logs,
         "h_bond_donors": hbd,
         "h_bond_acceptors": hba,
         "rotatable_bonds": rot_bonds,
@@ -138,7 +141,8 @@ def analyze_medchem_profile(smiles: str) -> Optional[Dict[str, Any]]:
             "nih": nih_hits[:5],
             "clean": (len(pains_hits) == 0 and len(brenk_hits) == 0 and len(nih_hits) == 0),
         },
-        "boiled_egg_svg": generate_boiled_egg_svg(tpsa, logp, label=rdMolDescriptors.CalcMolFormula(mol)),
+        "boiled_egg_svg": generate_boiled_egg_svg(tpsa, logp, label=formula_label),
+        "bioavailability_radar_svg": generate_bioavailability_radar_svg(mw, logp, tpsa, rot_bonds, fsp3, esol_logs, label=formula_label),
     }
 
 
@@ -205,4 +209,138 @@ def generate_boiled_egg_svg(tpsa: float, wlogp: float, label: str = "Query") -> 
         f'<text x="{min(px + 9, 310):.1f}" y="{max(py - 8, 34):.1f}" font-family="IBM Plex Mono, monospace" '
         f'font-size="10.5" font-weight="600" fill="#0f172a">{safe_label}</text>'
         '</svg>'
+    )
+
+
+def compute_esol_logs(mol: Any, mw: float, logp: float, rot_bonds: int) -> float:
+    """
+    Delaney ESOL (Estimated Aqueous Solubility, LogS in mol/L).
+    LogS = 0.16 - (0.63 * LogP) - (0.0062 * MW) + (0.066 * RB) - (0.74 * AP)
+    where AP = aromatic proportion = (number of aromatic atoms / number of heavy atoms).
+    """
+    if mol is None:
+        return 0.0
+    try:
+        heavy_atoms = mol.GetNumHeavyAtoms()
+        arom_atoms = sum(1 for a in mol.GetAtoms() if a.GetIsAromatic())
+        ap = arom_atoms / max(heavy_atoms, 1)
+        logs = 0.16 - (0.63 * logp) - (0.0062 * mw) + (0.066 * rot_bonds) - (0.74 * ap)
+        return round(float(logs), 2)
+    except Exception:
+        return 0.0
+
+
+def generate_bioavailability_radar_svg(
+    mw: float,
+    logp: float,
+    tpsa: float,
+    rot_bonds: int,
+    fsp3: float,
+    logs: float,
+    label: str = "Query",
+) -> str:
+    """
+    SwissADME-style 6-axis polygonal Bioavailability Radar chart.
+    Axes & Optimal Drug-like Boundaries:
+    1. LIPO:   -0.7 <= XLogP <= 5.0    (Range: -2.0 .. 8.0)
+    2. SIZE:   150 <= MW <= 500 Da     (Range: 50 .. 750)
+    3. POLAR:  20 <= TPSA <= 130 Å²    (Range: 0 .. 180)
+    4. INSOLU: -6.0 <= LogS <= 0.0     (Range: -10.0 .. 2.0)
+    5. INSATU: 0.25 <= Fsp3 <= 1.0     (Range: 0.0 .. 1.0)
+    6. FLEX:   0 <= RotB <= 9          (Range: 0 .. 16)
+    """
+    cx, cy = 160.0, 145.0
+    r_max = 95.0
+
+    axes = [
+        ("LIPO", logp, -0.7, 5.0, -2.0, 8.0, ""),
+        ("SIZE", mw, 150.0, 500.0, 50.0, 750.0, "Da"),
+        ("POLAR", tpsa, 20.0, 130.0, 0.0, 180.0, "Å²"),
+        ("INSOLU", logs, -6.0, 0.0, -10.0, 2.0, ""),
+        ("INSATU", fsp3, 0.25, 1.0, 0.0, 1.0, ""),
+        ("FLEX", float(rot_bonds), 0.0, 9.0, 0.0, 16.0, ""),
+    ]
+
+    def norm(val: float, v_min: float, v_max: float) -> float:
+        clamped = max(v_min, min(v_max, val))
+        return (clamped - v_min) / (v_max - v_min)
+
+    angles = [-math.pi / 2.0 + i * (2.0 * math.pi / 6.0) for i in range(6)]
+
+    # Concentric background polygon rings
+    grid_svg = []
+    for step in [0.25, 0.5, 0.75, 1.0]:
+        pts = [f"{cx + step * r_max * math.cos(a):.1f},{cy + step * r_max * math.sin(a):.1f}" for a in angles]
+        grid_svg.append(f'<polygon points="{" ".join(pts)}" fill="none" stroke="#e2e8f0" stroke-width="1"/>')
+
+    # Spoke lines and text labels
+    spokes_svg = []
+    for i, ((name, val, _, _, _, _, unit), a) in enumerate(zip(axes, angles)):
+        x_end = cx + r_max * math.cos(a)
+        y_end = cy + r_max * math.sin(a)
+        spokes_svg.append(
+            f'<line x1="{cx:.1f}" y1="{cy:.1f}" x2="{x_end:.1f}" y2="{y_end:.1f}" '
+            f'stroke="#cbd5e1" stroke-width="1" stroke-dasharray="2,2"/>'
+        )
+
+        lx = cx + (r_max + 18.0) * math.cos(a)
+        ly = cy + (r_max + 18.0) * math.sin(a)
+        anchor = "middle"
+        if math.cos(a) > 0.3:
+            anchor = "start"
+        elif math.cos(a) < -0.3:
+            anchor = "end"
+        val_str = f"{val:.1f}{unit}" if isinstance(val, float) else f"{int(val)}"
+        spokes_svg.append(
+            f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}" '
+            f'font-family="IBM Plex Sans, sans-serif" font-size="10" font-weight="700" fill="#334155">{name}'
+            f'<tspan font-size="9" font-weight="400" fill="#64748b"> ({val_str})</tspan></text>'
+        )
+
+    # Optimal Zone polygon (Pink translucent sweet spot)
+    opt_outer = []
+    for (name, _, omin, omax, amin, amax, _), a in zip(axes, angles):
+        r_out = (0.15 + 0.85 * norm(omax, amin, amax)) * r_max
+        opt_outer.append((cx + r_out * math.cos(a), cy + r_out * math.sin(a)))
+
+    opt_path_pts = " ".join([f"{x:.1f},{y:.1f}" for x, y in opt_outer])
+    opt_poly = (
+        f'<polygon points="{opt_path_pts}" fill="#fce7f3" fill-opacity="0.65" '
+        f'stroke="#f472b6" stroke-width="1.5" stroke-dasharray="3,3"/>'
+    )
+
+    # Current molecule polygon & vertex markers
+    mol_pts = []
+    mol_dots = []
+    violations = []
+    for (name, val, omin, omax, amin, amax, unit), a in zip(axes, angles):
+        if val < omin or val > omax:
+            violations.append(name)
+        r_val = (0.15 + 0.85 * norm(val, amin, amax)) * r_max
+        mx = cx + r_val * math.cos(a)
+        my = cy + r_val * math.sin(a)
+        mol_pts.append(f"{mx:.1f},{my:.1f}")
+        dot_color = "#dc2626" if (val < omin or val > omax) else "#2563eb"
+        mol_dots.append(
+            f'<circle cx="{mx:.1f}" cy="{my:.1f}" r="4" fill="{dot_color}" stroke="#ffffff" stroke-width="1.5"/>'
+        )
+
+    mol_poly = f'<polygon points="{" ".join(mol_pts)}" fill="#3b82f6" fill-opacity="0.30" stroke="#1d4ed8" stroke-width="2"/>'
+
+    status_text = "Optimal Oral Space" if len(violations) == 0 else f"Outside: {', '.join(violations[:2])}"
+    status_color = "#059669" if len(violations) == 0 else "#d97706"
+
+    return (
+        f'<svg viewBox="0 0 320 295" width="100%" role="img" '
+        f'aria-label="Bioavailability Radar Chart" xmlns="http://www.w3.org/2000/svg">'
+        f'<rect width="320" height="295" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>'
+        f'<text x="16" y="24" font-family="IBM Plex Sans, sans-serif" font-size="12" font-weight="700" fill="#0f172a">Bioavailability Radar</text>'
+        f'<text x="304" y="24" text-anchor="end" font-family="IBM Plex Sans, sans-serif" font-size="10.5" font-weight="700" fill="{status_color}">{status_text}</text>'
+        f'{"".join(grid_svg)}'
+        f'{opt_poly}'
+        f'{"".join(spokes_svg)}'
+        f'{mol_poly}'
+        f'{"".join(mol_dots)}'
+        f'<text x="160" y="285" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="9.5" fill="#94a3b8">Pink zone: Oral Bioavailability Space (SwissADME criteria)</text>'
+        f'</svg>'
     )
