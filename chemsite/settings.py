@@ -110,6 +110,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'calculator.context_processors.oauth_status',
             ],
         },
     },
@@ -256,6 +257,11 @@ _GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '').strip()
 _GOOGLE_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '').strip()
 _GITHUB_CLIENT_ID = os.environ.get('GITHUB_CLIENT_ID', '').strip()
 _GITHUB_SECRET = os.environ.get('GITHUB_CLIENT_SECRET', '').strip()
+
+GOOGLE_CLIENT_ID = _GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET = _GOOGLE_SECRET
+GITHUB_CLIENT_ID = _GITHUB_CLIENT_ID
+GITHUB_CLIENT_SECRET = _GITHUB_SECRET
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {

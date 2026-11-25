@@ -14,6 +14,8 @@ urlpatterns = [
     path('google889b369925c8069a.html', studio_views.google_verification_view, name='google_verify_calc'),
     path('og-image.png', studio_views.og_image_view, name='og_image_calc'),
     path('api/convert/', studio_views.api_convert_file, name='api_convert'),
+    # Instant Guest Researcher Login
+    path('accounts/guest-login/', views.guest_login_view, name='guest_login'),
     # Original Descriptors & API
     path('properties/', views.home_view, name='properties_home'),
     path('api/calculate/', views.api_calculate_properties, name='api_calculate'),

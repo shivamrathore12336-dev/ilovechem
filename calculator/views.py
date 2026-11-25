@@ -1,4 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from django.contrib.auth.models import User
+from django.views.decorators.http import require_POST
+from django.contrib import messages
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -114,3 +118,27 @@ def api_calculate_properties(request):
         resp_data["warning_3d"] = warn_3d
 
     return Response(resp_data, status=status.HTTP_200_OK)
+
+
+@require_POST
+def guest_login_view(request):
+    """
+    1-Click Guest Researcher login.
+    Enables users to immediately test authenticated features (saved docking boxes,
+    lab sessions, API access) without requiring Google/GitHub OAuth setup.
+    """
+    user, _ = User.objects.get_or_create(
+        username='guest_researcher',
+        defaults={
+            'email': 'guest.researcher@ilovechem.org',
+            'first_name': 'Guest',
+            'last_name': 'Researcher',
+        }
+    )
+    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+    messages.success(request, "Welcome! You are signed in as Guest Researcher.")
+    next_url = request.POST.get('next')
+    if not next_url or not next_url.startswith('/'):
+        next_url = '/'
+    return redirect(next_url)
+
